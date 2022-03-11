@@ -2,18 +2,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.cshaifa.spring</groupId>
-    <artifactId>lilach</artifactId>
+    <artifactId>lilach-server</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
-    <modules>
-        <module>lilach-client</module>
-        <module>lilach-server</module>
-    </modules>
     <build>
         <plugins>
             <plugin>
@@ -25,9 +20,20 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <executable>java</executable>
-                    <skip>true</skip>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>org.cshaifa.spring.TwoMain</argument>
+                    </arguments>
                 </configuration>
             </plugin>
         </plugins>
