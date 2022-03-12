@@ -1,6 +1,7 @@
 **/target/*
 *.jar
 *.class
+*.iml
 **/.idea/*
 !/.idea/runConfigurations
 **/.settings/*
