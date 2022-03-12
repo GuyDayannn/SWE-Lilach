@@ -1,7 +1,11 @@
-target/*
+**/target/*
 *.jar
 *.class
-.idea/*
-.settings/*
-.classpath
-.project
+*.iml
+**/.idea/*
+!/.idea/runConfigurations
+**/.settings/*
+**/.classpath
+**/.project
+**/bin/*
+*/dependency-reduced-pom.xml
