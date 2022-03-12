@@ -2,6 +2,7 @@
 *.jar
 *.class
 **/.idea/*
+!/.idea/runConfigurations
 **/.settings/*
 **/.classpath
 **/.project
