@@ -76,7 +76,7 @@
                     <arguments>
                         <argument>-classpath</argument>
                         <classpath/>
-                        <argument>org.cshaifa.spring.Main</argument>
+                        <argument>org.cshaifa.spring.client.Main</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -85,7 +85,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
                 <configuration>
-                    <mainClass>org.cshaifa.spring.App</mainClass>
+                    <mainClass>org.cshaifa.spring.client.App</mainClass>
                 </configuration>
             </plugin>
         </plugins>

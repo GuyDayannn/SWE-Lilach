@@ -1,4 +1,4 @@
-package org.cshaifa.spring;
+package org.cshaifa.spring.client;
 
 class Main {
     public static void main(String[] args) {

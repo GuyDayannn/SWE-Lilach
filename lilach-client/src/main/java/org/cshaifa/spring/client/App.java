@@ -1,4 +1,4 @@
-package org.cshaifa.spring;
+package org.cshaifa.spring.client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

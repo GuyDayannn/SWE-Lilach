@@ -1,6 +1,6 @@
-package org.cshaifa.spring;
+package org.cshaifa.spring.server;
 
-class TwoMain {
+public class ServerApp {
     public static void main(String[] args) {
         System.out.println("Server isn't ready yet obviously");
     }
