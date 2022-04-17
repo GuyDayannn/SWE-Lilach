@@ -8,14 +8,22 @@ import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 
 public class ClientHandler {
     private static LilachClient client = new LilachClient("localhost", 8080);
+    public static volatile Object msgFromServer = null;
+
+    private static Object waitForMsgFromServer() {
+        while (msgFromServer == null) {} // TODO: limit waiting
+        Object msg = msgFromServer;
+        msgFromServer = null;
+        return msg;
+    }
 
     @SuppressWarnings("unchecked")
     public static List<CatalogItem> getCatalog() throws IOException {
-        if (!client.isConnected())
-            client.openConnection();
+        client.openConnection();
 
         client.sendToServer(new GetCatalogRequest());
 
-        return (List<CatalogItem>) client.getMsgFromServer();
+        List<CatalogItem> list = (List<CatalogItem>) waitForMsgFromServer();
+        return list;
     }
 }

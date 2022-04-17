@@ -4,24 +4,21 @@ import org.cshaifa.spring.client.ocsf.AbstractClient;
 
 public class LilachClient extends AbstractClient {
 
-    private Object msgFromServer = null;
-
     public LilachClient(String host, int port) {
         super(host, port);
     }
 
-    /**
-     * We assume that we send one msg per time
-     */
-    public Object getMsgFromServer() {
-        while (msgFromServer != null) {}
-        Object msg = msgFromServer;
-        msgFromServer = null;
-        return msg;
+    @Override
+    protected void connectionEstablished() {
+        // TODO Auto-generated method stub
+        super.connectionEstablished();
+        System.out.println("ESTABLISHED");
     }
+
 
     @Override
     protected void handleMessageFromServer(Object msg) {
-        msgFromServer = msg;
+        ClientHandler.msgFromServer = msg;
+        System.out.println(ClientHandler.msgFromServer == null ? "MSG NULL" : "MSG NOT NULL");
     }
 }
