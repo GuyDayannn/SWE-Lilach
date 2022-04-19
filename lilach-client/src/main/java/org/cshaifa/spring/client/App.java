@@ -1,10 +1,17 @@
 package org.cshaifa.spring.client;
 
 import javafx.application.Application;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+
 
 import java.io.IOException;
 
@@ -14,11 +21,17 @@ import java.io.IOException;
 public class App extends Application {
 
     private static Scene scene;
+    private static Stage appStage;
+
+    private static CatalogItem currentItemDisplayed;
+    private static int DataBaseConnected = 0;
 
     @Override
-    public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+    public void start(Stage stage) throws IOException, InterruptedException {
+        scene = new Scene(loadFXML("primary"), 1280, 720);
+        stage.setTitle("Welcome");
         stage.setScene(scene);
+        appStage = stage;
         stage.show();
     }
 
@@ -33,6 +46,40 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    static void setWindowTitle(String title) {
+        appStage.setTitle(title);
+    }
+
+    static void setContent(String pageName) throws IOException {
+        Parent root= loadFXML(pageName);
+        scene = new Scene(root);
+        appStage.setScene(scene);
+        appStage.show();
+    }
+
+    static void popUpLaunch(Button caller){
+        Stage popUpStage = new Stage();
+        Parent root;
+
+        try {
+            root = loadFXML("PopUp");
+            popUpStage.setScene(new Scene(root));
+            popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
+            popUpStage.initOwner(caller.getScene().getWindow());
+            popUpStage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void setCurrentItemDisplayed(CatalogItem item) {
+        currentItemDisplayed = item;
+    }
+
+    static CatalogItem getCurrentItemDisplayed() {
+        return currentItemDisplayed;
     }
 
 }
