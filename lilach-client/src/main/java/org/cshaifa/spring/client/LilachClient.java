@@ -9,16 +9,7 @@ public class LilachClient extends AbstractClient {
     }
 
     @Override
-    protected void connectionEstablished() {
-        // TODO Auto-generated method stub
-        super.connectionEstablished();
-        System.out.println("ESTABLISHED");
-    }
-
-
-    @Override
     protected void handleMessageFromServer(Object msg) {
         ClientHandler.msgFromServer = msg;
-        System.out.println(ClientHandler.msgFromServer == null ? "MSG NULL" : "MSG NOT NULL");
     }
 }
