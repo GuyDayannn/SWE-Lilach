@@ -18,7 +18,7 @@ import org.hibernate.Transaction;
  */
 public class DatabaseHandler {
 
-    public List<CatalogItem> getCatalog() throws HibernateException {
+    public static List<CatalogItem> getCatalog() throws HibernateException {
         Session session = DatabaseConnector.getSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<CatalogItem> query = builder.createQuery(CatalogItem.class);
@@ -26,7 +26,7 @@ public class DatabaseHandler {
         return session.createQuery(query).getResultList();
     }
 
-    public void updateItem(CatalogItem newItem) throws HibernateException {
+    public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
         session.update(newItem);
@@ -37,7 +37,7 @@ public class DatabaseHandler {
         }
     }
 
-    public void closeSession() {
+    public static void closeSession() {
         DatabaseConnector.closeSession();
     }
 }
