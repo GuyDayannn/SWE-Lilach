@@ -1,5 +1,6 @@
 package org.cshaifa.spring.server.database;
 
+import org.cshaifa.spring.entities.CatalogItem;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -16,7 +17,7 @@ public class DatabaseConnector {
 
     private static SessionFactory getSessionFactory() throws HibernateException {
         Configuration configuration = new Configuration();
-        System.out.println(configuration.getProperties());
+        configuration.addAnnotatedClass(CatalogItem.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
             .applySettings(configuration.getProperties())
@@ -31,7 +32,7 @@ public class DatabaseConnector {
     }
 
     public static Session getSession() throws HibernateException {
-        if (session != null)
+        if (session != null && session.isOpen())
             return session;
 
         session = getSessionFactory().openSession();
