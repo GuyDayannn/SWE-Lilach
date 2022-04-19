@@ -1,11 +1,12 @@
 package org.cshaifa.spring.server;
 
-import org.cshaifa.spring.entities.Example;
+import java.io.IOException;
+
+import org.cshaifa.spring.utils.Constants;
 
 public class ServerApp {
-    public static void main(String[] args) {
-        Example example = new Example("Example");
-
-        System.out.println("Server isn't ready yet obviously");
+    public static void main(String[] args) throws IOException {
+        LilachServer server = new LilachServer(Constants.SERVER_PORT);
+        server.listen();
     }
 }

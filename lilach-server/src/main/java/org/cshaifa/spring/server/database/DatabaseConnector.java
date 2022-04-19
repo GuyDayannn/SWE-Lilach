@@ -14,8 +14,12 @@ import org.hibernate.service.ServiceRegistry;
  */
 public class DatabaseConnector {
     private static Session session = null;
+    private static SessionFactory sessionFactory = null;
 
     private static SessionFactory getSessionFactory() throws HibernateException {
+        if (sessionFactory != null)
+            return sessionFactory;
+
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(CatalogItem.class);
 
@@ -23,7 +27,8 @@ public class DatabaseConnector {
             .applySettings(configuration.getProperties())
             .build();
 
-        return configuration.buildSessionFactory(serviceRegistry);
+        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        return sessionFactory;
     }
 
     public static void closeSession() {
