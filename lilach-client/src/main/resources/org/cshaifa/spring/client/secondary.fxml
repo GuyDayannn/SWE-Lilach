@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.Pane?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.SecondaryController">
+   <children>
+      <MenuBar fx:id="menuBar" layoutY="1.0">
+        <menus>
+          <Menu fx:id="fileButton" mnemonicParsing="false" onAction="#openFile" text="File">
+            <items>
+                  <MenuItem mnemonicParsing="false" text="Start" />
+              <MenuItem mnemonicParsing="false" text="Exit" />
+            </items>
+          </Menu>
+          <Menu fx:id="editButton" mnemonicParsing="false" onAction="#openEdit" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+            <Menu fx:id="settingsButton" mnemonicParsing="false" onAction="#openSettings" text="Settings">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+              </items>
+            </Menu>
+          <Menu fx:id="helpButton" mnemonicParsing="false" onAction="#openHelp" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </children>
+</Pane>
