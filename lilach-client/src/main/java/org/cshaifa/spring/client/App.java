@@ -1,4 +1,5 @@
 package org.cshaifa.spring.client;
+import org.cshaifa.spring.entities.*;
 
 import javafx.application.Application;
 import javafx.concurrent.Service;

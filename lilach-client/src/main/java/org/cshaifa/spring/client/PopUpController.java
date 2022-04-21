@@ -17,8 +17,9 @@ public class PopUpController {
     @FXML ImageView itemImage;
 
     public void initialize() {
-        popUpMessageText.setText(App.getCurrentItemDisplayed().getItemName().getText());
-        itemImage.setImage(App.getCurrentItemDisplayed().getItemImage().getImage());
+        popUpMessageText.setText(App.getCurrentItemDisplayed().getName());
+        Image im= new Image(App.getCurrentItemDisplayed().getImagePath());
+        itemImage.setImage(im);
 
         btnPopUpOK.setOnAction(event -> {
             System.out.println("You clicked OK...");
