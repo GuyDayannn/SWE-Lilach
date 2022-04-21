@@ -5,8 +5,17 @@ import java.io.IOException;
 import org.cshaifa.spring.utils.Constants;
 
 public class ServerApp {
+    private static final LilachServer server = new LilachServer(Constants.SERVER_PORT);
+
     public static void main(String[] args) throws IOException {
-        LilachServer server = new LilachServer(Constants.SERVER_PORT);
         server.listen();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                server.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 }
