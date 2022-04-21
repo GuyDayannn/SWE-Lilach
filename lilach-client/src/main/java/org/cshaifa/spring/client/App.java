@@ -34,7 +34,7 @@ public class App extends Application {
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
-        stage.show();
+        appStage.show();
     }
 
     static void setRoot(String fxml) throws IOException {

@@ -6,8 +6,10 @@ import java.util.List;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetItemRequest;
+import org.cshaifa.spring.entities.requests.Request;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.Response;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 
 public class ClientHandler {
