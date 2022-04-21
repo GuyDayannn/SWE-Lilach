@@ -7,12 +7,17 @@ import org.cshaifa.spring.entities.CatalogItem;
  * provided to the server (for now)
  */
 public class UpdateItemRequest extends Request {
-    long itemID;
     CatalogItem updatedItem;
 
-    public UpdateItemRequest(long itemID, CatalogItem updatedItem) {
-        this.itemID = itemID;
+    public UpdateItemRequest(CatalogItem updatedItem) {
         this.updatedItem = updatedItem;
     }
 
+    public CatalogItem getUpdatedItem() {
+        return updatedItem;
+    }
+
+    public void setUpdatedItem(CatalogItem updatedItem) {
+        this.updatedItem = updatedItem;
+    }
 }
