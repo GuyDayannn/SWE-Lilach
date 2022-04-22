@@ -1,10 +1,14 @@
 package org.cshaifa.spring.server.database;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import javax.persistence.RollbackException;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -34,8 +38,10 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
         List<String> imageList = getRandomOrderedImages();
+        Random random = new Random();
         for (int i = 0; i < imageList.size(); i++) {
-            session.save(new CatalogItem("Random flower " + i, imageList.get(i), 40));
+            double randomPrice = 200 * random.nextDouble();
+            session.save(new CatalogItem("Random flower " + i, Paths.get(imageList.get(i)).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue()));
         }
         try {
             session.flush();
