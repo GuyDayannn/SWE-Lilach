@@ -31,9 +31,8 @@ public class CatalogItem implements Serializable {
         this.price = 0;
     }
 
-    public CatalogItem(long id, String name, String imagePath, double price) {
+    public CatalogItem(String name, String imagePath, double price) {
         super();
-        this.id = id;
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
