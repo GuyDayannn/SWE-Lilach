@@ -19,6 +19,5 @@ public class LilachClient extends AbstractClient {
     @Override
     protected void handleMessageFromServer(Object msg) {
         ClientHandler.msgFromServer = msg;
-        System.out.println(ClientHandler.msgFromServer == null ? "MSG NULL" : "MSG NOT NULL");
     }
 }

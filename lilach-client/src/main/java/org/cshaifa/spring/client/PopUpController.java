@@ -18,8 +18,8 @@ public class PopUpController {
 
     public void initialize() {
         popUpMessageText.setText(App.getCurrentItemDisplayed().getName());
-        Image im= new Image(App.getCurrentItemDisplayed().getImagePath());
-        itemImage.setImage(im);
+        Image image = new Image(App.getCurrentItemDisplayed().getImagePath());
+        itemImage.setImage(image);
 
         btnPopUpOK.setOnAction(event -> {
             System.out.println("You clicked OK...");
