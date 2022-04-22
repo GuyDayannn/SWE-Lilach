@@ -1,6 +1,7 @@
 package org.cshaifa.spring.client;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.List;
 
 import org.cshaifa.spring.entities.CatalogItem;
@@ -23,7 +24,7 @@ public class ClientHandler {
         return msg;
     }
 
-    public static GetCatalogResponse getCatalog() throws IOException {
+    public static GetCatalogResponse getCatalog() throws IOException, ConnectException {
         client.openConnection();
         client.sendToServer(new GetCatalogRequest());
         return (GetCatalogResponse) waitForMsgFromServer();
@@ -38,7 +39,7 @@ public class ClientHandler {
     }
      */
 
-    public static UpdateItemResponse updateItem(CatalogItem updatedItem) throws IOException{
+    public static UpdateItemResponse updateItem(CatalogItem updatedItem) throws IOException, ConnectException {
         client.openConnection();
         client.sendToServer(new UpdateItemRequest(updatedItem));
         return (UpdateItemResponse) waitForMsgFromServer();
