@@ -14,13 +14,18 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.scene.image.Image;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import javafx.application.Platform;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+
+import javax.imageio.ImageIO;
 
 
 public class CatalogController {
@@ -70,10 +75,9 @@ public class CatalogController {
     }
 
     @FXML
-    void initialize() {
-        File fi = new File("C:\\Users\\rtole\\Desktop\\LilachLogo.png");
-        Image logo = new Image(fi.toURI().toString());
-        catalogTitle.setImage(logo);
+    void initialize() throws IOException {
+        Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
+        catalogTitle.setImage((image));
 
         // remove left/right buttons for now
         flowerHBox.getChildren().remove(flowersLeft);
