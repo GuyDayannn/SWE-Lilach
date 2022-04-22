@@ -11,10 +11,7 @@ import javafx.scene.text.Text;
 import javafx.application.Platform;
 
 import java.io.IOException;
-
-import javafx.scene.control.TextArea;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import org.cshaifa.spring.entities.responses.*;
 
 public class PrimaryController {
 

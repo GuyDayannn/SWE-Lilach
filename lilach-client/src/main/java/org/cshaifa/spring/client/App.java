@@ -1,4 +1,5 @@
 package org.cshaifa.spring.client;
+import org.cshaifa.spring.entities.*;
 
 import javafx.application.Application;
 import javafx.concurrent.Service;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import org.cshaifa.spring.entities.CatalogItem;
 
 import java.io.IOException;
 
@@ -32,7 +34,7 @@ public class App extends Application {
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
-        stage.show();
+        appStage.show();
     }
 
     static void setRoot(String fxml) throws IOException {
