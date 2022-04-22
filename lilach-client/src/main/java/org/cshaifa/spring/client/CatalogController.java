@@ -25,33 +25,40 @@ import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 
 public class CatalogController {
 
+    @FXML    private Button NewOrderButton;
+
+    @FXML    private HBox bottomBar;
+
     @FXML    private ImageView catalogTitle;
 
     @FXML    private HBox flowerHBox;
 
-    @FXML    private HBox catalogItem1;
+    @FXML    private HBox flowerHBox2;
 
-    @FXML    private HBox catalogItem2;
+    @FXML    private HBox flowerHBox3;
 
-    @FXML    private HBox catalogItem3;
-
-    @FXML    private HBox catalogItem4;
-
-    @FXML    private HBox catalogItem5;
+    @FXML    private HBox flowerHBox4;
 
     @FXML    private Button flowersLeft;
 
     @FXML    private Button flowersRight;
 
-    @FXML    private ImageView item1Image;
-
-    @FXML    private Text item1Name;
-
-    @FXML    private Text item1Price;
-
-    @FXML    private Button showItem1Button;
-
     private List<CatalogItem> catalogItems;
+
+
+    @FXML    private Button nextPageButton;
+
+    @FXML    private Button previousPageButton;
+
+    @FXML
+    void nextPage(MouseEvent event) {
+
+    }
+
+    @FXML
+    void previousPage(MouseEvent event) {
+
+    }
 
     @FXML
     void showItem(MouseEvent event) { //popup item in catalog
@@ -68,6 +75,8 @@ public class CatalogController {
         Image logo = new Image(fi.toURI().toString());
         catalogTitle.setImage(logo);
 
+        // remove left/right buttons for now
+        flowerHBox.getChildren().remove(flowersLeft);
         flowerHBox.getChildren().remove(flowersRight);
 
         try {
@@ -77,45 +86,53 @@ public class CatalogController {
                 if (catalogItems!=null) {
                     int count_displayed_items = 0;
                     for (CatalogItem item : catalogItems) {
-                        if (count_displayed_items<4) {
-                            count_displayed_items++;
-                        }
-                        else {
-                            break;
-                        }
                         HBox hBox = new HBox();
                         VBox vBox = new VBox();
                         ImageView iv = new ImageView();
-                        iv.setFitWidth(140);
-                        iv.setFitHeight(140);
+                        iv.setFitWidth(60);
+                        iv.setFitHeight(60);
 
                         if (item.getImagePath() != null) {
                             iv.setImage(new Image(item.getImagePath()));
                         }
                         vBox.getChildren().add(new Text(item.getName()));
                         vBox.getChildren().add(new Text(Double.toString(item.getPrice())));
-                        Button button = new Button("Click here");
+                        Button button = new Button("View Item");
                         button.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {
-                                System.out.println("button clicked!!");
                                 App.setCurrentItemDisplayed(item);
                                 App.popUpLaunch(button);
                             }
                         });
                         vBox.getChildren().add(button);
                         hBox.getChildren().addAll(iv, vBox);
+                        hBox.setPrefSize(200,150);
+                        hBox.setSpacing(5);
+                        hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
+                                + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
+                                + "-fx-border-radius: 5;" + "-fx-border-color: green;");
+
                         /*hBox.setOnMouseClicked(event -> {
                             System.out.println(event.getSource());
                         });*/
 
-                        flowerHBox.getChildren().add(hBox);
-
-                        //File file = new File("C:\\Users\\rtole\\IdeaProjects\\SWE-Lilach\\lilach-server\\src\\main\\resources\\org\\cshaifa\\spring\\server\\database\\images\\Flower" + Integer.toString(i) + ".jpg");
-                        //Image image = new Image(file.toURI().toString());
-                        //item1Name.setText(item.getName());
-                        //item1Price.setText(Double.toString(item.getPrice()));
-                        //item1Image.setImage(image);
+                        if (count_displayed_items<5) {
+                            flowerHBox.getChildren().add(hBox);
+                        }
+                        else if (count_displayed_items >= 5 && count_displayed_items < 10) {
+                            flowerHBox2.getChildren().add(hBox);
+                        }
+                        else if (count_displayed_items >= 10 && count_displayed_items < 15) {
+                            flowerHBox3.getChildren().add(hBox);
+                        }
+                        else if (count_displayed_items >= 15 && count_displayed_items < 20) {
+                            flowerHBox4.getChildren().add(hBox);
+                        }
+                        else if (count_displayed_items >= 20) {
+                            break;
+                        }
+                        count_displayed_items++;
                     }
                 }
             }
@@ -126,7 +143,7 @@ public class CatalogController {
             e.printStackTrace();
         }
 
-        flowerHBox.getChildren().add(flowersRight);
+        //flowerHBox.getChildren().add(flowersRight);
     }
 
 
