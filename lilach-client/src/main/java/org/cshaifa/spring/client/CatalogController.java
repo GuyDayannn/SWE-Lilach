@@ -107,10 +107,20 @@ public class CatalogController {
                                 App.popUpLaunch(button);
                             }
                         });
+//                        Button edit_button = new Button("\uD83D\uDDD8");
+//                        button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//                            @Override public void handle(MouseEvent event) {
+//                                //TODO:  to add
+//                                item.setPrice(50);
+//                            }
+//                        });
+                        item.setPrice(50.0);
                         Button refresh_button = new Button("\uD83D\uDDD8");
                         button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override public void handle(MouseEvent event) {
-                                // to add
+                                try {
+                                    ClientHandler.updateItem(item);
+                                }catch (Exception e) {}
                             }
                         });
                         HBox buttonBox = new HBox();

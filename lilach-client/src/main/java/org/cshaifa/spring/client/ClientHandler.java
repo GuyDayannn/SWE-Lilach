@@ -14,7 +14,7 @@ import org.cshaifa.spring.entities.responses.Response;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 
 public class ClientHandler {
-    private static LilachClient client = new LilachClient("localhost", 8080);
+    private static LilachClient client = new LilachClient("localhost", 8095);
     public static volatile Object msgFromServer = null;
 
     private static Object waitForMsgFromServer() {
