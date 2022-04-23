@@ -17,13 +17,15 @@ import javafx.scene.image.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URL;
 import java.util.List;
 import javafx.application.Platform;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.requests.*;
+import org.cshaifa.spring.entities.responses.*;
 
 import javax.imageio.ImageIO;
 
@@ -67,10 +69,6 @@ public class CatalogController {
 
     @FXML
     void showItem(MouseEvent event) { //popup item in catalog
-        //Button button = (Button)event.getSource();
-        //int id = (int) Long.parseLong(button.getId());
-        //CatalogItem item = catalogItems.get(id);
-        //App.setCurrentItemDisplayed(item);
         App.popUpLaunch((Button)event.getSource());
     }
 
@@ -109,9 +107,17 @@ public class CatalogController {
                                 App.popUpLaunch(button);
                             }
                         });
-                        vBox.getChildren().add(button);
+                        Button refresh_button = new Button("\uD83D\uDDD8");
+                        button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                            @Override public void handle(MouseEvent event) {
+                                // to add
+                            }
+                        });
+                        HBox buttonBox = new HBox();
+                        buttonBox.getChildren().addAll(button, refresh_button);
+                        vBox.getChildren().addAll(buttonBox);
                         hBox.getChildren().addAll(iv, vBox);
-                        hBox.setPrefSize(200,150);
+                        hBox.setPrefSize(200,100);
                         hBox.setSpacing(5);
                         hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
                                 + "-fx-border-width: 2;" + "-fx-border-insets: 5;"

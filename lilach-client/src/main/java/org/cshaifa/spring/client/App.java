@@ -30,7 +30,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        scene = new Scene(loadFXML("primary"), 1280, 720);
+        scene = new Scene(loadFXML("primary"), 1040, 700);
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
@@ -55,7 +55,7 @@ public class App extends Application {
     }
 
     static void setContent(String pageName) throws IOException {
-        Parent root= loadFXML(pageName);
+        Parent root = loadFXML(pageName);
         scene = new Scene(root);
         appStage.setScene(scene);
         appStage.show();
