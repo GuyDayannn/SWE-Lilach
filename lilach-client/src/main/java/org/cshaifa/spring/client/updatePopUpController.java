@@ -63,6 +63,7 @@ public class updatePopUpController {
                 UpdateItemResponse response = ClientHandler.updateItem(updatedItem);
                 if (response.isSuccessful()) {
                     System.out.println("Success!");
+
                 }
                 else {
                     System.out.println("Failed!");
