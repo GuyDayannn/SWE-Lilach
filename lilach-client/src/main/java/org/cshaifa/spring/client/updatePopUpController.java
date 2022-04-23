@@ -56,14 +56,17 @@ public class updatePopUpController {
 
         btnPopUpUpdate.setOnAction(event -> {
             CatalogItem updatedItem = App.getCurrentItemDisplayed();
-            updatedItem.setName(newName);
-            updatedItem.setPrice(newPrice);
-            System.out.println( updatedItem.getId() + " " + updatedItem.getName() + " " + updatedItem.getPrice());
+            if (newName != null) {
+                updatedItem.setName(newName);
+            }
+            if (newPrice != null) {
+                updatedItem.setPrice(newPrice);
+            }
+            //System.out.println( updatedItem.getId() + " " + updatedItem.getName() + " " + updatedItem.getPrice());
             try {
                 UpdateItemResponse response = ClientHandler.updateItem(updatedItem);
                 if (response.isSuccessful()) {
                     System.out.println("Success!");
-
                 }
                 else {
                     System.out.println("Failed!");
@@ -71,7 +74,7 @@ public class updatePopUpController {
                 System.out.println("New catalog is:");
                 List<CatalogItem> catalog = ClientHandler.getCatalog().getCatalogItems();
                 for (CatalogItem item : catalog) {
-                    System.out.println(item.getName() + " " + item.getPrice() + " " + item.getId());
+                    System.out.println(item.getId() + " " + item.getName() + " " + item.getPrice());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
