@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -69,7 +68,7 @@ public class DatabaseHandler {
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
-        session.update(newItem);
+        session.merge(newItem);
         try {
             session.flush();
             session.getTransaction().commit();
