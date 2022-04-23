@@ -61,12 +61,12 @@ public class App extends Application {
         appStage.show();
     }
 
-    static void popUpLaunch(Button caller){
+    static void popUpLaunch(Button caller, String FXMLname){
         Stage popUpStage = new Stage();
         Parent root;
 
         try {
-            root = loadFXML("PopUp");
+            root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
             popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
             popUpStage.initOwner(caller.getScene().getWindow());

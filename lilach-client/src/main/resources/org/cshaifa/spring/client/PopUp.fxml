@@ -13,7 +13,7 @@
                 <Font size="38.0" />
             </font>
         </Text>
-        <Button fx:id="btnPopUpOK" layoutX="135.0" layoutY="206.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="OK" />
+        <Button fx:id="btnPopUpUpdate" layoutX="135.0" layoutY="206.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="Update Item" />
         <Button fx:id="btnPopUpCancel" layoutX="295.0" layoutY="206.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="169.0" text="Cancel" />
       <ImageView fx:id="itemImage" fitHeight="150.0" fitWidth="200.0" layoutX="195.0" layoutY="51.0" pickOnBounds="true" preserveRatio="true" />
     </children>

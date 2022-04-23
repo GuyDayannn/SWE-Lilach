@@ -52,7 +52,6 @@ public class CatalogController {
 
     private List<CatalogItem> catalogItems;
 
-
     @FXML    private Button nextPageButton;
 
     @FXML    private Button previousPageButton;
@@ -65,11 +64,6 @@ public class CatalogController {
     @FXML
     void previousPage(MouseEvent event) {
 
-    }
-
-    @FXML
-    void showItem(MouseEvent event) { //popup item in catalog
-        App.popUpLaunch((Button)event.getSource());
     }
 
     @FXML
@@ -104,18 +98,10 @@ public class CatalogController {
                             @Override
                             public void handle(ActionEvent event) {
                                 App.setCurrentItemDisplayed(item);
-                                App.popUpLaunch(button);
+                                App.popUpLaunch(button, "PopUp");
                             }
                         });
-                        Button refresh_button = new Button("\uD83D\uDDD8");
-                        button.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override public void handle(MouseEvent event) {
-                                // to add
-                            }
-                        });
-                        HBox buttonBox = new HBox();
-                        buttonBox.getChildren().addAll(button, refresh_button);
-                        vBox.getChildren().addAll(buttonBox);
+                        vBox.getChildren().add(button);
                         hBox.getChildren().addAll(iv, vBox);
                         hBox.setPrefSize(200,100);
                         hBox.setSpacing(5);
