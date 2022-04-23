@@ -5,18 +5,25 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.application.Platform;
 
 import java.io.IOException;
+import java.net.ConnectException;
+
 import org.cshaifa.spring.entities.responses.*;
 
 public class PrimaryController {
 
     @FXML
-    private Button exitButton;
+    private Button openButton;
+
+    @FXML
+    private ImageView lilachLogo;
 
     @FXML
     private Pane loadingtitle;
@@ -28,25 +35,44 @@ public class PrimaryController {
     private Text text;
 
     @FXML
-    void exit(MouseEvent event) throws InterruptedException {
-        Platform.runLater(() -> {
-            App.setWindowTitle("Catalog");
-            try {
-                App.setContent("catalog");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+    void open(MouseEvent event) throws InterruptedException {
+        if (checkConnection()) {
+            Platform.runLater(() -> {
+                App.setWindowTitle("Catalog");
+                try {
+                    App.setContent("catalog");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     @FXML
     void initialize() {
-        progressbar.setProgress(0.0);
+        Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
+        lilachLogo.setImage((image));
+        progressbar.progressProperty().bind(thread.progressProperty());
     }
 
     @FXML
     void startLilach(MouseEvent event) {
-        progressbar.progressProperty().bind(thread.progressProperty());
+
+    }
+
+    @FXML
+    boolean checkConnection() {
+        progressbar.progressProperty().unbind();
+        try {
+            GetCatalogResponse response = ClientHandler.getCatalog();
+            if (response.isSuccessful()) {
+                progressbar.progressProperty().setValue(100.00);
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     final Service thread = new Service<Integer>() {

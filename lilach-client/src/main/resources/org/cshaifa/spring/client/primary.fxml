@@ -2,18 +2,13 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<Pane fx:id="loadingtitle" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseMoved="#startLilach" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PrimaryController">
+<Pane fx:id="loadingtitle" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseMoved="#startLilach" prefHeight="700.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PrimaryController">
    <children>
-      <ProgressBar fx:id="progressbar" layoutX="540.0" layoutY="325.0" prefWidth="200.0" progress="0.5" />
-      <Text fx:id="text" layoutX="548.0" layoutY="365.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Loading Lilach..." textAlignment="CENTER" wrappingWidth="182.61053466796875">
-         <font>
-            <Font name="Curlz MT" size="18.0" />
-         </font>
-      </Text>
-      <Button fx:id="exitButton" layoutX="623.0" layoutY="441.0" mnemonicParsing="false" onMouseClicked="#exit" text="Open Catalog" />
+      <ProgressBar fx:id="progressbar" layoutX="420.0" layoutY="291.0" prefWidth="200.0" progress="0.5" />
+      <Button fx:id="openButton" layoutX="477.0" layoutY="347.0" mnemonicParsing="false" onMouseClicked="#open" text="Open Catalog" />
+      <ImageView fx:id="lilachLogo" fitHeight="150.0" fitWidth="193.0" layoutX="423.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true" />
    </children>
 </Pane>
