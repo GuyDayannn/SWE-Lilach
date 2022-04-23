@@ -9,9 +9,10 @@ import org.cshaifa.spring.entities.requests.GetItemRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.utils.Constants;
 
 public class ClientHandler {
-    private static LilachClient client = new LilachClient("localhost", 8080);
+    private static LilachClient client = new LilachClient("localhost", Constants.SERVER_PORT);
     public static volatile Object msgFromServer = null;
 
     private static Object waitForMsgFromServer() {
