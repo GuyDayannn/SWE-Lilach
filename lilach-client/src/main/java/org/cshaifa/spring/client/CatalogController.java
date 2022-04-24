@@ -34,6 +34,8 @@ public class CatalogController {
 
     @FXML    private Button NewOrderButton;
 
+    @FXML    private Button refreshButton;
+
     @FXML    private HBox bottomBar;
 
     @FXML    private ImageView catalogTitle;
@@ -45,10 +47,6 @@ public class CatalogController {
     @FXML    private HBox flowerHBox3;
 
     @FXML    private HBox flowerHBox4;
-
-    @FXML    private Button flowersLeft;
-
-    @FXML    private Button flowersRight;
 
     private List<CatalogItem> catalogItems;
 
@@ -67,13 +65,18 @@ public class CatalogController {
     }
 
     @FXML
+    void refreshCatalog(MouseEvent event) throws IOException {
+        flowerHBox.getChildren().clear();
+        flowerHBox2.getChildren().clear();
+        flowerHBox3.getChildren().clear();
+        flowerHBox4.getChildren().clear();
+        initialize();
+    }
+
+    @FXML
     void initialize() throws IOException {
         Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
         catalogTitle.setImage((image));
-
-        // remove left/right buttons for now
-        flowerHBox.getChildren().remove(flowersLeft);
-        flowerHBox.getChildren().remove(flowersRight);
 
         try {
             GetCatalogResponse response = ClientHandler.getCatalog();
@@ -109,10 +112,6 @@ public class CatalogController {
                                 + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
                                 + "-fx-border-radius: 5;" + "-fx-border-color: green;");
 
-                        /*hBox.setOnMouseClicked(event -> {
-                            System.out.println(event.getSource());
-                        });*/
-
                         if (count_displayed_items<5) {
                             flowerHBox.getChildren().add(hBox);
                         }
@@ -139,7 +138,6 @@ public class CatalogController {
             e.printStackTrace();
         }
 
-        //flowerHBox.getChildren().add(flowersRight);
     }
 
 
