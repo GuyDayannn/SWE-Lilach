@@ -30,7 +30,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        scene = new Scene(loadFXML("primary"), 1280, 720);
+        scene = new Scene(loadFXML("primary"), 1040, 700);
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
@@ -55,18 +55,18 @@ public class App extends Application {
     }
 
     static void setContent(String pageName) throws IOException {
-        Parent root= loadFXML(pageName);
+        Parent root = loadFXML(pageName);
         scene = new Scene(root);
         appStage.setScene(scene);
         appStage.show();
     }
 
-    static void popUpLaunch(Button caller){
+    static void popUpLaunch(Button caller, String FXMLname){
         Stage popUpStage = new Stage();
         Parent root;
 
         try {
-            root = loadFXML("PopUp");
+            root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
             popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
             popUpStage.initOwner(caller.getScene().getWindow());

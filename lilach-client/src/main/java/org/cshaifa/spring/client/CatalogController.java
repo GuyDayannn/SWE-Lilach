@@ -17,13 +17,15 @@ import javafx.scene.image.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URL;
 import java.util.List;
 import javafx.application.Platform;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.requests.*;
+import org.cshaifa.spring.entities.responses.*;
 
 import javax.imageio.ImageIO;
 
@@ -31,6 +33,8 @@ import javax.imageio.ImageIO;
 public class CatalogController {
 
     @FXML    private Button NewOrderButton;
+
+    @FXML    private Button refreshButton;
 
     @FXML    private HBox bottomBar;
 
@@ -44,12 +48,7 @@ public class CatalogController {
 
     @FXML    private HBox flowerHBox4;
 
-    @FXML    private Button flowersLeft;
-
-    @FXML    private Button flowersRight;
-
     private List<CatalogItem> catalogItems;
-
 
     @FXML    private Button nextPageButton;
 
@@ -66,22 +65,18 @@ public class CatalogController {
     }
 
     @FXML
-    void showItem(MouseEvent event) { //popup item in catalog
-        //Button button = (Button)event.getSource();
-        //int id = (int) Long.parseLong(button.getId());
-        //CatalogItem item = catalogItems.get(id);
-        //App.setCurrentItemDisplayed(item);
-        App.popUpLaunch((Button)event.getSource());
+    void refreshCatalog(MouseEvent event) throws IOException {
+        flowerHBox.getChildren().clear();
+        flowerHBox2.getChildren().clear();
+        flowerHBox3.getChildren().clear();
+        flowerHBox4.getChildren().clear();
+        initialize();
     }
 
     @FXML
     void initialize() throws IOException {
         Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
         catalogTitle.setImage((image));
-
-        // remove left/right buttons for now
-        flowerHBox.getChildren().remove(flowersLeft);
-        flowerHBox.getChildren().remove(flowersRight);
 
         try {
             GetCatalogResponse response = ClientHandler.getCatalog();
@@ -106,20 +101,16 @@ public class CatalogController {
                             @Override
                             public void handle(ActionEvent event) {
                                 App.setCurrentItemDisplayed(item);
-                                App.popUpLaunch(button);
+                                App.popUpLaunch(button, "PopUp");
                             }
                         });
                         vBox.getChildren().add(button);
                         hBox.getChildren().addAll(iv, vBox);
-                        hBox.setPrefSize(200,150);
+                        hBox.setPrefSize(200,100);
                         hBox.setSpacing(5);
                         hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
                                 + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
                                 + "-fx-border-radius: 5;" + "-fx-border-color: green;");
-
-                        /*hBox.setOnMouseClicked(event -> {
-                            System.out.println(event.getSource());
-                        });*/
 
                         if (count_displayed_items<5) {
                             flowerHBox.getChildren().add(hBox);
@@ -147,7 +138,6 @@ public class CatalogController {
             e.printStackTrace();
         }
 
-        //flowerHBox.getChildren().add(flowersRight);
     }
 
 
