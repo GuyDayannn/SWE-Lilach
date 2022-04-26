@@ -65,4 +65,18 @@ public class CatalogItem implements Serializable {
     public void setPrice(double price) {
         this.price = price;
     }
+
+
+    @Override
+    public boolean equals(Object obj){
+        CatalogItem temp = (CatalogItem) obj;
+        if(temp.getId() == this.id)
+            return true;
+        else if(temp.getName().equals(this.name))
+            return true;
+        else if(temp.getImagePath().equals(this.imagePath))
+            return true;
+
+        return false;
+    }
 }
