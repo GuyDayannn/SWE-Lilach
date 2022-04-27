@@ -81,4 +81,8 @@ public class DatabaseHandler {
     public static void closeSession() {
         DatabaseConnector.closeSession();
     }
+
+    public static void openSession() throws HibernateException {
+        DatabaseConnector.getSession();
+    }
 }
