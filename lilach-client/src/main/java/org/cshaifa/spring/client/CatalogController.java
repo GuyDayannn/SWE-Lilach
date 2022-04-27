@@ -84,6 +84,7 @@ public class CatalogController {
             GetCatalogResponse response = getCatalogTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
                 System.err.println("Getting catalog failed");
                 return;
             }

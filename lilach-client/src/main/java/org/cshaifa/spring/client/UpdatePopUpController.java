@@ -61,7 +61,8 @@ public class UpdatePopUpController {
                 UpdateItemResponse response = updateItemTask.getValue();
                 if (!response.isSuccessful()) {
                     // TODO: maybe log the specific exception somewhere
-                    System.err.println("Getting catalog failed");
+                    App.hideLoading();
+                    System.err.println("Updating item failed");
                     return;
                 }
 
