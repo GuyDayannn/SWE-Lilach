@@ -56,11 +56,6 @@ public class PrimaryController {
     }
 
     @FXML
-    void startLilach(MouseEvent event) {
-
-    }
-
-    @FXML
     boolean checkConnection() {
         progressbar.progressProperty().unbind();
         try {

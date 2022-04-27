@@ -48,7 +48,7 @@ public class CatalogController {
 
     @FXML    private HBox flowerHBox4;
 
-    private List<CatalogItem> catalogItems;
+    //private List<CatalogItem> catalogItems;
 
     @FXML    private Button nextPageButton;
 
@@ -77,6 +77,8 @@ public class CatalogController {
     void initialize() throws IOException {
         Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
         catalogTitle.setImage((image));
+
+        List<CatalogItem> catalogItems = null;
 
         try {
             GetCatalogResponse response = ClientHandler.getCatalog();
@@ -115,16 +117,16 @@ public class CatalogController {
                         if (count_displayed_items<5) {
                             flowerHBox.getChildren().add(hBox);
                         }
-                        else if (count_displayed_items >= 5 && count_displayed_items < 10) {
+                        else if (count_displayed_items < 10) {
                             flowerHBox2.getChildren().add(hBox);
                         }
-                        else if (count_displayed_items >= 10 && count_displayed_items < 15) {
+                        else if (count_displayed_items < 15) {
                             flowerHBox3.getChildren().add(hBox);
                         }
-                        else if (count_displayed_items >= 15 && count_displayed_items < 20) {
+                        else if (count_displayed_items < 20) {
                             flowerHBox4.getChildren().add(hBox);
                         }
-                        else if (count_displayed_items >= 20) {
+                        else {
                             break;
                         }
                         count_displayed_items++;

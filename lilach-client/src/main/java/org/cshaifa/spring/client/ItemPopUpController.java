@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class PopUpController {
+public class ItemPopUpController {
     @FXML Text  popUpMessageText;
     @FXML Button    btnPopUpUpdate;
     @FXML Button    btnPopUpCancel;

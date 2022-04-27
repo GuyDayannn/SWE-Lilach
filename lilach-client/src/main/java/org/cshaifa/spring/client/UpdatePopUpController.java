@@ -12,7 +12,7 @@ import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import java.io.IOException;
 import java.util.List;
 
-public class updatePopUpController {
+public class UpdatePopUpController {
     private String newName;
 
     private Double newPrice;
@@ -35,9 +35,7 @@ public class updatePopUpController {
     }
 
     @FXML
-    void updatePrice() {
-        newPrice = Double.parseDouble(itemPriceField.getText());
-    }
+    void updatePrice() { newPrice = Double.parseDouble(itemPriceField.getText()); }
 
     @FXML
     void initialize() {
