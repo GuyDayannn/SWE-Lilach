@@ -1,22 +1,21 @@
 package org.cshaifa.spring.client;
 
+import java.util.concurrent.TimeUnit;
+
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.utils.Constants;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.input.InputMethodEvent;
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
-
-import java.io.IOException;
-import java.util.List;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 public class UpdatePopUpController {
-    private String newName;
-
-    private Double newPrice;
-
     @FXML
     private Button btnPopUpCancel;
 
@@ -30,12 +29,7 @@ public class UpdatePopUpController {
     private TextField itemPriceField;
 
     @FXML
-    void updateName() {
-        newName = itemNameField.getText();
-    }
-
-    @FXML
-    void updatePrice() { newPrice = Double.parseDouble(itemPriceField.getText()); }
+    private AnchorPane rootPane;
 
     @FXML
     void initialize() {
@@ -46,40 +40,45 @@ public class UpdatePopUpController {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
-                if (!newValue.matches("\\d*") && !newValue.contains(".")) {
-                    itemPriceField.setText(newValue.replaceAll("[^\\d]", ""));
+                if (!newValue.matches("\\d*(\\.\\d*)?")) {
+                    itemPriceField.setText(oldValue);
                 }
             }
         });
 
         btnPopUpUpdate.setOnAction(event -> {
-            CatalogItem updatedItem = App.getCurrentItemDisplayed();
-            if (newName != null) {
-                updatedItem.setName(newName);
-            }
-            if (newPrice != null) {
-                updatedItem.setPrice(newPrice);
-            }
-            //System.out.println( updatedItem.getId() + " " + updatedItem.getName() + " " + updatedItem.getPrice());
-            try {
-                UpdateItemResponse response = ClientHandler.updateItem(updatedItem);
-                if (response.isSuccessful()) {
-                    System.out.println("Success!");
-                }
-                else {
-                    System.out.println("Failed!");
-                }
-                System.out.println("New catalog is:");
-                List<CatalogItem> catalog = ClientHandler.getCatalog().getCatalogItems();
-                for (CatalogItem item : catalog) {
-                    System.out.println(item.getId() + " " + item.getName() + " " + item.getPrice());
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Task<UpdateItemResponse> updateItemTask = App.createTimedTask(() -> {
+                CatalogItem updatedItem = App.getCurrentItemDisplayed();
+                if (!itemNameField.getText().isEmpty())
+                    updatedItem.setName(itemNameField.getText());
+                if (!itemPriceField.getText().isEmpty())
+                    updatedItem.setPrice(Double.parseDouble(itemPriceField.getText()));
 
-            System.out.println("You clicked OK");
-            btnPopUpUpdate.getScene().getWindow().hide();
+                return ClientHandler.updateItem(updatedItem);
+            }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+            updateItemTask.setOnSucceeded(e -> {
+                UpdateItemResponse response = updateItemTask.getValue();
+                if (!response.isSuccessful()) {
+                    // TODO: maybe log the specific exception somewhere
+                    System.err.println("Getting catalog failed");
+                    return;
+                }
+
+                App.updateCurrentItemDisplayed(response.getUpdatedItem());
+                App.hideLoading();
+                btnPopUpUpdate.getScene().getWindow().hide();
+            });
+
+            updateItemTask.setOnFailed(e -> {
+                App.hideLoading();
+                // TODO: maybe properly log it somewhere
+                updateItemTask.getException().printStackTrace();
+            });
+
+            Stage rootStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            App.showLoading(rootPane, rootStage, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+            new Thread(updateItemTask).start();
         });
 
         btnPopUpCancel.setOnAction(event -> {

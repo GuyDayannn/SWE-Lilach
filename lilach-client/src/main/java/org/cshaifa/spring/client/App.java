@@ -19,6 +19,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -35,6 +36,9 @@ public class App extends Application {
     private static int DataBaseConnected = 0;
     private static Stage loadingStage;
     private static Node loadingRootNode;
+
+    private static Text currentItemPrice;
+    private static Text currentItemName;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -95,7 +99,7 @@ public class App extends Application {
         }
     }
 
-    public static void showLoading(Node rootNode, long cancelButtonDelay, TimeUnit unit) {
+    public static void showLoading(Node rootNode, Stage rootStage, long cancelButtonDelay, TimeUnit unit) {
         loadingRootNode = rootNode;
         loadingRootNode.setEffect(new GaussianBlur());
 
@@ -117,8 +121,10 @@ public class App extends Application {
         });
 
         loadingStage.show();
-        loadingStage.setX(appStage.getX() + (appStage.getWidth() - loadingStage.getWidth()) / 2);
-        loadingStage.setY(appStage.getY() + (appStage.getHeight() - loadingStage.getHeight()) / 2);
+        if (rootStage == null)
+            rootStage = appStage;
+        loadingStage.setX(rootStage.getX() + (rootStage.getWidth() - loadingStage.getWidth()) / 2);
+        loadingStage.setY(rootStage.getY() + (rootStage.getHeight() - loadingStage.getHeight()) / 2);
         Executors.newSingleThreadScheduledExecutor().schedule(() -> {
             cancelButton.setVisible(true);
         }, cancelButtonDelay, unit);
@@ -140,8 +146,15 @@ public class App extends Application {
         }
     }
 
-    static void setCurrentItemDisplayed(CatalogItem item) {
+    static void setCurrentItemDisplayed(CatalogItem item, Text itemPrice, Text itemName) {
         currentItemDisplayed = item;
+        currentItemPrice = itemPrice;
+        currentItemName = itemName;
+    }
+
+    public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
+        currentItemPrice.setText(Double.toString(updatedItem.getPrice()));
+        currentItemName.setText(updatedItem.getName());
     }
 
     static CatalogItem getCurrentItemDisplayed() {

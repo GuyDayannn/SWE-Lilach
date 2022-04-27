@@ -38,7 +38,7 @@ public class LilachServer extends AbstractServer {
                 CatalogItem updatedItem = ((UpdateItemRequest)msg).getUpdatedItem();
                 try {
                     DatabaseHandler.updateItem(updatedItem);
-                    sendToAllClients(new UpdateItemResponse(true));
+                    sendToAllClients(new UpdateItemResponse(updatedItem));
                 } catch (HibernateException e) {
                     sendToAllClients(new UpdateItemResponse(false));
                 }

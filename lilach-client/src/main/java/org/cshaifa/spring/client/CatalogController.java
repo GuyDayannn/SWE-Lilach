@@ -100,13 +100,14 @@ public class CatalogController {
                 if (item.getImagePath() != null) {
                     iv.setImage(new Image(item.getImagePath()));
                 }
-                vBox.getChildren().add(new Text(item.getName()));
-                vBox.getChildren().add(new Text(Double.toString(item.getPrice())));
+                Text itemName = new Text(item.getName());
+                Text itemPrice = new Text(Double.toString(item.getPrice()));
+                vBox.getChildren().addAll(itemName, itemPrice);
                 Button button = new Button("View Item");
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        App.setCurrentItemDisplayed(item);
+                        App.setCurrentItemDisplayed(item, itemPrice, itemName);
                         App.popUpLaunch(button, "PopUp");
                     }
                 });
@@ -145,7 +146,7 @@ public class CatalogController {
             App.hideLoading();
         });
 
-        App.showLoading(rootVBox, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+        App.showLoading(rootVBox, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
         new Thread(getCatalogTask).start();
 
 
