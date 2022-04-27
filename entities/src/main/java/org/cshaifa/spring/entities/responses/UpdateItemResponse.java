@@ -5,8 +5,8 @@ import org.cshaifa.spring.entities.CatalogItem;
 public class UpdateItemResponse extends Response {
     private CatalogItem updatedItem = null;
 
-    public UpdateItemResponse(boolean success) {
-        super(success);
+    public UpdateItemResponse(int requestId, boolean success) {
+        super(requestId, success);
     }
 
     public UpdateItemResponse(CatalogItem updatedItem) {
