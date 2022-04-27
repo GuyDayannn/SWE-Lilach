@@ -9,8 +9,8 @@ public class UpdateItemResponse extends Response {
         super(requestId, success);
     }
 
-    public UpdateItemResponse(CatalogItem updatedItem) {
-        super(true);
+    public UpdateItemResponse(int requestId, CatalogItem updatedItem) {
+        super(requestId, true);
         this.updatedItem = updatedItem;
     }
 

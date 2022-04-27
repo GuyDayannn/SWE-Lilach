@@ -16,4 +16,8 @@ public class Request implements Serializable {
         this.requestId = nextRequestId.getAndIncrement();
     }
 
+    public int getRequestId() {
+        return requestId;
+    }
+
 }

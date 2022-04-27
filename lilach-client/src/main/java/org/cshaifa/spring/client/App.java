@@ -104,6 +104,7 @@ public class App extends Application {
         loadingRootNode.setEffect(new GaussianBlur());
 
         ProgressIndicator indicator = new ProgressIndicator();
+        indicator.setStyle("-fx-progress-color: green");
         Button cancelButton = new Button("Cancel");
         cancelButton.setVisible(false);
         VBox vBox = new VBox(indicator, cancelButton);
