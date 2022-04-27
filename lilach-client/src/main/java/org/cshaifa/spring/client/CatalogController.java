@@ -54,6 +54,12 @@ public class CatalogController {
 
     @FXML    private Button previousPageButton;
 
+    private int count_displayed_items = 0;
+
+    private int total_catalog_items = 0;
+
+    private int current_page = 1;
+
     @FXML
     void nextPage(MouseEvent event) {
 
@@ -85,7 +91,9 @@ public class CatalogController {
             if (response.isSuccessful()) {
                 catalogItems = response.getCatalogItems();
                 if (catalogItems!=null) {
-                    int count_displayed_items = 0;
+                    count_displayed_items = 0;
+                    total_catalog_items = catalogItems.size();
+                    current_page = 1;
                     for (CatalogItem item : catalogItems) {
                         HBox hBox = new HBox();
                         VBox vBox = new VBox();
@@ -130,6 +138,12 @@ public class CatalogController {
                             break;
                         }
                         count_displayed_items++;
+                    }
+                    if (current_page == 1) {
+                        previousPageButton.disableProperty().setValue(true);
+                    }
+                    if (count_displayed_items < 20) {
+                        nextPageButton.disableProperty().setValue(true);
                     }
                 }
             }
