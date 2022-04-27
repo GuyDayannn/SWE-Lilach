@@ -150,7 +150,6 @@ public class CatalogController {
         App.showLoading(rootVBox, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
         new Thread(getCatalogTask).start();
 
-
     }
 
 
