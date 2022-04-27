@@ -42,9 +42,4 @@ public class PrimaryController {
         lilachLogo.setImage((image));
     }
 
-    @FXML
-    void startLilach(MouseEvent event) {
-
-    }
-
 }

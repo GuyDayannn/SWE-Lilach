@@ -39,7 +39,7 @@ public class ClientHandler {
         CatalogItem item = (CatalogItem) waitForMsgFromServer();
         return item;
     }
-     */
+    */
 
     public static UpdateItemResponse updateItem(CatalogItem updatedItem) throws IOException, ConnectException {
         client.openConnection();

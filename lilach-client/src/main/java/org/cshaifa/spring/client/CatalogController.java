@@ -39,11 +39,15 @@ public class CatalogController {
 
     @FXML    private HBox flowerHBox4;
 
-    public static List<CatalogItem> catalogItems;
-
     @FXML    private Button nextPageButton;
 
     @FXML    private Button previousPageButton;
+
+    private int count_displayed_items = 0;
+
+    private int total_catalog_items = 0;
+
+    private int current_page = 1;
 
     @FXML
     private VBox rootVBox;
@@ -83,7 +87,7 @@ public class CatalogController {
                 System.err.println("Getting catalog failed");
                 return;
             }
-            catalogItems = response.getCatalogItems();
+            List<CatalogItem> catalogItems = response.getCatalogItems();
 
             int count_displayed_items = 0;
             for (CatalogItem item : catalogItems) {
