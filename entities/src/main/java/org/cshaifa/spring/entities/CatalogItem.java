@@ -1,12 +1,14 @@
 package org.cshaifa.spring.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
+import javax.persistence.Transient;
 
 /**
  * This class is a base class for all of the items on the catalog.
@@ -25,6 +27,9 @@ public class CatalogItem implements Serializable {
 
     private double price;
 
+    @Transient
+    byte[] image = null;
+
     public CatalogItem() {
         super();
         this.name = "";
@@ -36,6 +41,14 @@ public class CatalogItem implements Serializable {
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
+    }
+
+    public CatalogItem(String name, String imagePath, double price, byte[] image) {
+        super();
+        this.name = name;
+        this.imagePath = imagePath;
+        this.price = price;
+        this.image = image;
     }
 
     public long getId() {
@@ -64,5 +77,13 @@ public class CatalogItem implements Serializable {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public byte[] getImage() {
+      return image;
+    }
+
+    public void setImage(byte[] image) {
+      this.image = image;
     }
 }
