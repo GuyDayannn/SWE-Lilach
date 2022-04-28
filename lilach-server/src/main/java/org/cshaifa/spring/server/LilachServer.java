@@ -27,20 +27,21 @@ public class LilachServer extends AbstractServer {
     @Override
     protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
         if (msg instanceof Request) {
+            Request request = (Request) msg;
             if (msg instanceof GetCatalogRequest) {
                 try {
                     List<CatalogItem> catalogItems = DatabaseHandler.getCatalog();
-                    sendToAllClients(new GetCatalogResponse(catalogItems));
+                    sendToAllClients(new GetCatalogResponse(request.getRequestId(), catalogItems));
                 } catch (HibernateException e) {
-                    sendToAllClients(new GetCatalogResponse(false));
+                    sendToAllClients(new GetCatalogResponse(request.getRequestId(), false));
                 }
             } else if (msg instanceof UpdateItemRequest) {
                 CatalogItem updatedItem = ((UpdateItemRequest)msg).getUpdatedItem();
                 try {
                     DatabaseHandler.updateItem(updatedItem);
-                    sendToAllClients(new UpdateItemResponse(updatedItem));
+                    sendToAllClients(new UpdateItemResponse(request.getRequestId(), updatedItem));
                 } catch (HibernateException e) {
-                    sendToAllClients(new UpdateItemResponse(false));
+                    sendToAllClients(new UpdateItemResponse(request.getRequestId(), false));
                 }
             }
         } else {

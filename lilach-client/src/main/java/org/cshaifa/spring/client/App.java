@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.cshaifa.spring.entities.CatalogItem;
@@ -36,6 +38,8 @@ public class App extends Application {
     private static int DataBaseConnected = 0;
     private static Stage loadingStage;
     private static Node loadingRootNode;
+    private static ScheduledFuture<Void> scheduledCancelButtonShow;
+    private static ScheduledExecutorService cancelButtonExecutorService;
 
     private static Text currentItemPrice;
     private static Text currentItemName;
@@ -96,6 +100,8 @@ public class App extends Application {
             loadingRootNode.setEffect(null);
             loadingStage.hide();
             loadingStage = null;
+            scheduledCancelButtonShow.cancel(true);
+            cancelButtonExecutorService.shutdown();
         }
     }
 
@@ -104,6 +110,7 @@ public class App extends Application {
         loadingRootNode.setEffect(new GaussianBlur());
 
         ProgressIndicator indicator = new ProgressIndicator();
+        indicator.setStyle("-fx-progress-color: green");
         Button cancelButton = new Button("Cancel");
         cancelButton.setVisible(false);
         VBox vBox = new VBox(indicator, cancelButton);
@@ -125,10 +132,12 @@ public class App extends Application {
             rootStage = appStage;
         loadingStage.setX(rootStage.getX() + (rootStage.getWidth() - loadingStage.getWidth()) / 2);
         loadingStage.setY(rootStage.getY() + (rootStage.getHeight() - loadingStage.getHeight()) / 2);
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-            cancelButton.setVisible(true);
-        }, cancelButtonDelay, unit);
+        cancelButtonExecutorService = Executors.newSingleThreadScheduledExecutor();
 
+        scheduledCancelButtonShow = cancelButtonExecutorService.schedule(() -> {
+            cancelButton.setVisible(true);
+            return null;
+        }, cancelButtonDelay, unit);
     }
 
     static void popUpLaunch(Button caller, String FXMLname) {
