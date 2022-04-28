@@ -7,4 +7,6 @@ public class Constants {
     public static final String FAIL_MSG = "Fail";
 
     public static final int SERVER_PORT = 8095;
+    public static final long REQUEST_TIMEOUT = 5;
+    public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
 }

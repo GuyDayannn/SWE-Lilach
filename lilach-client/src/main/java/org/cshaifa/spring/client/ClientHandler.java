@@ -12,24 +12,26 @@ import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.Response;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.utils.Constants;
 
 public class ClientHandler {
-    private static LilachClient client = new LilachClient("localhost", 8095);
+    private static LilachClient client = new LilachClient("localhost", Constants.SERVER_PORT);
     public static volatile Object msgFromServer = null;
 
-    private static Object waitForMsgFromServer() {
-        while (msgFromServer == null) {
+    private static Object waitForMsgFromServer(int requestId) {
+        while (msgFromServer == null || (msgFromServer instanceof Response && ((Response) msgFromServer).getRequestId() != requestId)) {
             Thread.onSpinWait();
-        } // TODO: limit waiting
+        }
         Object msg = msgFromServer;
         msgFromServer = null;
         return msg;
     }
 
     public static GetCatalogResponse getCatalog() throws IOException, ConnectException {
+        GetCatalogRequest getCatalogRequest = new GetCatalogRequest();
         client.openConnection();
-        client.sendToServer(new GetCatalogRequest());
-        return (GetCatalogResponse) waitForMsgFromServer();
+        client.sendToServer(getCatalogRequest);
+        return (GetCatalogResponse) waitForMsgFromServer(getCatalogRequest.getRequestId());
     }
 
     /*
@@ -39,11 +41,12 @@ public class ClientHandler {
         CatalogItem item = (CatalogItem) waitForMsgFromServer();
         return item;
     }
-     */
+    */
 
     public static UpdateItemResponse updateItem(CatalogItem updatedItem) throws IOException, ConnectException {
+        UpdateItemRequest updateItemRequest = new UpdateItemRequest(updatedItem);
         client.openConnection();
-        client.sendToServer(new UpdateItemRequest(updatedItem));
-        return (UpdateItemResponse) waitForMsgFromServer();
+        client.sendToServer(updateItemRequest);
+        return (UpdateItemResponse) waitForMsgFromServer(updateItemRequest.getRequestId());
     }
 }

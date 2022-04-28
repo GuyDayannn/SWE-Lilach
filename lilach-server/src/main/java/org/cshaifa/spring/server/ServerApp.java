@@ -2,6 +2,7 @@ package org.cshaifa.spring.server;
 
 import java.io.IOException;
 
+import org.cshaifa.spring.server.database.DatabaseHandler;
 import org.cshaifa.spring.utils.Constants;
 
 public class ServerApp {
@@ -9,6 +10,7 @@ public class ServerApp {
 
     public static void main(String[] args) throws IOException {
         server.listen();
+        DatabaseHandler.openSession();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {

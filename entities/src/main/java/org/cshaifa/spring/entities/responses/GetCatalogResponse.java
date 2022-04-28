@@ -7,12 +7,12 @@ import org.cshaifa.spring.entities.CatalogItem;
 public class GetCatalogResponse extends Response {
     List<CatalogItem> catalogItems = null;
 
-    public GetCatalogResponse(boolean success) {
-        super(success);
+    public GetCatalogResponse(int requestId, boolean success) {
+        super(requestId, success);
     }
 
-    public GetCatalogResponse(List<CatalogItem> catalogItems) {
-        super(true);
+    public GetCatalogResponse(int requestId, List<CatalogItem> catalogItems) {
+        super(requestId, true);
         this.catalogItems = catalogItems;
     }
 
