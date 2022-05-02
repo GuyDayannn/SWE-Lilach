@@ -1,4 +1,7 @@
 package org.cshaifa.spring.client;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -6,6 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
 
 import org.cshaifa.spring.entities.CatalogItem;
 
@@ -19,6 +24,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -75,6 +82,19 @@ public class App extends Application {
         scene = new Scene(root);
         appStage.setScene(scene);
         appStage.show();
+    }
+
+    public static WritableImage getImageFromByteArray(byte[] image) throws IOException {
+        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
+        WritableImage wr = null;
+        wr = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
+        PixelWriter pw = wr.getPixelWriter();
+        for (int x = 0; x < bufferedImage.getWidth(); x++) {
+            for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                pw.setArgb(x, y, bufferedImage.getRGB(x, y));
+            }
+        }
+        return wr;
     }
 
     public static <T> Task<T> createTimedTask(Callable<T> callable, long timeout, TimeUnit unit) {

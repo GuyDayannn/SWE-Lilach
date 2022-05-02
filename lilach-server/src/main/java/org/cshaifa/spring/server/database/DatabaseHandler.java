@@ -1,14 +1,25 @@
 package org.cshaifa.spring.server.database;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
+import javax.imageio.ImageIO;
 import javax.persistence.RollbackException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -24,11 +35,53 @@ import org.hibernate.Session;
  */
 public class DatabaseHandler {
 
-    private static List<String> getRandomOrderedImages() {
-        List<String> imagesList = new ArrayList<>();
-        for (File imageFile : new File(DatabaseHandler.class.getResource("images").getPath()).listFiles()) {
-            imagesList.add(imageFile.getAbsolutePath());
+    private static byte[] getByteArrayFromURI(URI imageUri) throws IOException {
+        BufferedImage image;
+
+        if (imageUri.getScheme().equals("jar"))
+            image = ImageIO.read(DatabaseHandler.class.getResource(imageUri.toString().split("!")[1]));
+        else
+            image = ImageIO.read(new File(imageUri));
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", outputStream);
+        return outputStream.toByteArray();
+    }
+
+    private static List<Path> getAllImagesFromFolder(String path) {
+        List<Path> imagesList = new ArrayList<>();
+        FileSystem fileSystem = null;
+
+        try {
+            Path imagesPath;
+            URI imagesUri = DatabaseHandler.class.getResource(path).toURI();
+
+            if (imagesUri.getScheme().equals("jar")) {
+                fileSystem = FileSystems.newFileSystem(imagesUri, Collections.emptyMap(), null);
+                imagesPath = fileSystem.getPath(imagesUri.toString().split("!")[1]);
+            } else {
+                imagesPath = Paths.get(imagesUri);
+            }
+
+            for (Iterator<Path> it = Files.walk(imagesPath, 1).iterator(); it.hasNext();) {
+                Path folderPath = it.next().toAbsolutePath();
+                if (!Files.isDirectory(folderPath))
+                    imagesList.add(folderPath.toAbsolutePath());
+            }
+
+            if (fileSystem != null)
+                fileSystem.close();
+        } catch (Exception e) {
+            // TODO: maybe report this somewhere
+            e.printStackTrace();
         }
+
+        return imagesList;
+    }
+
+    private static List<Path> getRandomOrderedImages() {
+        List<Path> imagesList = getAllImagesFromFolder("images");
+
         Collections.shuffle(imagesList);
         return imagesList;
     }
@@ -36,11 +89,11 @@ public class DatabaseHandler {
     private static void initializeDatabaseIfEmpty() throws HibernateException {
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
-        List<String> imageList = getRandomOrderedImages();
+        List<Path> imageList = getRandomOrderedImages();
         Random random = new Random();
         for (int i = 0; i < imageList.size(); i++) {
             double randomPrice = 200 * random.nextDouble();
-            session.save(new CatalogItem("Random flower " + i, Paths.get(imageList.get(i)).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue()));
+            session.save(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue()));
         }
         try {
             session.flush();
@@ -61,6 +114,15 @@ public class DatabaseHandler {
         if (catalogItems.isEmpty()) {
             initializeDatabaseIfEmpty();
             catalogItems = session.createQuery(query).getResultList();
+        }
+
+        for (CatalogItem catalogItem : catalogItems) {
+            try {
+                catalogItem.setImage(getByteArrayFromURI(new URI(catalogItem.getImagePath())));
+            } catch (Exception e) {
+                // TODO: maybe log the exception somewhere
+                e.printStackTrace();
+            }
         }
         return catalogItems;
     }
