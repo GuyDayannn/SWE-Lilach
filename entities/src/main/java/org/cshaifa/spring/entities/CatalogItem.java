@@ -8,9 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
-/**
- * This class is a base class for all of the items on the catalog.
- */
 @Entity
 @Table(name = "catalog_item")
 public class CatalogItem implements Serializable {
@@ -25,17 +22,21 @@ public class CatalogItem implements Serializable {
 
     private double price;
 
+    private int quantity;
+
     public CatalogItem() {
         super();
         this.name = "";
         this.price = 0;
+        this.quantity = 0;
     }
 
-    public CatalogItem(String name, String imagePath, double price) {
+    public CatalogItem(String name, String imagePath, double price, int quantity) {
         super();
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
+        this.quantity = quantity;
     }
 
     public long getId() {
@@ -67,8 +68,16 @@ public class CatalogItem implements Serializable {
     }
 
 
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     @Override
-    public boolean equals(Object obj){
+    public boolean equals(Object obj) {
         CatalogItem temp = (CatalogItem) obj;
         if(temp.getId() == this.id)
             return true;
