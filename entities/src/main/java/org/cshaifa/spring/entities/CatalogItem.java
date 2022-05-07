@@ -10,9 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-/**
- * This class is a base class for all of the items on the catalog.
- */
 @Entity
 @Table(name = "catalog_item")
 public class CatalogItem implements Serializable {
@@ -28,26 +25,23 @@ public class CatalogItem implements Serializable {
     private double price;
 
     @Transient
-    byte[] image = null;
+    private byte[] image = null;
+
+    private int quantity;
 
     public CatalogItem() {
         super();
         this.name = "";
         this.price = 0;
+        this.quantity = 0;
     }
 
-    public CatalogItem(String name, String imagePath, double price) {
+    public CatalogItem(String name, String imagePath, double price, int quantity, byte[] image) {
         super();
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
-    }
-
-    public CatalogItem(String name, String imagePath, double price, byte[] image) {
-        super();
-        this.name = name;
-        this.imagePath = imagePath;
-        this.price = price;
+        this.quantity = quantity;
         this.image = image;
     }
 
@@ -85,5 +79,25 @@ public class CatalogItem implements Serializable {
 
     public void setImage(byte[] image) {
       this.image = image;
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        CatalogItem temp = (CatalogItem) obj;
+        if(temp.getId() == this.id)
+            return true;
+        else if(temp.getName().equals(this.name))
+            return true;
+        else if(temp.getImagePath().equals(this.imagePath))
+            return true;
+
+        return false;
     }
 }
