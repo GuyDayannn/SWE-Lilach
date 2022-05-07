@@ -1,36 +1,40 @@
 package org.cshaifa.spring.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = "shops")
-public class shops implements Serializable {
+@Table(name = "store")
+public class Store implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     private String name;
     private String address;
 
     @OneToOne
-    private Stock myStock;
+    private Stock stock;
 
-    public shops() {
+    public Store() {
         this.name = "";
         this.address = "";
 
     }
 
-    public shops(String name, String address, Stock myStock) {
+    public Store(String name, String address, Stock myStock) {
         this.name = name;
         this.address = address;
-        this.myStock = myStock;
+        this.stock = myStock;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -51,11 +55,11 @@ public class shops implements Serializable {
     }
 
     public Stock getMyStock() {
-        return myStock;
+        return stock;
     }
 
     public void setMyStock(Stock myStock) {
-        this.myStock = myStock;
+        this.stock = myStock;
     }
 
 }

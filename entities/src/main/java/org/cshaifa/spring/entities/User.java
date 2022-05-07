@@ -5,45 +5,46 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-@Table(name = "User")
-public class User implements Serializable{
+@Table(name = "user")
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String name;
+    private long id;
+
+    private String fullName;
     private String username;
     private String mail;
     private String password;
 
     @OneToMany
-    private List<shops> shops;
+    private List<Store> stores;
 
-    public User(String name, String username, String mail, String password, List<shops> shops) {
-        this.name = name;
+    public User(String name, String username, String mail, String password, List<Store> shops) {
+        this.fullName = name;
         this.username = username;
         this.mail = mail;
         this.password = password;
-        this.shops = shops;
+        this.stores = shops;
     }
 
     public User() {
-        this.name = "";
+        this.fullName = "";
         this.username = "";
         this.mail = "";
         this.password = "";
-        this.shops = null;
+        this.stores = null;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
     public String getName() {
-        return name;
+        return fullName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.fullName = name;
     }
 
     public String getUsername() {
@@ -70,12 +71,12 @@ public class User implements Serializable{
         this.password = password;
     }
 
-    public List getShops() {
-        return shops;
+    public List getStores() {
+        return stores;
     }
 
-    public void setShops(List shops) {
-        this.shops = shops;
+    public void setStores(List shops) {
+        this.stores = shops;
     }
 
     @Override
