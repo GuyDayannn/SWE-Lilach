@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
+import org.cshaifa.spring.entities.requests.LoginRequest;
 import org.cshaifa.spring.entities.requests.Request;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
@@ -43,6 +44,8 @@ public class LilachServer extends AbstractServer {
                 } catch (HibernateException e) {
                     sendToAllClients(new UpdateItemResponse(request.getRequestId(), false));
                 }
+            } else if (msg instanceof LoginRequest) {
+                // TODO: Not implemented
             }
         } else {
             // TODO: Return an error message to the client

@@ -5,6 +5,8 @@ public class Constants {
     public static final String DATABASE_ERROR = "database_error";
     public static final String SUCCESS_MSG = "Success";
     public static final String FAIL_MSG = "Fail";
+    public static final String CUSTOMER_FROZEN_MSG = "Your account is frozen. Contact System Admin.";
+    public static final String WRONG_CREDENTIALS = "The username or password is incorrect";
 
     public static final int SERVER_PORT = 8095;
     public static final long REQUEST_TIMEOUT = 5;
