@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "catalog_item")
+@Table(name = "catalog_items")
 public class CatalogItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

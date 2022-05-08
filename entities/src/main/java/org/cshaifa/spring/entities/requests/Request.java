@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This class is a base class which all requests subclasses derive from
  */
-public class Request implements Serializable {
+public abstract class Request implements Serializable {
 
     private static AtomicInteger nextRequestId = new AtomicInteger(1);
 

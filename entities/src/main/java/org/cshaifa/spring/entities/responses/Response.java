@@ -2,7 +2,7 @@ package org.cshaifa.spring.entities.responses;
 
 import java.io.Serializable;
 
-public class Response implements Serializable {
+public abstract class Response implements Serializable {
     private boolean success;
     private int requestId;
 
