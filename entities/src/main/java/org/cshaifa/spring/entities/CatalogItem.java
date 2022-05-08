@@ -36,13 +36,12 @@ public class CatalogItem implements Serializable {
         this.quantity = 0;
     }
 
-    public CatalogItem(String name, String imagePath, double price, int quantity, byte[] image) {
+    public CatalogItem(String name, String imagePath, double price, int quantity) {
         super();
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
         this.quantity = quantity;
-        this.image = image;
     }
 
     public long getId() {
@@ -79,6 +78,7 @@ public class CatalogItem implements Serializable {
 
     public void setImage(byte[] image) {
       this.image = image;
+    }
 
     public int getQuantity() {
         return quantity;

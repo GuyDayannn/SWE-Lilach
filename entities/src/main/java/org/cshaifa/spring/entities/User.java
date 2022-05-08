@@ -1,30 +1,31 @@
 package org.cshaifa.spring.entities;
 
-import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
 @Entity
-@Table(name = "user")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    protected long id;
 
     private String fullName;
     private String username;
     private String mail;
     private String password;
 
-    @OneToMany
-    private List<Store> stores;
-
-    public User(String name, String username, String mail, String password, List<Store> shops) {
+    public User(String name, String username, String mail, String password) {
         this.fullName = name;
         this.username = username;
         this.mail = mail;
         this.password = password;
-        this.stores = shops;
     }
 
     public User() {
@@ -32,7 +33,6 @@ public class User implements Serializable {
         this.username = "";
         this.mail = "";
         this.password = "";
-        this.stores = null;
     }
 
     public long getId() {
@@ -69,14 +69,6 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public List getStores() {
-        return stores;
-    }
-
-    public void setStores(List shops) {
-        this.stores = shops;
     }
 
     @Override

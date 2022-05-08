@@ -1,6 +1,9 @@
 package org.cshaifa.spring.server.database;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.User;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,6 +25,9 @@ public class DatabaseConnector {
 
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(CatalogItem.class);
+        configuration.addAnnotatedClass(Store.class);
+        configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(Customer.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
             .applySettings(configuration.getProperties())

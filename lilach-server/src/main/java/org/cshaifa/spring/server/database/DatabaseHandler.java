@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.persistence.RollbackException;
@@ -25,6 +24,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.utils.Constants;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -91,17 +92,25 @@ public class DatabaseHandler {
         session.beginTransaction();
         List<Path> imageList = getRandomOrderedImages();
         Random random = new Random();
+        List<CatalogItem> randomItems = new ArrayList<>();
         for (int i = 0; i < imageList.size(); i++) {
             double randomPrice = 200 * random.nextDouble();
-            session.save(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue()));
+            int randomQuantity = random.nextInt(500);
+            randomItems.add(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity));
         }
-        try {
-            session.flush();
-            session.getTransaction().commit();
-        } catch (IllegalStateException | RollbackException e) {
-            session.getTransaction().rollback();
-            throw new HibernateException(Constants.DATABASE_ERROR);
+
+        for (CatalogItem item : randomItems) {
+            session.save(item);
         }
+
+        Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5));
+        session.save(store);
+
+        for (int i = 0; i < 20; i++) {
+            session.save(new Customer("Customer " + i, "cust" + i, "example@mail.com", "pass", List.of(store)));
+        }
+
+        tryFlushSession(session);
     }
 
     public static List<CatalogItem> getCatalog() throws HibernateException {
@@ -131,10 +140,14 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
         session.merge(newItem);
+        tryFlushSession(session);
+    }
+
+    public static void tryFlushSession(Session session) throws HibernateException {
         try {
             session.flush();
             session.getTransaction().commit();
-        } catch (IllegalStateException | RollbackException e) {
+        } catch (Exception e) {
             session.getTransaction().rollback();
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
