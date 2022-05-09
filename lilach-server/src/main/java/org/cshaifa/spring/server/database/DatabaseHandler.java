@@ -21,10 +21,12 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -79,6 +81,58 @@ public class DatabaseHandler {
         return imagesList;
     }
 
+    public static User loginUser(String username, String password) {
+        Session session = DatabaseConnector.getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<User> query = builder.createQuery(User.class);
+        Root<User> root = query.from(User.class);
+
+        query.select(root).where(builder.and(builder.equal(root.get("username"), username),
+                                             builder.equal(root.get("password"), password)));
+
+        return session.createQuery(query).uniqueResult();
+    }
+
+    public static User getUserByUsername(String username) {
+        Session session = DatabaseConnector.getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<User> query = builder.createQuery(User.class);
+        Root<User> root = query.from(User.class);
+
+        query.select(root).where(builder.equal(root.get("username"), username));
+
+        return session.createQuery(query).uniqueResult();
+    }
+
+    public static User getUserByEmail(String email) {
+        Session session = DatabaseConnector.getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<User> query = builder.createQuery(User.class);
+        Root<User> root = query.from(User.class);
+
+        query.select(root).where(builder.equal(root.get("email"), email));
+
+        return session.createQuery(query).uniqueResult();
+    }
+
+    public static String registerCustomer(String fullName, String email, String username, String password) throws HibernateException {
+        if (getUserByEmail(email) != null) {
+            return Constants.EMAIL_EXISTS;
+        }
+
+        if (getUserByUsername(username) != null) {
+            return Constants.USERNAME_EXISTS;
+        }
+
+        Session session = DatabaseConnector.getSession();
+        session.beginTransaction();
+
+        session.save(new Customer(fullName, username, email, password, null, false));
+        tryFlushSession(session);
+
+        return Constants.SUCCESS_MSG;
+    }
+
     private static List<Path> getRandomOrderedImages() {
         List<Path> imagesList = getAllImagesFromFolder("images");
 
@@ -106,7 +160,7 @@ public class DatabaseHandler {
         session.save(store);
 
         for (int i = 0; i < 20; i++) {
-            session.save(new Customer("Customer " + i, "cust" + i, "example@mail.com", "pass", List.of(store)));
+            session.save(new Customer("Customer " + i, "cust" + i, "example@mail.com", "pass", List.of(store), false));
         }
 
         tryFlushSession(session);

@@ -1,5 +1,6 @@
 package org.cshaifa.spring.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -14,6 +15,12 @@ public class Customer extends User {
 
     @ManyToMany
     private List<Store> stores;
+
+    public Customer(String fullName, String username, String email, String password, boolean frozen) {
+        super(fullName, username, email, password);
+        this.stores = new ArrayList<>();
+        this.frozen = frozen;
+    }
 
     public Customer(String fullName, String username, String email, String password, List<Store> stores, boolean frozen) {
         super(fullName, username, email, password);
