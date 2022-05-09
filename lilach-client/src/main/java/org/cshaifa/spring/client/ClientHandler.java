@@ -5,8 +5,10 @@ import java.net.ConnectException;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
+import org.cshaifa.spring.entities.requests.LoginRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.entities.responses.Response;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
@@ -45,5 +47,14 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(updateItemRequest);
         return (UpdateItemResponse) waitForMsgFromServer(updateItemRequest.getRequestId());
+    }
+
+
+    public static LoginResponse loginUser(String username, String password) throws IOException {
+        LoginRequest loginRequest = new LoginRequest(username, password);
+        client.openConnection();
+        client.sendToServer(loginRequest);
+        return (LoginResponse) waitForMsgFromServer(loginRequest.getRequestId());
+
     }
 }
