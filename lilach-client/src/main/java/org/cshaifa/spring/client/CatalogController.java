@@ -1,26 +1,20 @@
 package org.cshaifa.spring.client;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.imageio.ImageIO;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
 
 import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -87,7 +81,11 @@ public class CatalogController {
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
         getCatalogTask.setOnSucceeded(e -> {
-            if (getCatalogTask.getValue() == null) return;
+            if (getCatalogTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting catalog failed");
+                return;
+            }
             GetCatalogResponse response = getCatalogTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere

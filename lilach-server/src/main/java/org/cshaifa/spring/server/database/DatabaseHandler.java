@@ -160,7 +160,7 @@ public class DatabaseHandler {
         session.save(store);
 
         for (int i = 0; i < 20; i++) {
-            session.save(new Customer("Customer " + i, "cust" + i, "example@mail.com", "pass", List.of(store), false));
+            session.save(new Customer("Customer " + i, "cust" + i, "example"+i+"@mail.com", "pass", false));
         }
 
         tryFlushSession(session);
@@ -212,5 +212,6 @@ public class DatabaseHandler {
 
     public static void openSession() throws HibernateException {
         DatabaseConnector.getSession();
+        initializeDatabaseIfEmpty();
     }
 }

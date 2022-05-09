@@ -19,8 +19,6 @@ import org.cshaifa.spring.server.ocsf.ConnectionToClient;
 import org.cshaifa.spring.utils.Constants;
 import org.hibernate.HibernateException;
 
-import jdk.vm.ci.meta.Constant;
-
 public class LilachServer extends AbstractServer {
 
     public LilachServer(int port) {

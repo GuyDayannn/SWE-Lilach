@@ -8,7 +8,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
@@ -16,6 +15,9 @@ public class PrimaryController {
 
     @FXML
     private Button openButton;
+
+    @FXML
+    private Button loginButton;
 
     @FXML
     private ImageView lilachLogo;
@@ -33,6 +35,12 @@ public class PrimaryController {
     void open(ActionEvent event) throws InterruptedException, IOException {
         App.setWindowTitle("Catalog");
         App.setContent("catalog");
+    }
+
+    @FXML
+    void openLogin(ActionEvent event) throws InterruptedException, IOException {
+        App.setWindowTitle("Login");
+        App.setContent("customerLogin");
     }
 
 

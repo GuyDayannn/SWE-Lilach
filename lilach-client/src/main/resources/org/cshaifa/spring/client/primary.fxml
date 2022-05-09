@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane fx:id="loadingtitle" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PrimaryController">
+<Pane fx:id="loadingtitle" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PrimaryController">
    <children>
       <Button fx:id="openButton" layoutX="471.0" layoutY="383.0" mnemonicParsing="false" onAction="#open" text="Open Catalog" />
       <ImageView fx:id="lilachLogo" fitHeight="150.0" fitWidth="193.0" layoutX="423.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true" />
+      <Button fx:id="loginButton" layoutX="495.0" layoutY="426.0" mnemonicParsing="false" onAction="#openLogin" text="Login" />
    </children>
 </Pane>
