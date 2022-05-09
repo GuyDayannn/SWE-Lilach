@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.cshaifa.spring.entities.responses.LoginResponse;
@@ -40,8 +41,9 @@ public class CustomerLoginController {
     private TextField pwdTxtField;
 
     @FXML
-    void cancelBtnOnAction(ActionEvent event) {
-
+    void cancelBtnOnAction(ActionEvent event) throws IOException {
+        App.setWindowTitle("Catalog");
+        App.setContent("catalog");
     }
 
     @FXML
