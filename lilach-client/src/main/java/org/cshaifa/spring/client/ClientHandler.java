@@ -6,11 +6,9 @@ import java.net.ConnectException;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.LoginRequest;
+import org.cshaifa.spring.entities.requests.RegisterRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
-import org.cshaifa.spring.entities.responses.LoginResponse;
-import org.cshaifa.spring.entities.responses.Response;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
 public class ClientHandler {
@@ -56,5 +54,12 @@ public class ClientHandler {
         client.sendToServer(loginRequest);
         return (LoginResponse) waitForMsgFromServer(loginRequest.getRequestId());
 
+    }
+
+    public static RegisterResponse registerCustomer(String fullName, String username, String email, String password) throws IOException {
+        RegisterRequest registerRequest = new RegisterRequest(fullName, username, email, password);
+        client.openConnection();
+        client.sendToServer(registerRequest);
+        return (RegisterResponse) waitForMsgFromServer(registerRequest.getRequestId());
     }
 }
