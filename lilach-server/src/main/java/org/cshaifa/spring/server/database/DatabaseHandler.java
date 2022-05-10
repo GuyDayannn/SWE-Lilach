@@ -1,24 +1,14 @@
 package org.cshaifa.spring.server.database;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -28,6 +18,7 @@ import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
+import org.cshaifa.spring.utils.ImageUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
@@ -36,50 +27,6 @@ import org.hibernate.Session;
  * like getting the catalog, updating items etc.
  */
 public class DatabaseHandler {
-
-    private static byte[] getByteArrayFromURI(URI imageUri) throws IOException {
-        BufferedImage image;
-
-        if (imageUri.getScheme().equals("jar"))
-            image = ImageIO.read(DatabaseHandler.class.getResource(imageUri.toString().split("!")[1]));
-        else
-            image = ImageIO.read(new File(imageUri));
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(image, "jpg", outputStream);
-        return outputStream.toByteArray();
-    }
-
-    private static List<Path> getAllImagesFromFolder(String path) {
-        List<Path> imagesList = new ArrayList<>();
-        FileSystem fileSystem = null;
-
-        try {
-            Path imagesPath;
-            URI imagesUri = DatabaseHandler.class.getResource(path).toURI();
-
-            if (imagesUri.getScheme().equals("jar")) {
-                fileSystem = FileSystems.newFileSystem(imagesUri, Collections.emptyMap(), null);
-                imagesPath = fileSystem.getPath(imagesUri.toString().split("!")[1]);
-            } else {
-                imagesPath = Paths.get(imagesUri);
-            }
-
-            for (Iterator<Path> it = Files.walk(imagesPath, 1).iterator(); it.hasNext();) {
-                Path folderPath = it.next().toAbsolutePath();
-                if (!Files.isDirectory(folderPath))
-                    imagesList.add(folderPath.toAbsolutePath());
-            }
-
-            if (fileSystem != null)
-                fileSystem.close();
-        } catch (Exception e) {
-            // TODO: maybe report this somewhere
-            e.printStackTrace();
-        }
-
-        return imagesList;
-    }
 
     public static User loginUser(String username, String password) {
         Session session = DatabaseConnector.getSession();
@@ -134,7 +81,7 @@ public class DatabaseHandler {
     }
 
     private static List<Path> getRandomOrderedImages() {
-        List<Path> imagesList = getAllImagesFromFolder("images");
+        List<Path> imagesList = ImageUtils.getAllImagesFromFolder("images", DatabaseHandler.class);
 
         Collections.shuffle(imagesList);
         return imagesList;
@@ -180,7 +127,7 @@ public class DatabaseHandler {
 
         for (CatalogItem catalogItem : catalogItems) {
             try {
-                catalogItem.setImage(getByteArrayFromURI(new URI(catalogItem.getImagePath())));
+                catalogItem.setImage(ImageUtils.getByteArrayFromURI(new URI(catalogItem.getImagePath()), DatabaseHandler.class));
             } catch (Exception e) {
                 // TODO: maybe log the exception somewhere
                 e.printStackTrace();
