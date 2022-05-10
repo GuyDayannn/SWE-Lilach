@@ -30,13 +30,16 @@ public abstract class User implements Serializable {
 
     private String password;
 
+    private String passwordSalt;
+
     private boolean loggedIn;
 
-    public User(String fullName, String username, String email, String password) {
+    public User(String fullName, String username, String email, String password, String passwordSalt) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.passwordSalt = passwordSalt;
         this.loggedIn = false;
     }
 
@@ -45,6 +48,7 @@ public abstract class User implements Serializable {
         this.username = "";
         this.email = "";
         this.password = "";
+        this.passwordSalt = "";
         this.loggedIn = false;
     }
 
@@ -78,6 +82,14 @@ public abstract class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPasswordSalt() {
+        return passwordSalt;
+    }
+
+    public void setPasswordSalt(String passwordSalt) {
+        this.passwordSalt = passwordSalt;
     }
 
     public long getId() {

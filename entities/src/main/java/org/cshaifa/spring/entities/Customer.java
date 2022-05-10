@@ -16,14 +16,15 @@ public class Customer extends User {
     @ManyToMany
     private List<Store> stores;
 
-    public Customer(String fullName, String username, String email, String password, boolean frozen) {
-        super(fullName, username, email, password);
+
+    public Customer(String fullName, String username, String email, String password, String passwordSalt, boolean frozen) {
+        super(fullName, username, email, password, passwordSalt);
         this.stores = new ArrayList<>();
         this.frozen = frozen;
     }
 
-    public Customer(String fullName, String username, String email, String password, List<Store> stores, boolean frozen) {
-        super(fullName, username, email, password);
+    public Customer(String fullName, String username, String email, String password, String passwordSalt, List<Store> stores, boolean frozen) {
+        super(fullName, username, email, password, passwordSalt);
         this.stores = stores;
         this.frozen = frozen;
     }

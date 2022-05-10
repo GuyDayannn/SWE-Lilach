@@ -4,11 +4,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -19,6 +24,7 @@ import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
+import org.cshaifa.spring.utils.SecureUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
@@ -28,14 +34,38 @@ import org.hibernate.Session;
  */
 public class DatabaseHandler {
 
+    private static String generateHexSalt() {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[Constants.PASSWORD_SALT_SIZE];
+        random.nextBytes(salt);
+        return SecureUtils.encodeHexString(salt);
+    }
+
+    private static String getHashedPassword(String rawPassword, String saltHexString) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] salt = SecureUtils.decodeHexString(saltHexString);
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(Constants.PBKDF2_ALGORITHM);
+        PBEKeySpec spec = new PBEKeySpec(rawPassword.toCharArray(), salt, Constants.PBKDF2_ITERATIONS, Constants.PASSWORD_KEY_LENGTH);
+        return SecureUtils.encodeHexString(secretKeyFactory.generateSecret(spec).getEncoded());
+    }
+
     public static User loginUser(String username, String password) {
+        User user = getUserByUsername(username);
+        if (user == null)
+            return null;
+
         Session session = DatabaseConnector.getSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<User> query = builder.createQuery(User.class);
         Root<User> root = query.from(User.class);
 
-        query.select(root).where(builder.and(builder.equal(root.get("username"), username),
-                                             builder.equal(root.get("password"), password)));
+        try {
+            query.select(root).where(builder.and(builder.equal(root.get("username"), username),
+                                                 builder.equal(root.get("password"), getHashedPassword(password, user.getPasswordSalt()))));
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            return null;
+        }
 
         return session.createQuery(query).uniqueResult();
     }
@@ -62,7 +92,7 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
-    public static String registerCustomer(String fullName, String email, String username, String password) throws HibernateException {
+    public static String registerCustomer(String fullName, String email, String username, String rawPassword) throws HibernateException {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -74,7 +104,15 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
 
-        session.save(new Customer(fullName, username, email, password, null, false));
+        try {
+            String hexSalt = generateHexSalt();
+            session.save(new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt, false));
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
         tryFlushSession(session);
 
         return Constants.SUCCESS_MSG;
@@ -105,12 +143,12 @@ public class DatabaseHandler {
 
         Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5));
         session.save(store);
+        tryFlushSession(session);
 
         for (int i = 0; i < 20; i++) {
-            session.save(new Customer("Customer " + i, "cust" + i, "example"+i+"@mail.com", "pass", false));
+            registerCustomer("Customer " + i, "example"+i+"@mail.com", "cust" + i, "pass" + i);
         }
 
-        tryFlushSession(session);
     }
 
     public static List<CatalogItem> getCatalog() throws HibernateException {

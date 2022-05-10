@@ -10,8 +10,8 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Employee extends User {
 
-    public Employee(String fullName, String username, String email, String password) {
-        super(fullName, username, email, password);
+    public Employee(String fullName, String username, String email, String password, String passwordSalt) {
+        super(fullName, username, email, password, passwordSalt);
     }
 
     public Employee() {

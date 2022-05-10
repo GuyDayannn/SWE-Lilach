@@ -10,8 +10,8 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class ChainEmployee extends Employee {
 
-    public ChainEmployee(String fullName, String username, String email, String password) {
-        super(fullName, username, email, password);
+    public ChainEmployee(String fullName, String username, String email, String password, String passwordSalt) {
+        super(fullName, username, email, password, passwordSalt);
     }
 
     public ChainEmployee() {

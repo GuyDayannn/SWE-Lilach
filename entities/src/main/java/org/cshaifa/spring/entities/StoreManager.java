@@ -12,8 +12,9 @@ public class StoreManager extends ChainEmployee{
     @OneToOne
     private Store store;
 
-    public StoreManager(String fullName, String username, String email, String password, Store store) {
-        super(fullName, username, email, password);
+    public StoreManager(String fullName, String username, String email, String password, String passwordSalt,
+            Store store) {
+        super(fullName, username, email, password, passwordSalt);
         this.store = store;
     }
 
