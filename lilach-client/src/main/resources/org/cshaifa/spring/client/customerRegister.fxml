@@ -19,18 +19,20 @@
    <center>
       <AnchorPane prefHeight="400.0" prefWidth="429.0" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="14.0" layoutY="85.0" text="Full name" />
-            <TextField fx:id="fullNameTxtField" layoutX="109.0" layoutY="81.0" promptText="Full name" />
-            <Label layoutX="14.0" layoutY="132.0" text="Username" />
-            <TextField fx:id="usernameTxtField" layoutX="109.0" layoutY="128.0" promptText="Username" />
-            <Label layoutX="14.0" layoutY="178.0" text="Email" />
-            <TextField fx:id="emailTxtField" layoutX="109.0" layoutY="174.0" promptText="Email" />
-            <Label layoutX="14.0" layoutY="222.0" text="Password" />
-            <PasswordField fx:id="pwdTxtField" layoutX="108.0" layoutY="218.0" promptText="Password" />
-            <Button fx:id="registerBtn" layoutX="87.0" layoutY="291.0" mnemonicParsing="false" onAction="#onRegisterButton" prefHeight="30.0" prefWidth="131.0" text="Register" />
-            <Button fx:id="cancelLoginBtn" layoutX="88.0" layoutY="340.0" mnemonicParsing="false" onAction="#cancelBtnOnAction" prefHeight="30.0" prefWidth="130.0" text="Cancel" />
-            <Label fx:id="invalid_login_text" layoutX="53.0" layoutY="262.0" prefHeight="18.0" prefWidth="198.0" text="Invalid login. Please try again." />
-            <Text layoutX="89.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Registration" wrappingWidth="187.078125">
+            <Label layoutX="14.0" layoutY="62.0" text="Full name" />
+            <TextField fx:id="fullNameTxtField" layoutX="109.0" layoutY="58.0" promptText="Full name" />
+            <Label layoutX="14.0" layoutY="109.0" text="Username" />
+            <TextField fx:id="usernameTxtField" layoutX="109.0" layoutY="105.0" promptText="Username" />
+            <Label layoutX="14.0" layoutY="155.0" text="Email" />
+            <TextField fx:id="emailTxtField" layoutX="109.0" layoutY="151.0" promptText="Email" />
+            <Label layoutX="14.0" layoutY="199.0" text="Password" />
+            <PasswordField fx:id="pwdTxtField" layoutX="108.0" layoutY="195.0" promptText="Password" />
+            <Label layoutX="14.0" layoutY="242.0" text="Password Conf" />
+            <PasswordField fx:id="pwdConfTxtField" layoutX="108.0" layoutY="238.0" promptText="re-type your password" />
+            <Button fx:id="registerBtn" layoutX="86.0" layoutY="309.0" mnemonicParsing="false" onAction="#onRegisterButton" prefHeight="30.0" prefWidth="131.0" text="Register" />
+            <Button fx:id="cancelLoginBtn" layoutX="87.0" layoutY="348.0" mnemonicParsing="false" onAction="#cancelBtnOnAction" prefHeight="30.0" prefWidth="130.0" text="Cancel" />
+            <Label fx:id="invalid_register_text" layoutX="77.0" layoutY="282.0" prefHeight="18.0" prefWidth="231.0" textFill="RED" />
+            <Text layoutX="90.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Registration" wrappingWidth="187.078125">
                <font>
                   <Font name="System Italic" size="18.0" />
                </font>

@@ -9,6 +9,8 @@ public class Constants {
     public static final String WRONG_CREDENTIALS = "The username or password is incorrect";
     public static final String EMAIL_EXISTS = "A user with this email already exists";
     public static final String USERNAME_EXISTS = "A user with this username already exists";
+    public static final String REGISTER_SUCCESS = "You have successfully registered for LiLach";
+    public static final String LOGIN_SUCCESS = "You have successfully logged in to LiLach";
 
     public static final int SERVER_PORT = 8095;
     public static final long REQUEST_TIMEOUT = 5;

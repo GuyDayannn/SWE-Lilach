@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -41,6 +42,9 @@ public class CustomerLoginController {
     private TextField pwdTxtField;
 
     @FXML
+    private Label invalid_login_text;
+
+    @FXML
     void cancelBtnOnAction(ActionEvent event) throws IOException {
         App.setWindowTitle("Catalog");
         App.setContent("catalog");
@@ -64,18 +68,24 @@ public class CustomerLoginController {
         loginTask.setOnSucceeded(e -> {
             if (loginTask.getValue() == null) {
                 System.err.println("Login Failed");
+                invalid_login_text.setText("Login Failed");
+                invalid_login_text.setTextFill(Color.RED);
                 App.hideLoading();
                 return;
             }
 
             LoginResponse loginResponse = loginTask.getValue();
             if (!loginResponse.isSuccessful()) {
-                System.err.println("Login Failed");
+                System.err.println("Login Failed " + loginResponse.getMessage());
+                invalid_login_text.setText(loginResponse.getMessage());
+                invalid_login_text.setTextFill(Color.RED);
                 App.hideLoading();
                 return;
             }
 
             System.out.println("Login Success!");
+            invalid_login_text.setText(Constants.LOGIN_SUCCESS);
+            invalid_login_text.setTextFill(Color.GREEN);
             App.hideLoading();
         });
 
