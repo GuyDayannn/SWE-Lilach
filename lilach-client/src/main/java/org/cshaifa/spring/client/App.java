@@ -32,6 +32,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.cshaifa.spring.entities.User;
 
 /**
  * JavaFX App
@@ -50,6 +51,8 @@ public class App extends Application {
 
     private static Text currentItemPrice;
     private static Text currentItemName;
+
+    private static User currentUser;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -190,4 +193,5 @@ public class App extends Application {
         return currentItemDisplayed;
     }
 
+    public static User getCurrentUser() { return currentUser; }
 }

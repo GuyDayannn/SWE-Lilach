@@ -43,6 +43,12 @@ public class PrimaryController {
         App.setContent("customerLogin");
     }
 
+    @FXML
+    void openRegister(ActionEvent event) throws InterruptedException, IOException {
+        App.setWindowTitle("Register");
+        App.setContent("customerRegister");
+    }
+
 
     @FXML
     void initialize() {
