@@ -56,8 +56,8 @@ public class RegistrationController {
 
     @FXML
     void cancelBtnOnAction(ActionEvent event) throws IOException {
-        App.setWindowTitle("Catalog");
-        App.setContent("catalog");
+        App.setWindowTitle("Primary");
+        App.setContent("primary");
     }
 
     @FXML
