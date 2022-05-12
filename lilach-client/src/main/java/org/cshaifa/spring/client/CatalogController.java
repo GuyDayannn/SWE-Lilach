@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
@@ -42,6 +44,12 @@ public class CatalogController {
     @FXML    private Button nextPageButton;
 
     @FXML    private Button previousPageButton;
+
+    @FXML    private Menu shoppingCart;
+
+    @FXML    private MenuItem item1;
+
+    @FXML private ImageView item1image;
 
     private int count_displayed_items = 0;
 
@@ -94,7 +102,8 @@ public class CatalogController {
                 return;
             }
             List<CatalogItem> catalogItems = response.getCatalogItems();
-
+            Image imagexample = new Image(catalogItems.get(0).getImagePath());
+            item1image.setImage(imagexample);
             int count_displayed_items = 0;
             for (CatalogItem item : catalogItems) {
                 HBox hBox = new HBox();
