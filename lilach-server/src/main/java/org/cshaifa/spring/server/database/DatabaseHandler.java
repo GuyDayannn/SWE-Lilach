@@ -34,17 +34,22 @@ import org.hibernate.Session;
  */
 public class DatabaseHandler {
 
+    private static final int PASSWORD_SALT_SIZE = 24;
+    private static final int PASSWORD_KEY_LENGTH = 512;
+    private static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512";
+    private static final int PBKDF2_ITERATIONS = 10000;
+
     private static String generateHexSalt() {
         SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[Constants.PASSWORD_SALT_SIZE];
+        byte[] salt = new byte[PASSWORD_SALT_SIZE];
         random.nextBytes(salt);
         return SecureUtils.encodeHexString(salt);
     }
 
     private static String getHashedPassword(String rawPassword, String saltHexString) throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] salt = SecureUtils.decodeHexString(saltHexString);
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(Constants.PBKDF2_ALGORITHM);
-        PBEKeySpec spec = new PBEKeySpec(rawPassword.toCharArray(), salt, Constants.PBKDF2_ITERATIONS, Constants.PASSWORD_KEY_LENGTH);
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
+        PBEKeySpec spec = new PBEKeySpec(rawPassword.toCharArray(), salt, PBKDF2_ITERATIONS, PASSWORD_KEY_LENGTH);
         return SecureUtils.encodeHexString(secretKeyFactory.generateSecret(spec).getEncoded());
     }
 
