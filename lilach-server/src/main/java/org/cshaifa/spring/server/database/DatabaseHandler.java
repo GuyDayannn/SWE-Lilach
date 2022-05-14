@@ -202,6 +202,5 @@ public class DatabaseHandler {
 
     public static void openSession() throws HibernateException {
         DatabaseConnector.getSession();
-        initializeDatabaseIfEmpty();
     }
 }
