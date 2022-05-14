@@ -171,7 +171,9 @@ public class App extends Application {
             root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
             popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
-            popUpStage.initOwner(caller.getScene().getWindow());
+            if (caller!=null) {
+                popUpStage.initOwner(caller.getScene().getWindow());
+            }
             popUpStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
