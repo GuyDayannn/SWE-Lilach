@@ -33,6 +33,8 @@ public class CatalogController {
 
     @FXML    private ImageView catalogTitle;
 
+    @FXML    private Text onSaleText;
+
     @FXML    private HBox salesHBox;
 
     @FXML    private HBox flowerHBox;
@@ -107,9 +109,8 @@ public class CatalogController {
                 System.err.println("Getting catalog failed");
                 return;
             }
-            List<CatalogItem> catalogItems = response.getCatalogItems();
 
-            Image imagexample = new Image(catalogItems.get(0).getImagePath());
+            List<CatalogItem> catalogItems = response.getCatalogItems();
 
             int count_displayed_items = 0;
             for (CatalogItem item : catalogItems) {
@@ -148,7 +149,7 @@ public class CatalogController {
                 Text itemName = new Text(item.getName());
                 Text itemPrice;
                 if(item.getIsOnSale()) {
-                    itemPrice = new Text(Double.toString(item.getPrice()*(1-item.getDiscount())));
+                    itemPrice = new Text(Double.toString(item.getPrice()*0.01*(100-item.getDiscount())));
                 }
                 else {
                     itemPrice = new Text(Double.toString(item.getPrice()));
@@ -171,9 +172,12 @@ public class CatalogController {
                 hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
                               + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
                               + "-fx-border-radius: 5;" + "-fx-border-color: green;");
-                if(item.getIsOnSale()==true) {
-                    salesHBox.getChildren().add(hBox);
 
+                if(item.getIsOnSale()==true) {
+                    hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
+                            + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
+                            + "-fx-border-radius: 5;" + "-fx-background: #8d8484 ;" + "-fx-border-color: red;");
+                    salesHBox.getChildren().add(hBox);
                 }
                 else {
                     if (count_displayed_items<5) {
@@ -207,7 +211,7 @@ public class CatalogController {
             MenuItem completeOrder = new MenuItem("Finish Order");
             shoppingCart.getItems().add(editCart);
             shoppingCart.getItems().add(completeOrder);
-            //shoppingCart.setStyle("-fx-background-color: black;" + "-fx-opacity: 0.5;");
+            salesHBox.setStyle("-fx-border-width: 2;" + "-fx-border-color: red;");
 
             App.hideLoading();
         });
