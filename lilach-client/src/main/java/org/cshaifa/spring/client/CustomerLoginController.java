@@ -26,6 +26,7 @@ import javafx.event.ActionEvent;
 public class CustomerLoginController {
     @FXML
     private Button cancelBtn;
+
     @FXML
     private Button loginBtn;
 
@@ -56,6 +57,7 @@ public class CustomerLoginController {
             validateLogin();
         } else {
             loginMessageLabel.setText("Please enter username and password");
+            loginMessageLabel.setVisible(true);
         }
     }
 
@@ -91,5 +93,9 @@ public class CustomerLoginController {
 
         App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
         new Thread(loginTask).start();
+    }
+
+    void initialize() {
+        loginMessageLabel.setText("");
     }
 }
