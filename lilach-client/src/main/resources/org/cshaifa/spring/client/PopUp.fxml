@@ -18,8 +18,8 @@
                 <Font size="24.0" />
             </font>
         </Text>
-        <Button fx:id="btnPopUpUpdate" layoutX="135.0" layoutY="232.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="Update Item" />
-        <Button fx:id="btnPopUpCancel" layoutX="295.0" layoutY="232.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="169.0" text="Cancel" />
-      <ImageView fx:id="itemImage" fitHeight="150.0" fitWidth="200.0" layoutX="195.0" layoutY="82.0" pickOnBounds="true" preserveRatio="true" />
+        <Button fx:id="btnPopUpUpdate" layoutX="135.0" layoutY="251.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="Update Item" />
+        <Button fx:id="btnPopUpCancel" layoutX="295.0" layoutY="251.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="169.0" text="Cancel" />
+      <ImageView fx:id="itemImage" fitHeight="150.0" fitWidth="200.0" layoutX="194.0" layoutY="90.0" pickOnBounds="true" preserveRatio="true" />
     </children>
 </AnchorPane>
