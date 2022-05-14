@@ -110,7 +110,7 @@ public class CatalogController {
             List<CatalogItem> catalogItems = response.getCatalogItems();
 
             Image imagexample = new Image(catalogItems.get(0).getImagePath());
-            item1image.setImage(imagexample);
+
             int count_displayed_items = 0;
             for (CatalogItem item : catalogItems) {
                 HBox hBox = new HBox();
