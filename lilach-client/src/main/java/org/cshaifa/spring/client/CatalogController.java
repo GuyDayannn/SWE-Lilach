@@ -47,10 +47,6 @@ public class CatalogController {
 
     @FXML    private Menu shoppingCart;
 
-    @FXML    private MenuItem item1;
-
-    @FXML private ImageView item1image;
-
     private int count_displayed_items = 0;
 
     private int total_catalog_items = 0;
@@ -102,24 +98,41 @@ public class CatalogController {
                 return;
             }
             List<CatalogItem> catalogItems = response.getCatalogItems();
-            Image imagexample = new Image(catalogItems.get(0).getImagePath());
-            item1image.setImage(imagexample);
             int count_displayed_items = 0;
             for (CatalogItem item : catalogItems) {
+                total_catalog_items = catalogItems.size();
                 HBox hBox = new HBox();
                 VBox vBox = new VBox();
                 ImageView iv = null;
+                ImageView iv2 = null;
 
                 if (item.getImage() != null) {
                     try {
                         iv = new ImageView(App.getImageFromByteArray(item.getImage()));
+                        iv2 = new ImageView(App.getImageFromByteArray(item.getImage()));
                         iv.setFitWidth(60);
                         iv.setFitHeight(60);
+                        iv2.setFitWidth(20);
+                        iv2.setFitHeight(20);
                     } catch (IOException e1) {
                         // TODO: maybe log the exception somewhere
                         e1.printStackTrace();
                     }
                 }
+
+                if (catalogItems.indexOf(item)%5==0) {
+                    MenuItem menuItem = new MenuItem();
+                    menuItem.setGraphic(iv2);
+                    menuItem.setText(item.getName());
+                    menuItem.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            // add event
+                        }
+                    });
+                    shoppingCart.getItems().add(menuItem);
+                }
+
                 Text itemName = new Text(item.getName());
                 Text itemPrice = new Text(Double.toString(item.getPrice()));
                 vBox.getChildren().addAll(itemName, itemPrice);
@@ -144,20 +157,33 @@ public class CatalogController {
                 if (count_displayed_items<5) {
                     flowerHBox.getChildren().add(hBox);
                 }
-                else if (count_displayed_items >= 5 && count_displayed_items < 10) {
+                else if (count_displayed_items < 10) {
                     flowerHBox2.getChildren().add(hBox);
                 }
-                else if (count_displayed_items >= 10 && count_displayed_items < 15) {
+                else if ( count_displayed_items < 15) {
                     flowerHBox3.getChildren().add(hBox);
                 }
-                else if (count_displayed_items >= 15 && count_displayed_items < 20) {
+                else if (count_displayed_items < 20) {
                     flowerHBox4.getChildren().add(hBox);
                 }
-                else if (count_displayed_items >= 20) {
+                else {
                     break;
                 }
                 count_displayed_items++;
             }
+
+            if (current_page == 1) {
+                previousPageButton.disableProperty().setValue(true);
+            }
+            if (count_displayed_items >= total_catalog_items) {
+                nextPageButton.disableProperty().setValue(true);
+            }
+
+            MenuItem editCart = new MenuItem("Edit Cart");
+            MenuItem completeOrder = new MenuItem("Finish Order");
+            shoppingCart.getItems().add(editCart);
+            shoppingCart.getItems().add(completeOrder);
+            //shoppingCart.setStyle("-fx-background-color: black;" + "-fx-opacity: 0.5;");
 
             App.hideLoading();
         });
