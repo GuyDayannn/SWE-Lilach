@@ -40,10 +40,18 @@
             </Text>
          </children>
       </VBox>
+      <HBox fx:id="salesHBox" layoutX="10.0" layoutY="197.0" prefHeight="226.0" prefWidth="1040.0">
+         <children>
+            <Text fx:id="onSaleText" fill="#e80909" strokeType="OUTSIDE" strokeWidth="0.0" text="On Sale!">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Text>
+         </children></HBox>
       <HBox fx:id="flowerHBox" prefHeight="226.0" prefWidth="1040.0" />
-      <HBox fx:id="flowerHBox2" prefHeight="226.0" prefWidth="1040.0" />
+      <HBox fx:id="flowerHBox2" prefHeight="226.0" prefWidth="200.0" />
       <HBox fx:id="flowerHBox3" prefHeight="226.0" prefWidth="1040.0" />
-      <HBox fx:id="flowerHBox4" prefHeight="226.0" prefWidth="1040.0" />
+      <HBox fx:id="flowerHBox4" maxWidth="300.0" minWidth="100.0" prefHeight="226.0" prefWidth="200.0" />
       <HBox prefHeight="120.0" prefWidth="1040.0">
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0" />

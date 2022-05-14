@@ -9,12 +9,14 @@ import javafx.scene.text.Text;
 
 public class ItemPopUpController {
     @FXML Text  popUpMessageText;
+    @FXML Text  popupPrice;
     @FXML Button    btnPopUpUpdate;
     @FXML Button    btnPopUpCancel;
     @FXML ImageView itemImage;
 
     public void initialize() {
         popUpMessageText.setText(App.getCurrentItemDisplayed().getName());
+        popupPrice.setText(String.valueOf(App.getCurrentItemDisplayed().getPrice()));
         try {
             itemImage.setImage(App.getImageFromByteArray(App.getCurrentItemDisplayed().getImage()));
         } catch (IOException e) {

@@ -17,7 +17,7 @@ import org.cshaifa.spring.utils.Constants;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 
-//TODO: 1. create login btn from matin screen
+//TODO: 1. create login btn from main screen
 //2. connect to db
 //3. validatelogin
 
