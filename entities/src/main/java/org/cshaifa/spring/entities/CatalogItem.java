@@ -24,6 +24,11 @@ public class CatalogItem implements Serializable {
 
     private double price;
 
+    private boolean onSale;
+
+    private double discountPercent;
+
+
     @Transient
     private byte[] image = null;
 
@@ -34,18 +39,37 @@ public class CatalogItem implements Serializable {
         this.name = "";
         this.price = 0;
         this.quantity = 0;
+        this.onSale = false;
+        this.discountPercent = 0.0;
     }
 
-    public CatalogItem(String name, String imagePath, double price, int quantity) {
+    public CatalogItem(String name, String imagePath, double price, int quantity, boolean onSale, double discountPercent) {
         super();
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
         this.quantity = quantity;
+        this.onSale = onSale;
+        this.discountPercent = discountPercent;
     }
 
     public long getId() {
         return id;
+    }
+
+    public double getDiscount() {
+        return discountPercent;
+    }
+    public boolean getIsOnSale() {
+        return onSale;
+    }
+
+    public void setOnSale(boolean isOnSale){
+        this.onSale = isOnSale;
+    }
+
+    public void setDiscountPercent(double discountPercent){
+        this.discountPercent = discountPercent;
     }
 
     public String getName() {
