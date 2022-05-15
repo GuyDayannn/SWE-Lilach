@@ -60,7 +60,8 @@ public class CatalogItem implements Serializable {
     public double getDiscount() {
         return discountPercent;
     }
-    public boolean getIsOnSale() {
+
+    public boolean isOnSale() {
         return onSale;
     }
 

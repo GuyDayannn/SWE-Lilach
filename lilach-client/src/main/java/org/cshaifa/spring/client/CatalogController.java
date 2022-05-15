@@ -1,11 +1,16 @@
 package org.cshaifa.spring.client;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
@@ -117,22 +122,23 @@ public class CatalogController {
                 HBox hBox = new HBox();
                 VBox vBox = new VBox();
                 ImageView iv = null;
-                ImageView iv2 = null;
+                //ImageView iv2 = null;
 
                 if (item.getImage() != null) {
                     try {
                         iv = new ImageView(App.getImageFromByteArray(item.getImage()));
-                        iv2 = new ImageView(App.getImageFromByteArray(item.getImage()));
+                        //iv2 = new ImageView(App.getImageFromByteArray(item.getImage()));
                         iv.setFitWidth(60);
                         iv.setFitHeight(60);
-                        iv2.setFitWidth(20);
-                        iv2.setFitHeight(20);
+                        //iv2.setFitWidth(20);
+                        //iv2.setFitHeight(20);
                     } catch (IOException e1) {
                         // TODO: maybe log the exception somewhere
                         e1.printStackTrace();
                     }
                 }
 
+                /*
                 if (catalogItems.indexOf(item)%5==0) {
                     MenuItem menuItem = new MenuItem();
                     menuItem.setGraphic(iv2);
@@ -145,16 +151,24 @@ public class CatalogController {
                     });
                     shoppingCart.getItems().add(menuItem);
                 }
+                */
 
                 Text itemName = new Text(item.getName());
-                Text itemPrice;
-                if(item.getIsOnSale()) {
-                    itemPrice = new Text(Double.toString(item.getPrice()*0.01*(100-item.getDiscount())));
+                Text itemPrice = new Text(Double.toString(item.getPrice()));
+                if(item.isOnSale()) {
+                    VBox textBox = new VBox();
+                    itemPrice.strikethroughProperty().setValue(true);
+
+                    double newPrice = new BigDecimal(item.getPrice()*0.01*(100-item.getDiscount())).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                    Text newItemPrice = new Text(Double.toString(newPrice));
+                    newItemPrice.setFill(Color.RED);
+                    newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                    textBox.getChildren().addAll(itemPrice, newItemPrice);
+                    vBox.getChildren().addAll(itemName, textBox);
                 }
                 else {
-                    itemPrice = new Text(Double.toString(item.getPrice()));
+                    vBox.getChildren().addAll(itemName, itemPrice);
                 }
-                vBox.getChildren().addAll(itemName, itemPrice);
                 Button button = new Button("View Item");
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -173,7 +187,7 @@ public class CatalogController {
                               + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
                               + "-fx-border-radius: 5;" + "-fx-border-color: green;");
 
-                if(item.getIsOnSale()==true) {
+                if(item.isOnSale()) {
                     hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
                             + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
                             + "-fx-border-radius: 5;" + "-fx-background: #8d8484 ;" + "-fx-border-color: red;");
@@ -211,7 +225,6 @@ public class CatalogController {
             MenuItem completeOrder = new MenuItem("Finish Order");
             shoppingCart.getItems().add(editCart);
             shoppingCart.getItems().add(completeOrder);
-            salesHBox.setStyle("-fx-border-width: 2;" + "-fx-border-color: red;");
 
             App.hideLoading();
         });
