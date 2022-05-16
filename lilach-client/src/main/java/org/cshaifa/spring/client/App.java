@@ -3,6 +3,7 @@ package org.cshaifa.spring.client;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -52,11 +53,11 @@ public class App extends Application {
     private static Text currentItemPrice;
     private static Text currentItemName;
 
-    private static User currentUser;
+    private static User currentUser = null;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        scene = new Scene(loadFXML("primary"), 1040, 700);
+        scene = new Scene(loadFXML("employeeProfile"), 1040, 700);
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
@@ -85,7 +86,10 @@ public class App extends Application {
         scene = new Scene(root);
         if (pageName == "catalog") {
             System.out.println("catalog");
-            scene.getStylesheets().add(App.class.getResource("stylesheets/catalog.css").toExternalForm());
+            URL styleSheet = App.class.getResource("stylesheets/"+pageName+".css");
+            if (styleSheet!=null) {
+                scene.getStylesheets().add(styleSheet.toExternalForm());
+            }
         }
         appStage.setScene(scene);
         appStage.show();
@@ -200,4 +204,6 @@ public class App extends Application {
     }
 
     public static User getCurrentUser() { return currentUser; }
+
+    public static void setCurrentUser(User user) { currentUser = user; }
 }

@@ -20,7 +20,7 @@
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
           <Button fx:id="NewOrderButton" mnemonicParsing="false" text="New Order" />
-            <Button mnemonicParsing="false" text="Register" />
+            <Button fx:id="registerButton" mnemonicParsing="false" onMouseClicked="#goRegister" text="Register" />
             <Button fx:id="refreshButton" mnemonicParsing="false" onMouseClicked="#refreshCatalog" text="Refresh" />
             <MenuBar styleClass="menubar">
               <menus>

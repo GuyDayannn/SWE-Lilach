@@ -34,6 +34,8 @@ public class CatalogController {
 
     @FXML    private Button refreshButton;
 
+    @FXML    private Button registerButton;
+
     @FXML    private HBox bottomBar;
 
     @FXML    private ImageView catalogTitle;
@@ -90,6 +92,12 @@ public class CatalogController {
         salesHBox.getChildren().clear();
         shoppingCart.getItems().clear();
         initialize();
+    }
+
+    @FXML
+    void goRegister(MouseEvent event) throws IOException {
+        App.setWindowTitle("register");
+        App.setContent("customerRegister");
     }
 
 
