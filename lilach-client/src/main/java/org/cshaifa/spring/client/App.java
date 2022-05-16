@@ -57,7 +57,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        scene = new Scene(loadFXML("employeeProfile"), 1040, 700);
+        scene = new Scene(loadFXML("primary"), 1040, 700);
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;

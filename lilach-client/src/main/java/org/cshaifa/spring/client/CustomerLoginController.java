@@ -89,6 +89,13 @@ public class CustomerLoginController {
             invalid_login_text.setText(Constants.LOGIN_SUCCESS);
             invalid_login_text.setTextFill(Color.GREEN);
             App.hideLoading();
+            App.setCurrentUser(loginResponse.getUser());
+            try {
+                App.setWindowTitle("Customer Profile");
+                App.setContent("customerProfile");
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         });
 
         App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
