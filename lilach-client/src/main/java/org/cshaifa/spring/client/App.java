@@ -194,4 +194,6 @@ public class App extends Application {
     }
 
     public static User getCurrentUser() { return currentUser; }
+
+    public static void setCurrentUser(User user) { currentUser = user; }
 }

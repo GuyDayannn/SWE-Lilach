@@ -1,13 +1,5 @@
 package org.cshaifa.spring.client;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -16,12 +8,12 @@ import org.cshaifa.spring.utils.Constants;
 
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-
-//TODO: 1. create login btn from main screen
-//2. connect to db
-//3. validatelogin
-
-
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 
 public class CustomerLoginController {
     @FXML
@@ -69,7 +61,6 @@ public class CustomerLoginController {
 
         loginTask.setOnSucceeded(e -> {
             if (loginTask.getValue() == null) {
-                System.err.println("Login Failed");
                 invalid_login_text.setText("Login Failed");
                 invalid_login_text.setTextFill(Color.RED);
                 App.hideLoading();
@@ -78,17 +69,22 @@ public class CustomerLoginController {
 
             LoginResponse loginResponse = loginTask.getValue();
             if (!loginResponse.isSuccessful()) {
-                System.err.println("Login Failed " + loginResponse.getMessage());
                 invalid_login_text.setText(loginResponse.getMessage());
                 invalid_login_text.setTextFill(Color.RED);
                 App.hideLoading();
                 return;
             }
 
-            System.out.println("Login Success!");
-            invalid_login_text.setText(Constants.LOGIN_SUCCESS);
-            invalid_login_text.setTextFill(Color.GREEN);
+            App.setCurrentUser(loginResponse.getUser());
             App.hideLoading();
+            App.setWindowTitle("Catalog");
+            try {
+                App.setContent("catalog");
+            } catch (IOException e1) {
+                // shouldn't happen
+                e1.printStackTrace();
+                App.setWindowTitle("Login");
+            }
         });
 
         App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);

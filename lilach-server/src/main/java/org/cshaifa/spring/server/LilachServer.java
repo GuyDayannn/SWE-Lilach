@@ -67,11 +67,14 @@ public class LilachServer extends AbstractServer {
                 String message = user != null ? Constants.SUCCESS_MSG : Constants.WRONG_CREDENTIALS;
                 sendToAllClients(new LoginResponse(requestId, user != null, message, user));
             } else if (request instanceof RegisterRequest) {
+                // We assume we login immediately after register
                 RegisterRequest registerRequest = (RegisterRequest) request;
                 try {
                     String message = DatabaseHandler.registerCustomer(registerRequest.getFullName(), registerRequest.getEmail(), registerRequest.getUsername(), registerRequest.getPassword());
                     if (message.equals(Constants.SUCCESS_MSG)) {
                         User user = DatabaseHandler.getUserByEmail(registerRequest.getEmail());
+                        // TODO: maybe catch this separately
+                        DatabaseHandler.updateLoginStatus(user);
                         sendToAllClients(new RegisterResponse(requestId, true, message, user));
                     } else {
                         sendToAllClients(new RegisterResponse(requestId, false, message));
