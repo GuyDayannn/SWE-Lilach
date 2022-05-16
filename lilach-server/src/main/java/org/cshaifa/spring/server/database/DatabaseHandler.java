@@ -18,10 +18,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -140,6 +137,27 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
+    public static String registerChainEmployee(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSession();
+        session.beginTransaction();
+
+        try {
+            String hexSalt = generateHexSalt();
+            session.save(
+                    new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return Constants.SUCCESS_MSG;
+    }
+
     private static List<Path> getRandomOrderedImages() {
         List<Path> imagesList = ImageUtils.getAllImagesFromFolder("images", DatabaseHandler.class);
 
@@ -153,6 +171,7 @@ public class DatabaseHandler {
         List<Path> imageList = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
+
         for (int i = 0; i < imageList.size(); i++) {
             double randomPrice = 200 * random.nextDouble();
             int randomQuantity = random.nextInt(500);
@@ -172,6 +191,8 @@ public class DatabaseHandler {
         for (int i = 0; i < 20; i++) {
             registerCustomer("Customer " + i, "example" + i + "@mail.com", "cust" + i, "pass" + i);
         }
+
+        registerChainEmployee("Employee","Employee","Employee123","Employee123");
 
     }
 
