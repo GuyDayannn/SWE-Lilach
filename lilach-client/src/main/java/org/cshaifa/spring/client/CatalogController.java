@@ -183,17 +183,13 @@ public class CatalogController {
                 hBox.getChildren().add(vBox);
                 hBox.setPrefSize(200,100);
                 hBox.setSpacing(5);
-                hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
-                              + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
-                              + "-fx-border-radius: 5;" + "-fx-border-color: green;");
-
                 if(item.isOnSale()) {
-                    hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
-                            + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
-                            + "-fx-border-radius: 5;" + "-fx-background: #8d8484 ;" + "-fx-border-color: red;");
+                    hBox.getStyleClass().add("saleitem");
                     salesHBox.getChildren().add(hBox);
                 }
                 else {
+                    hBox.getStyleClass().add("catalogitem");
+
                     if (count_displayed_items<5) {
                         flowerHBox.getChildren().add(hBox);
                     }

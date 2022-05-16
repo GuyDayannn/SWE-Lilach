@@ -1,0 +1,28 @@
+.root {
+
+}
+
+.onsale {
+    -fx-background-color: #acacac;
+}
+
+.saleitem {
+    -fx-padding: 5;
+    -fx-border-style: solid inside;
+    -fx-border-width: 2;
+    -fx-border-insets: 5;
+    -fx-border-radius: 5;
+    -fx-background-color: #ffd75b;
+    -fx-background-insets: 5;
+    -fx-background-radius: 5;
+    -fx-border-color: red;
+}
+
+.catalogitem {
+    -fx-padding: 5;
+    -fx-border-style: solid inside;
+    -fx-border-width: 2;
+    -fx-border-insets: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: green;
+}
