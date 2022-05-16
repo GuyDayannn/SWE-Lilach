@@ -83,6 +83,10 @@ public class App extends Application {
     static void setContent(String pageName) throws IOException {
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
+        if (pageName == "catalog") {
+            System.out.println("catalog");
+            scene.getStylesheets().add(App.class.getResource("stylesheets/catalog.css").toExternalForm());
+        }
         appStage.setScene(scene);
         appStage.show();
     }

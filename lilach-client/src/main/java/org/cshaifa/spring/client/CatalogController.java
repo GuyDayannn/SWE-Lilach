@@ -1,11 +1,16 @@
 package org.cshaifa.spring.client;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
@@ -32,6 +37,8 @@ public class CatalogController {
     @FXML    private HBox bottomBar;
 
     @FXML    private ImageView catalogTitle;
+
+    @FXML    private Text onSaleText;
 
     @FXML    private HBox salesHBox;
 
@@ -107,31 +114,31 @@ public class CatalogController {
                 System.err.println("Getting catalog failed");
                 return;
             }
-            List<CatalogItem> catalogItems = response.getCatalogItems();
 
-            Image imagexample = new Image(catalogItems.get(0).getImagePath());
+            List<CatalogItem> catalogItems = response.getCatalogItems();
 
             int count_displayed_items = 0;
             for (CatalogItem item : catalogItems) {
                 HBox hBox = new HBox();
                 VBox vBox = new VBox();
                 ImageView iv = null;
-                ImageView iv2 = null;
+                //ImageView iv2 = null;
 
                 if (item.getImage() != null) {
                     try {
                         iv = new ImageView(App.getImageFromByteArray(item.getImage()));
-                        iv2 = new ImageView(App.getImageFromByteArray(item.getImage()));
+                        //iv2 = new ImageView(App.getImageFromByteArray(item.getImage()));
                         iv.setFitWidth(60);
                         iv.setFitHeight(60);
-                        iv2.setFitWidth(20);
-                        iv2.setFitHeight(20);
+                        //iv2.setFitWidth(20);
+                        //iv2.setFitHeight(20);
                     } catch (IOException e1) {
                         // TODO: maybe log the exception somewhere
                         e1.printStackTrace();
                     }
                 }
 
+                /*
                 if (catalogItems.indexOf(item)%5==0) {
                     MenuItem menuItem = new MenuItem();
                     menuItem.setGraphic(iv2);
@@ -144,16 +151,24 @@ public class CatalogController {
                     });
                     shoppingCart.getItems().add(menuItem);
                 }
+                */
 
                 Text itemName = new Text(item.getName());
-                Text itemPrice;
-                if(item.getIsOnSale()) {
-                    itemPrice = new Text(Double.toString(item.getPrice()*(1-item.getDiscount())));
+                Text itemPrice = new Text(Double.toString(item.getPrice()));
+                if(item.isOnSale()) {
+                    VBox textBox = new VBox();
+                    itemPrice.strikethroughProperty().setValue(true);
+
+                    double newPrice = new BigDecimal(item.getPrice()*0.01*(100-item.getDiscount())).setScale(2, RoundingMode.HALF_UP).doubleValue();
+                    Text newItemPrice = new Text(Double.toString(newPrice));
+                    newItemPrice.setFill(Color.RED);
+                    newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                    textBox.getChildren().addAll(itemPrice, newItemPrice);
+                    vBox.getChildren().addAll(itemName, textBox);
                 }
                 else {
-                    itemPrice = new Text(Double.toString(item.getPrice()));
+                    vBox.getChildren().addAll(itemName, itemPrice);
                 }
-                vBox.getChildren().addAll(itemName, itemPrice);
                 Button button = new Button("View Item");
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
@@ -168,14 +183,13 @@ public class CatalogController {
                 hBox.getChildren().add(vBox);
                 hBox.setPrefSize(200,100);
                 hBox.setSpacing(5);
-                hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
-                              + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
-                              + "-fx-border-radius: 5;" + "-fx-border-color: green;");
-                if(item.getIsOnSale()==true) {
+                if(item.isOnSale()) {
+                    hBox.getStyleClass().add("saleitem");
                     salesHBox.getChildren().add(hBox);
-
                 }
                 else {
+                    hBox.getStyleClass().add("catalogitem");
+
                     if (count_displayed_items<5) {
                         flowerHBox.getChildren().add(hBox);
                     }
@@ -207,7 +221,6 @@ public class CatalogController {
             MenuItem completeOrder = new MenuItem("Finish Order");
             shoppingCart.getItems().add(editCart);
             shoppingCart.getItems().add(completeOrder);
-            //shoppingCart.setStyle("-fx-background-color: black;" + "-fx-opacity: 0.5;");
 
             App.hideLoading();
         });
