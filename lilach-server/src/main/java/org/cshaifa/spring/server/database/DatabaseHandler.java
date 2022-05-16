@@ -87,10 +87,13 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
-    public static void updateLoginStatus(User user) throws HibernateException {
+    public static void updateLoginStatus(User user, boolean status) throws HibernateException {
         Session session = DatabaseConnector.getSession();
-        if (!user.isLoggedIn()) {
-            user.login();
+        if (user.isLoggedIn() == !status) {
+            if (status)
+                user.login();
+            else
+                user.logout();
             session.beginTransaction();
             session.merge(user);
             tryFlushSession(session);
