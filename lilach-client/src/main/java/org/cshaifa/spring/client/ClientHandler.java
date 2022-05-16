@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.net.ConnectException;
 
 import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.requests.GetCatalogRequest;
-import org.cshaifa.spring.entities.requests.LoginRequest;
-import org.cshaifa.spring.entities.requests.RegisterRequest;
-import org.cshaifa.spring.entities.requests.UpdateItemRequest;
+import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.requests.*;
 import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
@@ -61,5 +59,12 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(registerRequest);
         return (RegisterResponse) waitForMsgFromServer(registerRequest.getRequestId());
+    }
+
+    public static LogoutResponse logoutUser(User user) throws IOException{
+        LogoutRequest logoutRequest  = new LogoutRequest(user);
+        client.openConnection();
+        client.sendToServer(logoutRequest);
+        return (LogoutResponse) waitForMsgFromServer(logoutRequest.getRequestId());
     }
 }
