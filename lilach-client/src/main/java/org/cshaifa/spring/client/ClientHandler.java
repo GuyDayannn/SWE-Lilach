@@ -62,6 +62,8 @@ public class ClientHandler {
     }
 
     public static LogoutResponse logoutUser(User user) throws IOException{
+        if (user == null)
+            return null;
         LogoutRequest logoutRequest  = new LogoutRequest(user);
         client.openConnection();
         client.sendToServer(logoutRequest);

@@ -33,6 +33,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.utils.Constants;
 
 /**
  * JavaFX App
@@ -60,6 +61,11 @@ public class App extends Application {
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
+        // TODO: logout without any loading for now, maybe change, maybe don't
+        appStage.setOnCloseRequest(e -> new Thread(
+                createTimedTask(() -> ClientHandler.logoutUser(currentUser), Constants.REQUEST_TIMEOUT,
+                        TimeUnit.SECONDS))
+                .start());
         appStage.show();
     }
 
@@ -140,7 +146,6 @@ public class App extends Application {
         vBox.setAlignment(Pos.CENTER);
         vBox.setStyle("-fx-background-color: transparent");
 
-
         loadingStage = new Stage();
         loadingStage.initStyle(StageStyle.TRANSPARENT);
         loadingStage.initOwner(appStage);
@@ -170,7 +175,7 @@ public class App extends Application {
         try {
             root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
-            popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
+            popUpStage.initModality(Modality.APPLICATION_MODAL); // popup
             popUpStage.initOwner(caller.getScene().getWindow());
             popUpStage.showAndWait();
         } catch (IOException e) {
@@ -193,7 +198,11 @@ public class App extends Application {
         return currentItemDisplayed;
     }
 
-    public static User getCurrentUser() { return currentUser; }
+    public static User getCurrentUser() {
+        return currentUser;
+    }
 
-    public static void setCurrentUser(User user) { currentUser = user; }
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
 }
