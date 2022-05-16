@@ -53,6 +53,17 @@ public class LilachServer extends AbstractServer {
             } else if (request instanceof LoginRequest) {
                 LoginRequest loginRequest = (LoginRequest) request;
                 User user = DatabaseHandler.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
+                if (user != null && user.isLoggedIn()) {
+                    sendToAllClients(new LoginResponse(requestId, false, Constants.ALREADY_LOGGED_IN));
+                    return;
+                }
+                if (user != null) {
+                    try {
+                        DatabaseHandler.updateLoginStatus(user);
+                    } catch (HibernateException e) {
+                        sendToAllClients(new LoginResponse(requestId, false, Constants.FAIL_MSG));
+                    }
+                }
                 String message = user != null ? Constants.SUCCESS_MSG : Constants.WRONG_CREDENTIALS;
                 sendToAllClients(new LoginResponse(requestId, user != null, message, user));
             } else if (request instanceof RegisterRequest) {

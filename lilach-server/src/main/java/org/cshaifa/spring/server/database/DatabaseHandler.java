@@ -46,7 +46,8 @@ public class DatabaseHandler {
         return SecureUtils.encodeHexString(salt);
     }
 
-    private static String getHashedPassword(String rawPassword, String saltHexString) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private static String getHashedPassword(String rawPassword, String saltHexString)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] salt = SecureUtils.decodeHexString(saltHexString);
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
         PBEKeySpec spec = new PBEKeySpec(rawPassword.toCharArray(), salt, PBKDF2_ITERATIONS, PASSWORD_KEY_LENGTH);
@@ -65,7 +66,7 @@ public class DatabaseHandler {
 
         try {
             query.select(root).where(builder.and(builder.equal(root.get("username"), username),
-                                                 builder.equal(root.get("password"), getHashedPassword(password, user.getPasswordSalt()))));
+                    builder.equal(root.get("password"), getHashedPassword(password, user.getPasswordSalt()))));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
@@ -86,6 +87,17 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
+    public static void updateLoginStatus(User user) throws HibernateException {
+        Session session = DatabaseConnector.getSession();
+        if (!user.isLoggedIn()) {
+            user.login();
+            session.beginTransaction();
+            session.merge(user);
+            tryFlushSession(session);
+        }
+
+    }
+
     public static User getUserByEmail(String email) {
         Session session = DatabaseConnector.getSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -97,7 +109,8 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
-    public static String registerCustomer(String fullName, String email, String username, String rawPassword) throws HibernateException {
+    public static String registerCustomer(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -111,7 +124,8 @@ public class DatabaseHandler {
 
         try {
             String hexSalt = generateHexSalt();
-            session.save(new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt, false));
+            session.save(
+                    new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt, false));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
@@ -139,7 +153,9 @@ public class DatabaseHandler {
         for (int i = 0; i < imageList.size(); i++) {
             double randomPrice = 200 * random.nextDouble();
             int randomQuantity = random.nextInt(500);
-            randomItems.add(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, false, 0.0));
+            randomItems.add(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(),
+                    new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, false,
+                    0.0));
         }
 
         for (CatalogItem item : randomItems) {
@@ -151,7 +167,7 @@ public class DatabaseHandler {
         tryFlushSession(session);
 
         for (int i = 0; i < 20; i++) {
-            registerCustomer("Customer " + i, "example"+i+"@mail.com", "cust" + i, "pass" + i);
+            registerCustomer("Customer " + i, "example" + i + "@mail.com", "cust" + i, "pass" + i);
         }
 
     }
@@ -170,7 +186,8 @@ public class DatabaseHandler {
 
         for (CatalogItem catalogItem : catalogItems) {
             try {
-                catalogItem.setImage(ImageUtils.getByteArrayFromURI(new URI(catalogItem.getImagePath()), DatabaseHandler.class));
+                catalogItem.setImage(
+                        ImageUtils.getByteArrayFromURI(new URI(catalogItem.getImagePath()), DatabaseHandler.class));
             } catch (Exception e) {
                 // TODO: maybe log the exception somewhere
                 e.printStackTrace();
@@ -178,7 +195,6 @@ public class DatabaseHandler {
         }
         return catalogItems;
     }
-
 
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSession();
