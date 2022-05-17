@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "customers")
@@ -16,8 +14,7 @@ public class Customer extends User {
 
     private boolean frozen;
 
-    @Cascade(CascadeType.ALL)
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Store> stores;
 
     private SubscriptionType subscriptionType;
@@ -34,6 +31,7 @@ public class Customer extends User {
             List<Store> stores, boolean frozen, SubscriptionType subscriptionType) {
         super(fullName, username, email, password, passwordSalt);
         this.stores = stores;
+
         this.frozen = frozen;
         this.subscriptionType = subscriptionType;
     }

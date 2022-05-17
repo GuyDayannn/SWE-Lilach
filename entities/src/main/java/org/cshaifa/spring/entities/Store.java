@@ -4,10 +4,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
-
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "stores")
@@ -19,11 +23,10 @@ public class Store implements Serializable {
     private String name;
     private String address;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<CatalogItem> stock;
 
-    @Cascade(CascadeType.ALL)
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Customer> customers;
 
     public Store() {

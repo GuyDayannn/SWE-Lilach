@@ -14,12 +14,16 @@ import java.util.Random;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.persistence.Entity;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.*;
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.ChainEmployee;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.SubscriptionType;
+import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -126,11 +130,16 @@ public class DatabaseHandler {
 
         try {
             String hexSalt = generateHexSalt();
-            session.save(
-                    new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt, stores,
-                            false, subscriptionType));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
+                    hexSalt, stores,
+                    false, subscriptionType);
+            session.save(customer);
+            for (Store store : stores) {
+                store.addCustomer(customer);
+                session.merge(store);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
             throw new HibernateException(Constants.FAIL_MSG);
         }
@@ -148,7 +157,7 @@ public class DatabaseHandler {
 
         try {
             String hexSalt = generateHexSalt();
-            session.save(
+            session.merge(
                     new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
@@ -191,20 +200,24 @@ public class DatabaseHandler {
             session.save(item);
         }
 
-        tryFlushSession(session);
+        // tryFlushSession(session);
 
         Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5));
+        session.save(store);
+        tryFlushSession(session);
 
         for (int i = 0; i < 20; i++) {
             String email = "example" + i + "@mail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, List.of(store), SubscriptionType.STORE);
-            // We know its a customer
-            store.addCustomer((Customer) getUserByEmail(email));
         }
 
-        session.beginTransaction();
-        session.save(store);
-        tryFlushSession(session);
+        // session.beginTransaction();
+        // try {
+        // session.save(store);
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+        // tryFlushSession(session);
 
         registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
 
@@ -249,6 +262,8 @@ public class DatabaseHandler {
             session.flush();
             session.getTransaction().commit();
         } catch (Exception e) {
+            // TODO: report somewhere
+            e.printStackTrace();
             session.getTransaction().rollback();
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
