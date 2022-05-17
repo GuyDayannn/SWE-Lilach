@@ -63,11 +63,17 @@ public class App extends Application {
         stage.setScene(scene);
         appStage = stage;
         // TODO: logout without any loading for now, maybe change, maybe don't
-        appStage.setOnCloseRequest(e -> new Thread(
-                createTimedTask(() -> ClientHandler.logoutUser(currentUser), Constants.REQUEST_TIMEOUT,
-                        TimeUnit.SECONDS))
-                .start());
+        appStage.setOnCloseRequest(e -> logoutUser());
         appStage.show();
+    }
+
+    public static void logoutUser() {
+        final User toLogout = currentUser;
+        new Thread(
+                createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT,
+                        TimeUnit.SECONDS))
+                .start();
+        currentUser = null;
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -92,8 +98,8 @@ public class App extends Application {
         scene = new Scene(root);
         if (pageName == "catalog") {
             System.out.println("catalog");
-            URL styleSheet = App.class.getResource("stylesheets/"+pageName+".css");
-            if (styleSheet!=null) {
+            URL styleSheet = App.class.getResource("stylesheets/" + pageName + ".css");
+            if (styleSheet != null) {
                 scene.getStylesheets().add(styleSheet.toExternalForm());
             }
         }
@@ -183,8 +189,8 @@ public class App extends Application {
         try {
             root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
-            popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
-            if (caller!=null) {
+            popUpStage.initModality(Modality.APPLICATION_MODAL); // popup
+            if (caller != null) {
                 popUpStage.initOwner(caller.getScene().getWindow());
             }
             popUpStage.showAndWait();
@@ -208,7 +214,11 @@ public class App extends Application {
         return currentItemDisplayed;
     }
 
-    public static User getCurrentUser() { return currentUser; }
+    public static User getCurrentUser() {
+        return currentUser;
+    }
 
-    public static void setCurrentUser(User user) { currentUser = user; }
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
 }

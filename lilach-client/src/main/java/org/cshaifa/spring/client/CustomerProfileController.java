@@ -55,7 +55,7 @@ public class CustomerProfileController {
 
     @FXML
     void logOut(ActionEvent event) throws IOException {
-        App.setCurrentUser(null);
+        App.logoutUser();
         App.setWindowTitle("primary");
         App.setContent("primary");
     }

@@ -90,11 +90,7 @@ public class EmployeeProfileController {
 
     @FXML
     void exitProfile(ActionEvent event) throws IOException {
-        User currentUser = App.getCurrentUser();
-        new Thread(App.createTimedTask(() -> ClientHandler.logoutUser(currentUser), Constants.REQUEST_TIMEOUT,
-                        TimeUnit.SECONDS))
-                .start();
-        App.setCurrentUser(null);
+        App.logoutUser();
         App.setWindowTitle("primary");
         App.setContent("primary");
     }
