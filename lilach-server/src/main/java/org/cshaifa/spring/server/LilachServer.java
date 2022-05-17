@@ -84,7 +84,8 @@ public class LilachServer extends AbstractServer {
                     } else {
                         sendToAllClients(new RegisterResponse(requestId, false, message));
                     }
-                } catch (HibernateException e) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                     sendToAllClients(new RegisterResponse(requestId, false, Constants.FAIL_MSG));
                 }
             } else if (request instanceof LogoutRequest logoutRequest) {

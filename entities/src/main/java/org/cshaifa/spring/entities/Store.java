@@ -36,6 +36,13 @@ public class Store implements Serializable {
         this.customers = new ArrayList<>();
     }
 
+    public Store(String name, String address) {
+        this.name = name;
+        this.address = address;
+        this.stock = new ArrayList<>();
+        this.customers = new ArrayList<>();
+    }
+
     public Store(String name, String address, List<CatalogItem> stock) {
         this.name = name;
         this.address = address;

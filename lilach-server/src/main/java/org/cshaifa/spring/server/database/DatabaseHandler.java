@@ -116,7 +116,7 @@ public class DatabaseHandler {
 
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
             List<Store> stores, SubscriptionType subscriptionType)
-            throws HibernateException {
+            throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -177,7 +177,7 @@ public class DatabaseHandler {
         return imagesList;
     }
 
-    public static void initializeDatabaseIfEmpty() throws HibernateException {
+    public static void initializeDatabaseIfEmpty() throws Exception {
         // Assume that we initialize only if the catalog is empty
         if (!getAllEntities(CatalogItem.class).isEmpty())
             return;
@@ -200,24 +200,16 @@ public class DatabaseHandler {
             session.save(item);
         }
 
-        // tryFlushSession(session);
-
-        Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5));
+        Store store = new Store("Example Store", "Example Address", new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
         session.save(store);
         tryFlushSession(session);
 
+        List<Store> stores = new ArrayList<>();
+        stores.add(store);
         for (int i = 0; i < 20; i++) {
             String email = "example" + i + "@mail.com";
-            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, List.of(store), SubscriptionType.STORE);
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE);
         }
-
-        // session.beginTransaction();
-        // try {
-        // session.save(store);
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // }
-        // tryFlushSession(session);
 
         registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
 

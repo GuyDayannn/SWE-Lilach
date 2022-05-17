@@ -8,7 +8,7 @@ import org.cshaifa.spring.utils.Constants;
 public class ServerApp {
     private static final LilachServer server = new LilachServer(Constants.SERVER_PORT);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         server.listen();
         DatabaseHandler.initializeDatabaseIfEmpty();
 
