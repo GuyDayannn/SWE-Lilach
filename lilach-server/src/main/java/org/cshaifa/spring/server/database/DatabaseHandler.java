@@ -157,27 +157,6 @@ public class DatabaseHandler {
 
         try {
             String hexSalt = generateHexSalt();
-            session.merge(
-                    new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
-            e.printStackTrace();
-            throw new HibernateException(Constants.FAIL_MSG);
-        }
-
-        tryFlushSession(session);
-
-        return Constants.SUCCESS_MSG;
-    }
-
-    public static String registerChainEmployee(String fullName, String email, String username, String rawPassword)
-            throws HibernateException {
-
-        Session session = DatabaseConnector.getSession();
-        session.beginTransaction();
-
-        try {
-            String hexSalt = generateHexSalt();
             session.save(
                     new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
