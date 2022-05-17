@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CustomerProfileController">
+   <children>
+      <Text fx:id="welcomeText" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, _____________">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Text>
+      <TabPane layoutY="32.0" prefHeight="568.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="                           Orders                           ">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView fx:id="orderList" layoutY="23.0" prefHeight="408.0" prefWidth="800.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="                           Complaints                           ">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView fx:id="complaintList" layoutY="36.0" prefHeight="200.0" prefWidth="800.0" />
+                        <Button fx:id="newComplaintButton" layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#sendComplaint" text="New Complaint" />
+                        <Text layoutX="22.0" layoutY="265.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
+                        <TextArea fx:id="complaintDescription" layoutX="21.0" layoutY="270.0" prefHeight="246.0" prefWidth="345.0" />
+                        <Button fx:id="closeComplaintButton" layoutX="107.0" layoutY="5.0" mnemonicParsing="false" onAction="#closeComplaint" text="Close Complaint" />
+                        <Text layoutX="400.0" layoutY="322.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Order ID:" />
+                        <Text layoutX="400.0" layoutY="283.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Status:" />
+                        <Text layoutX="400.0" layoutY="362.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Response:" />
+                        <Text layoutX="400.0" layoutY="512.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Compensation Amount:" />
+                        <TextField fx:id="complaintStatus" layoutX="512.0" layoutY="266.0" prefHeight="26.0" prefWidth="151.0" />
+                        <TextField fx:id="complaintOrderID" layoutX="463.0" layoutY="305.0" prefHeight="26.0" prefWidth="200.0" />
+                        <TextField fx:id="complaintResponse" layoutX="400.0" layoutY="380.0" prefHeight="94.0" prefWidth="378.0" />
+                        <TextField fx:id="compensationAmount" layoutX="537.0" layoutY="494.0" prefHeight="26.0" prefWidth="142.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+      <Button fx:id="signOutButton" layoutX="723.0" layoutY="3.0" mnemonicParsing="false" onAction="#logOut" text="Sign Out" />
+      <Button fx:id="viewCatalogButton" layoutX="623.0" layoutY="3.0" mnemonicParsing="false" onAction="#openCatalog" text="View Catalog" />
+   </children>
+</AnchorPane>

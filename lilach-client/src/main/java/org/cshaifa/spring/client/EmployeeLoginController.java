@@ -1,11 +1,5 @@
 package org.cshaifa.spring.client;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import org.cshaifa.spring.entities.responses.LoginResponse;
-import org.cshaifa.spring.utils.Constants;
-
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,8 +8,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import org.cshaifa.spring.entities.responses.LoginResponse;
+import org.cshaifa.spring.utils.Constants;
 
-public class CustomerLoginController {
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+//TODO: 1. create login btn from main screen
+//2. connect to db
+//3. validatelogin
+
+
+public class EmployeeLoginController {
     @FXML
     private Button cancelBtn;
 
@@ -61,6 +65,7 @@ public class CustomerLoginController {
 
         loginTask.setOnSucceeded(e -> {
             if (loginTask.getValue() == null) {
+                System.err.println("Login Failed");
                 invalid_login_text.setText("Login Failed");
                 invalid_login_text.setTextFill(Color.RED);
                 App.hideLoading();
@@ -69,17 +74,21 @@ public class CustomerLoginController {
 
             LoginResponse loginResponse = loginTask.getValue();
             if (!loginResponse.isSuccessful()) {
+                System.err.println("Login Failed " + loginResponse.getMessage());
                 invalid_login_text.setText(loginResponse.getMessage());
                 invalid_login_text.setTextFill(Color.RED);
                 App.hideLoading();
                 return;
             }
 
-            App.setCurrentUser(loginResponse.getUser());
+            System.out.println("Login Success!");
+            invalid_login_text.setText(Constants.LOGIN_SUCCESS);
+            invalid_login_text.setTextFill(Color.GREEN);
             App.hideLoading();
+            App.setCurrentUser(loginResponse.getUser());
             try {
-                App.setWindowTitle("Customer Profile");
-                App.setContent("customerProfile");
+                App.setWindowTitle("Employee Profile");
+                App.setContent("employeeProfile");
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

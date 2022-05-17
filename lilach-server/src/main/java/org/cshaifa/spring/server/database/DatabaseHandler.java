@@ -170,6 +170,28 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
+    public static String registerChainEmployee(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSession();
+        session.beginTransaction();
+
+        try {
+            String hexSalt = generateHexSalt();
+            session.save(
+                    new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return Constants.SUCCESS_MSG;
+    }
+
+
     private static List<Path> getRandomOrderedImages() {
         List<Path> imagesList = ImageUtils.getAllImagesFromFolder("images", DatabaseHandler.class);
 
@@ -195,6 +217,9 @@ public class DatabaseHandler {
                     new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, false,
                     0.0));
         }
+        double randomPrice = 200 * random.nextDouble();
+        int randomQuantity = random.nextInt(500);
+        randomItems.add(new CatalogItem("Cool flower", imageList.get(3).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, true, 50.0));
 
         for (CatalogItem item : randomItems) {
             session.save(item);

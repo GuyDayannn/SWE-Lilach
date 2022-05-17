@@ -3,6 +3,7 @@ package org.cshaifa.spring.client;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -53,7 +54,7 @@ public class App extends Application {
     private static Text currentItemPrice;
     private static Text currentItemName;
 
-    private static User currentUser;
+    private static User currentUser = null;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -89,6 +90,13 @@ public class App extends Application {
     static void setContent(String pageName) throws IOException {
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
+        if (pageName == "catalog") {
+            System.out.println("catalog");
+            URL styleSheet = App.class.getResource("stylesheets/"+pageName+".css");
+            if (styleSheet!=null) {
+                scene.getStylesheets().add(styleSheet.toExternalForm());
+            }
+        }
         appStage.setScene(scene);
         appStage.show();
     }
@@ -175,8 +183,10 @@ public class App extends Application {
         try {
             root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
-            popUpStage.initModality(Modality.APPLICATION_MODAL); // popup
-            popUpStage.initOwner(caller.getScene().getWindow());
+            popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
+            if (caller!=null) {
+                popUpStage.initOwner(caller.getScene().getWindow());
+            }
             popUpStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
@@ -198,11 +208,7 @@ public class App extends Application {
         return currentItemDisplayed;
     }
 
-    public static User getCurrentUser() {
-        return currentUser;
-    }
+    public static User getCurrentUser() { return currentUser; }
 
-    public static void setCurrentUser(User user) {
-        currentUser = user;
-    }
+    public static void setCurrentUser(User user) { currentUser = user; }
 }
