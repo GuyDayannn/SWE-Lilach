@@ -25,6 +25,7 @@ public class DatabaseConnector {
         configuration.addAnnotatedClass(Store.class);
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Customer.class);
+        configuration.addAnnotatedClass(Employee.class);
         configuration.addAnnotatedClass(ChainEmployee.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()

@@ -11,6 +11,7 @@ public class Constants {
     public static final String USERNAME_EXISTS = "A user with this username already exists";
     public static final String REGISTER_SUCCESS = "You have successfully registered for LiLach";
     public static final String LOGIN_SUCCESS = "You have successfully logged in to LiLach";
+    public static final String ALREADY_LOGGED_IN = "You're already logged in on another device. Please log out, then try again";
 
     public static final int SERVER_PORT = 8072;
     public static final long REQUEST_TIMEOUT = 15;

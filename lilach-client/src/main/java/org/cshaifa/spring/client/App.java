@@ -34,6 +34,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.utils.Constants;
 
 /**
  * JavaFX App
@@ -61,6 +62,11 @@ public class App extends Application {
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
+        // TODO: logout without any loading for now, maybe change, maybe don't
+        appStage.setOnCloseRequest(e -> new Thread(
+                createTimedTask(() -> ClientHandler.logoutUser(currentUser), Constants.REQUEST_TIMEOUT,
+                        TimeUnit.SECONDS))
+                .start());
         appStage.show();
     }
 
@@ -147,7 +153,6 @@ public class App extends Application {
         VBox vBox = new VBox(indicator, cancelButton);
         vBox.setAlignment(Pos.CENTER);
         vBox.setStyle("-fx-background-color: transparent");
-
 
         loadingStage = new Stage();
         loadingStage.initStyle(StageStyle.TRANSPARENT);

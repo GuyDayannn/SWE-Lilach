@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -21,19 +23,38 @@ public class Store implements Serializable {
     private String name;
     private String address;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<CatalogItem> stock;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Customer> customers;
 
     public Store() {
         this.name = "";
         this.address = "";
         this.stock = new ArrayList<>();
+        this.customers = new ArrayList<>();
+    }
+
+    public Store(String name, String address) {
+        this.name = name;
+        this.address = address;
+        this.stock = new ArrayList<>();
+        this.customers = new ArrayList<>();
     }
 
     public Store(String name, String address, List<CatalogItem> stock) {
         this.name = name;
         this.address = address;
         this.stock = stock;
+        this.customers = new ArrayList<>();
+    }
+
+    public Store(String name, String address, List<CatalogItem> stock, List<Customer> customers) {
+        this.name = name;
+        this.address = address;
+        this.stock = stock;
+        this.customers = customers;
     }
 
     public long getId() {
@@ -63,4 +84,8 @@ public class Store implements Serializable {
     public void setStock(List<CatalogItem> stock) {
         this.stock = stock;
     }
+
+    public void addCustomer(Customer customer) { this.customers.add(customer); }
+
+    public void addItem(CatalogItem catalogItem) { this.stock.add(catalogItem); }
 }
