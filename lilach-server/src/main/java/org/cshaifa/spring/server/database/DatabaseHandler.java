@@ -166,7 +166,11 @@ public class DatabaseHandler {
         return imagesList;
     }
 
-    private static void initializeDatabaseIfEmpty() throws HibernateException {
+    public static void initializeDatabaseIfEmpty() throws HibernateException {
+        // Assume that we initialize only if the catalog is empty
+        if (!getAllEntities(CatalogItem.class).isEmpty())
+            return;
+
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
         List<Path> imageList = getRandomOrderedImages();
@@ -209,13 +213,8 @@ public class DatabaseHandler {
         return getAllEntities(Store.class);
     }
 
-    public static List<CatalogItem> getCatalog() throws HibernateException {
-        // We assume that we're getting the catalog when we first run our app
+    public static List<CatalogItem> getCatalog() {
         List<CatalogItem> catalogItems = getAllEntities(CatalogItem.class);
-        if (catalogItems.isEmpty()) {
-            initializeDatabaseIfEmpty();
-            catalogItems = getAllEntities(CatalogItem.class);
-        }
 
         for (CatalogItem catalogItem : catalogItems) {
             try {

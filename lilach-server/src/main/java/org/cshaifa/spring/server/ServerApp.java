@@ -10,7 +10,7 @@ public class ServerApp {
 
     public static void main(String[] args) throws IOException {
         server.listen();
-        DatabaseHandler.openSession();
+        DatabaseHandler.initializeDatabaseIfEmpty();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
