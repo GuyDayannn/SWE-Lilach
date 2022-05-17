@@ -1,4 +1,7 @@
 package org.cshaifa.spring.client;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -6,6 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
 
 import org.cshaifa.spring.entities.CatalogItem;
 
@@ -19,12 +24,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.utils.Constants;
 
 /**
  * JavaFX App
@@ -44,12 +53,19 @@ public class App extends Application {
     private static Text currentItemPrice;
     private static Text currentItemName;
 
+    private static User currentUser;
+
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
         scene = new Scene(loadFXML("primary"), 1040, 700);
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
+        // TODO: logout without any loading for now, maybe change, maybe don't
+        appStage.setOnCloseRequest(e -> new Thread(
+                createTimedTask(() -> ClientHandler.logoutUser(currentUser), Constants.REQUEST_TIMEOUT,
+                        TimeUnit.SECONDS))
+                .start());
         appStage.show();
     }
 
@@ -75,6 +91,19 @@ public class App extends Application {
         scene = new Scene(root);
         appStage.setScene(scene);
         appStage.show();
+    }
+
+    public static WritableImage getImageFromByteArray(byte[] image) throws IOException {
+        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
+        WritableImage wr = null;
+        wr = new WritableImage(bufferedImage.getWidth(), bufferedImage.getHeight());
+        PixelWriter pw = wr.getPixelWriter();
+        for (int x = 0; x < bufferedImage.getWidth(); x++) {
+            for (int y = 0; y < bufferedImage.getHeight(); y++) {
+                pw.setArgb(x, y, bufferedImage.getRGB(x, y));
+            }
+        }
+        return wr;
     }
 
     public static <T> Task<T> createTimedTask(Callable<T> callable, long timeout, TimeUnit unit) {
@@ -117,7 +146,6 @@ public class App extends Application {
         vBox.setAlignment(Pos.CENTER);
         vBox.setStyle("-fx-background-color: transparent");
 
-
         loadingStage = new Stage();
         loadingStage.initStyle(StageStyle.TRANSPARENT);
         loadingStage.initOwner(appStage);
@@ -147,7 +175,7 @@ public class App extends Application {
         try {
             root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
-            popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
+            popUpStage.initModality(Modality.APPLICATION_MODAL); // popup
             popUpStage.initOwner(caller.getScene().getWindow());
             popUpStage.showAndWait();
         } catch (IOException e) {
@@ -170,4 +198,11 @@ public class App extends Application {
         return currentItemDisplayed;
     }
 
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
 }

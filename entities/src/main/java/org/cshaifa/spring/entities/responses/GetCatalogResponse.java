@@ -19,4 +19,5 @@ public class GetCatalogResponse extends Response {
     public List<CatalogItem> getCatalogItems() {
         return catalogItems;
     }
+
 }

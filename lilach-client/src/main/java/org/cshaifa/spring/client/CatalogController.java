@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
@@ -31,6 +33,8 @@ public class CatalogController {
 
     @FXML    private ImageView catalogTitle;
 
+    @FXML    private HBox salesHBox;
+
     @FXML    private HBox flowerHBox;
 
     @FXML    private HBox flowerHBox2;
@@ -43,7 +47,14 @@ public class CatalogController {
 
     @FXML    private Button previousPageButton;
 
+    @FXML    private Menu shoppingCart;
+
+    @FXML    private MenuItem item1;
+
+    @FXML private ImageView item1image;
+
     private int count_displayed_items = 0;
+    private int count_displayed_sales_items = 0;
 
     private int total_catalog_items = 0;
 
@@ -68,8 +79,10 @@ public class CatalogController {
         flowerHBox2.getChildren().clear();
         flowerHBox3.getChildren().clear();
         flowerHBox4.getChildren().clear();
+        salesHBox.getChildren().clear();
         initialize();
     }
+
 
     @FXML
     void initialize() throws IOException {
@@ -80,7 +93,11 @@ public class CatalogController {
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
         getCatalogTask.setOnSucceeded(e -> {
-            if (getCatalogTask.getValue() == null) return;
+            if (getCatalogTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting catalog failed");
+                return;
+            }
             GetCatalogResponse response = getCatalogTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
@@ -90,19 +107,32 @@ public class CatalogController {
             }
             List<CatalogItem> catalogItems = response.getCatalogItems();
 
+            Image imagexample = new Image(catalogItems.get(0).getImagePath());
+            item1image.setImage(imagexample);
             int count_displayed_items = 0;
             for (CatalogItem item : catalogItems) {
                 HBox hBox = new HBox();
                 VBox vBox = new VBox();
-                ImageView iv = new ImageView();
-                iv.setFitWidth(60);
-                iv.setFitHeight(60);
+                ImageView iv = null;
 
-                if (item.getImagePath() != null) {
-                    iv.setImage(new Image(item.getImagePath()));
+                if (item.getImage() != null) {
+                    try {
+                        iv = new ImageView(App.getImageFromByteArray(item.getImage()));
+                        iv.setFitWidth(60);
+                        iv.setFitHeight(60);
+                    } catch (IOException e1) {
+                        // TODO: maybe log the exception somewhere
+                        e1.printStackTrace();
+                    }
                 }
                 Text itemName = new Text(item.getName());
-                Text itemPrice = new Text(Double.toString(item.getPrice()));
+                Text itemPrice;
+                if(item.getIsOnSale()==true){
+                    itemPrice = new Text(Double.toString(item.getPrice()*(1-item.getDiscount())));
+                }
+                else{
+                    itemPrice = new Text(Double.toString(item.getPrice()));
+                }
                 vBox.getChildren().addAll(itemName, itemPrice);
                 Button button = new Button("View Item");
                 button.setOnAction(new EventHandler<ActionEvent>() {
@@ -113,29 +143,41 @@ public class CatalogController {
                     }
                 });
                 vBox.getChildren().add(button);
-                hBox.getChildren().addAll(iv, vBox);
+                if (iv != null)
+                    hBox.getChildren().add(iv);
+                hBox.getChildren().add(vBox);
                 hBox.setPrefSize(200,100);
                 hBox.setSpacing(5);
                 hBox.setStyle("-fx-padding: 5;" + "-fx-border-style: solid inside;"
                               + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
                               + "-fx-border-radius: 5;" + "-fx-border-color: green;");
+                if(item.getIsOnSale()==true){
+                    salesHBox.getChildren().add(hBox);
 
-                if (count_displayed_items<5) {
-                    flowerHBox.getChildren().add(hBox);
                 }
-                else if (count_displayed_items >= 5 && count_displayed_items < 10) {
-                    flowerHBox2.getChildren().add(hBox);
+                else{
+                    if (count_displayed_items<5) {
+                        flowerHBox.getChildren().add(hBox);
+
+                    }
+                    else if (count_displayed_items >= 5 && count_displayed_items < 10) {
+                        flowerHBox2.getChildren().add(hBox);
+                    }
+                    else if (count_displayed_items >= 10 && count_displayed_items < 15) {
+                        flowerHBox3.getChildren().add(hBox);
+                    }
+                    else if (count_displayed_items >= 15 && count_displayed_items < 20) {
+                        flowerHBox4.getChildren().add(hBox);
+                    }
+//                else if (count_displayed_items < 25) { //adding sales
+//                        salesHBox.getChildren().add(hBox);
+//                        salesHBox.setStyle("-fx-border-color: red;");
+                    else{// if (count_displayed_items >= 25) {
+                        break;
+                    }
+
                 }
-                else if (count_displayed_items >= 10 && count_displayed_items < 15) {
-                    flowerHBox3.getChildren().add(hBox);
-                }
-                else if (count_displayed_items >= 15 && count_displayed_items < 20) {
-                    flowerHBox4.getChildren().add(hBox);
-                }
-                else if (count_displayed_items >= 20) {
-                    break;
-                }
-                count_displayed_items++;
+                               count_displayed_items++;
             }
 
             App.hideLoading();
