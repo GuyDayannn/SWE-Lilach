@@ -73,7 +73,9 @@ public class LilachServer extends AbstractServer {
             } else if (request instanceof RegisterRequest registerRequest) {
                 // We assume we login immediately after register
                 try {
-                    String message = DatabaseHandler.registerCustomer(registerRequest.getFullName(), registerRequest.getEmail(), registerRequest.getUsername(), registerRequest.getPassword());
+                    String message = DatabaseHandler.registerCustomer(registerRequest.getFullName(),
+                            registerRequest.getEmail(), registerRequest.getUsername(), registerRequest.getPassword(),
+                            registerRequest.getStores(), registerRequest.getSubscriptionType());
                     if (message.equals(Constants.SUCCESS_MSG)) {
                         User user = DatabaseHandler.getUserByEmail(registerRequest.getEmail());
                         // TODO: maybe catch this separately

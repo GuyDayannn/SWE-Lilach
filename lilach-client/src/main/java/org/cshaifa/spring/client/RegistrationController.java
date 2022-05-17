@@ -1,8 +1,13 @@
 package org.cshaifa.spring.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.SubscriptionType;
+import org.cshaifa.spring.entities.responses.GetStoresResponse;
 import org.cshaifa.spring.entities.responses.RegisterResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -10,6 +15,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -46,6 +52,53 @@ public class RegistrationController {
     private Label invalid_register_text;
 
     @FXML
+    private ComboBox<String> subscriptionSelector;
+
+    @FXML
+    private ComboBox<String> storeSelector;
+
+    private List<Store> stores = null;
+
+    @FXML
+    void initialize() {
+        subscriptionSelector.getItems().addAll("Store Subscription", "Chain Subscription", "Yearly Subscription");
+
+        Task<GetStoresResponse> getStoresTask = App.createTimedTask(ClientHandler::getStores, Constants.REQUEST_TIMEOUT,
+                TimeUnit.SECONDS);
+        getStoresTask.setOnSucceeded(e -> {
+            if (getStoresTask.getValue() == null || !getStoresTask.getValue().isSuccessful()) {
+                // TODO: notify on failure
+                App.hideLoading();
+                return;
+            }
+
+            stores = getStoresTask.getValue().getStores();
+            storeSelector.getItems().addAll(stores.stream().map(Store::getName).toList());
+            App.hideLoading();
+        });
+
+        getStoresTask.setOnFailed(e -> {
+            // TODO: notify on failure
+            getStoresTask.getException().printStackTrace();
+            App.hideLoading();
+            return;
+        });
+
+        App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+        new Thread(getStoresTask).start();
+    }
+
+    @FXML
+    void onSubscriptionSelect(ActionEvent event) {
+        int subscriptionIndex = subscriptionSelector.getSelectionModel().getSelectedIndex();
+        if (subscriptionIndex == SubscriptionType.STORE.ordinal()) {
+            storeSelector.setDisable(false);
+        } else {
+            storeSelector.setDisable(true);
+        }
+    }
+
+    @FXML
     void cancelBtnOnAction(ActionEvent event) throws IOException {
         App.setWindowTitle("Primary");
         App.setContent("primary");
@@ -69,9 +122,17 @@ public class RegistrationController {
     public void validateRegister() {
 
         Task<RegisterResponse> registerTask = App.createTimedTask(() -> {
+            List<Store> registredStores = new ArrayList<>();
+            int subscriptionIndex = subscriptionSelector.getSelectionModel().getSelectedIndex();
+
+            if (subscriptionIndex == SubscriptionType.STORE.ordinal())
+                registredStores.add(stores.get(storeSelector.getSelectionModel().getSelectedIndex()));
+            else
+                registredStores = stores;
             return ClientHandler.registerCustomer(fullNameTxtField.getText().strip(),
                     usernameTxtField.getText().strip(),
-                    emailTxtField.getText().strip(), pwdTxtField.getText().strip());
+                    emailTxtField.getText().strip(), pwdTxtField.getText().strip(),
+                    registredStores, SubscriptionType.values()[subscriptionIndex]);
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
         registerTask.setOnSucceeded(e -> {
@@ -100,6 +161,12 @@ public class RegistrationController {
                 e1.printStackTrace();
                 App.setWindowTitle("Login");
             }
+        });
+
+        registerTask.setOnFailed(e -> {
+            // TODO: maybe log somewhere else...
+            registerTask.getException().printStackTrace();
+            App.hideLoading();
         });
 
         App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);

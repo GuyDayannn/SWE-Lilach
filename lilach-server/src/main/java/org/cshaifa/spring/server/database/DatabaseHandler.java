@@ -110,7 +110,8 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
-    public static String registerCustomer(String fullName, String email, String username, String rawPassword)
+    public static String registerCustomer(String fullName, String email, String username, String rawPassword,
+            List<Store> stores, SubscriptionType subscriptionType)
             throws HibernateException {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
@@ -126,7 +127,8 @@ public class DatabaseHandler {
         try {
             String hexSalt = generateHexSalt();
             session.save(
-                    new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt, false));
+                    new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt, stores,
+                            false, subscriptionType));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
@@ -189,15 +191,22 @@ public class DatabaseHandler {
             session.save(item);
         }
 
-        Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5), null);
+        tryFlushSession(session);
+
+        Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5));
+
+        for (int i = 0; i < 20; i++) {
+            String email = "example" + i + "@mail.com";
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, List.of(store), SubscriptionType.STORE);
+            // We know its a customer
+            store.addCustomer((Customer) getUserByEmail(email));
+        }
+
+        session.beginTransaction();
         session.save(store);
         tryFlushSession(session);
 
-        for (int i = 0; i < 20; i++) {
-            registerCustomer("Customer " + i, "example" + i + "@mail.com", "cust" + i, "pass" + i);
-        }
-
-        registerChainEmployee("Employee","Employee","Employee123","Employee123");
+        registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
 
     }
 

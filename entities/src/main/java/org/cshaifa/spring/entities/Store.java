@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 @Entity
 @Table(name = "stores")
 public class Store implements Serializable {
@@ -19,6 +22,7 @@ public class Store implements Serializable {
     @OneToMany
     private List<CatalogItem> stock;
 
+    @Cascade(CascadeType.ALL)
     @ManyToMany
     private List<Customer> customers;
 
@@ -26,6 +30,13 @@ public class Store implements Serializable {
         this.name = "";
         this.address = "";
         this.stock = new ArrayList<>();
+        this.customers = new ArrayList<>();
+    }
+
+    public Store(String name, String address, List<CatalogItem> stock) {
+        this.name = name;
+        this.address = address;
+        this.stock = stock;
         this.customers = new ArrayList<>();
     }
 
