@@ -14,6 +14,7 @@ import java.util.Random;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.persistence.Entity;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -196,16 +197,24 @@ public class DatabaseHandler {
 
     }
 
-    public static List<CatalogItem> getCatalog() throws HibernateException {
-        // We assume that we're getting the catalog when we first run our app
+    private static <T> List<T> getAllEntities(Class<T> c) {
         Session session = DatabaseConnector.getSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<CatalogItem> query = builder.createQuery(CatalogItem.class);
-        query.from(CatalogItem.class);
-        List<CatalogItem> catalogItems = session.createQuery(query).getResultList();
+        CriteriaQuery<T> query = builder.createQuery(c);
+        query.from(c);
+        return session.createQuery(query).getResultList();
+    }
+
+    public static List<Store> getStores() {
+        return getAllEntities(Store.class);
+    }
+
+    public static List<CatalogItem> getCatalog() throws HibernateException {
+        // We assume that we're getting the catalog when we first run our app
+        List<CatalogItem> catalogItems = getAllEntities(CatalogItem.class);
         if (catalogItems.isEmpty()) {
             initializeDatabaseIfEmpty();
-            catalogItems = session.createQuery(query).getResultList();
+            catalogItems = getAllEntities(CatalogItem.class);
         }
 
         for (CatalogItem catalogItem : catalogItems) {
