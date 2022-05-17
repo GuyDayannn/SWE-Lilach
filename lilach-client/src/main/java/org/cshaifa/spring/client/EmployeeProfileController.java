@@ -23,6 +23,7 @@ import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
 
 import javax.xml.catalog.Catalog;
+import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.TimeUnit;
@@ -86,12 +87,16 @@ public class EmployeeProfileController {
     }
 
     @FXML
-    void exitProfile(ActionEvent event) {
-
+    void exitProfile(ActionEvent event) throws IOException {
+        App.setCurrentUser(null);
+        App.setWindowTitle("primary");
+        App.setContent("primary");
     }
 
     @FXML
-    void goCatalog(ActionEvent event) {
+    void goCatalog(ActionEvent event) throws IOException {
+        App.setWindowTitle("catalog");
+        App.setContent("catalog");
 
     }
 

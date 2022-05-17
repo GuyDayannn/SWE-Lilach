@@ -77,7 +77,7 @@ public class CustomerProfileController {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         }
         else {
-            welcomeText.setText("Welcome, unknown employee");
+            welcomeText.setText("Welcome, unknown customer");
         }
     }
 

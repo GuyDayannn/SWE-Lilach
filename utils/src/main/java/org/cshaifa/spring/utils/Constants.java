@@ -12,7 +12,7 @@ public class Constants {
     public static final String REGISTER_SUCCESS = "You have successfully registered for LiLach";
     public static final String LOGIN_SUCCESS = "You have successfully logged in to LiLach";
 
-    public static final int SERVER_PORT = 8084;
+    public static final int SERVER_PORT = 8073;
     public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
 }
