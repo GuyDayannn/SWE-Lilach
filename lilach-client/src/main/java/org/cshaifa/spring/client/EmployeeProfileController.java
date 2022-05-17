@@ -1,5 +1,6 @@
 package org.cshaifa.spring.client;
 
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -58,15 +59,15 @@ public class EmployeeProfileController {
 
     @FXML private CheckBox selectAllCheckbox;
 
-    @FXML private TableColumn<CatalogItem, String> discountColumn;
+    @FXML private TableColumn<CatalogItem, Double> discountColumn;
 
-    @FXML private TableColumn<CatalogItem, String> idColumn;
+    @FXML private TableColumn<CatalogItem, Number> idColumn;
 
     @FXML private TableColumn<CatalogItem, String> itemNameColumn;
 
-    @FXML private TableColumn<CatalogItem, String> itemPriceColumn;
+    @FXML private TableColumn<CatalogItem, Double> itemPriceColumn;
 
-    @FXML private TableColumn<CatalogItem, String> onsaleColumn;
+    @FXML private TableColumn<CatalogItem, Boolean> onsaleColumn;
 
     @FXML private TableColumn<CatalogItem, CheckBoxTableCell> selectColumn;
 
@@ -145,12 +146,14 @@ public class EmployeeProfileController {
 
             List<CatalogItem> catalogItems = response.getCatalogItems();
 
-            idColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, String>("id"));
+            idColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Number>("id"));
             itemNameColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, String>("name"));
-            itemPriceColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, String>("price"));
-            onsaleColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, String>("onSale"));
-            discountColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, String>("discountPercent"));
+            itemPriceColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Double>("price"));
+            onsaleColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Boolean>("onSale"));
+            discountColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Double>("discountPercent"));
 
+            idColumn.setCellValueFactory(cellData ->
+            new SimpleLongProperty(cellData.getValue().getId()));
         });
     }
 
