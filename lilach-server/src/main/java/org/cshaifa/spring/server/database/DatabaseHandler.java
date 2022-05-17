@@ -184,7 +184,7 @@ public class DatabaseHandler {
             session.save(item);
         }
 
-        Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5));
+        Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5), null);
         session.save(store);
         tryFlushSession(session);
 
