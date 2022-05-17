@@ -20,6 +20,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -89,6 +90,10 @@ public class EmployeeProfileController {
 
     @FXML
     void exitProfile(ActionEvent event) throws IOException {
+        User currentUser = App.getCurrentUser();
+        new Thread(App.createTimedTask(() -> ClientHandler.logoutUser(currentUser), Constants.REQUEST_TIMEOUT,
+                        TimeUnit.SECONDS))
+                .start();
         App.setCurrentUser(null);
         App.setWindowTitle("primary");
         App.setContent("primary");
