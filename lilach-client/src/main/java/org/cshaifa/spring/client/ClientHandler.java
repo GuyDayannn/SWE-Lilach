@@ -69,4 +69,11 @@ public class ClientHandler {
         client.sendToServer(logoutRequest);
         return (LogoutResponse) waitForMsgFromServer(logoutRequest.getRequestId());
     }
+
+    public static GetStoresResponse getStores() throws IOException {
+        GetStoresRequest getStoresRequest = new GetStoresRequest();
+        client.openConnection();
+        client.sendToServer(getStoresRequest);
+        return (GetStoresResponse) waitForMsgFromServer(getStoresRequest.getRequestId());
+    }
 }
