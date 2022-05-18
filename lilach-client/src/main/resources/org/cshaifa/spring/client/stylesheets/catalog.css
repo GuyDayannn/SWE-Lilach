@@ -2,6 +2,38 @@
 
 }
 
+.categoryText {
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-font-style: Italic;
+    -fx-font-size: 20;
+}
+
+.filterBar {
+    -fx-border-color: green;
+    -fx-border-style: solid none solid none;
+}
+
+.menubar {
+    -fx-background-color: white;
+    -fx-background-insets: 5;
+    -fx-background-radius: 5;
+    -fx-border-color: green;
+    -fx-border-radius: 5;
+    -fx-border-insets: 5;
+}
+.menubar:hover, .menubar:showing{
+    -fx-background-color: white;
+}
+
+.shoppingcart {
+    -fx-fill: green;
+    -fx-text-fill: green;
+}
+.shoppingcart:hover, .shoppingcart:showing{
+    -fx-background-color: white;
+}
+
+
 .onsale {
     -fx-background-color: #acacac;
 }

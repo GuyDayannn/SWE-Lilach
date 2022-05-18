@@ -1,0 +1,23 @@
+.root {
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+}
+
+.button {
+    -fx-background-color: green;
+    -fx-text-fill: white;
+    -fx-font-style: Italic;
+    -fx-font-family: "Trebuchet MS", Helvetica, sans-serif;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+    -fx-border-radius: 2;
+    -fx-background-insets: 2;
+    -fx-border-insets: 2;
+}
+
+.button.customerButton {
+    -fx-font-size: 24;
+}
+
+.button.employeeButton {
+    -fx-font-size: 12;
+}

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -10,19 +12,17 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
+<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1040.0" stylesheets="@stylesheets/catalog.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
    <children>
       <HBox prefHeight="61.0" prefWidth="1041.0">
          <children>
             <ImageView fx:id="catalogTitle" fitHeight="108.0" fitWidth="1040.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </HBox>
-      <ToolBar prefHeight="40.0" prefWidth="200.0">
+      <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button fx:id="NewOrderButton" mnemonicParsing="false" text="New Order" />
-            <Button fx:id="registerButton" mnemonicParsing="false" onMouseClicked="#goRegister" text="Register" />
-            <Button fx:id="refreshButton" mnemonicParsing="false" onMouseClicked="#refreshCatalog" text="Refresh" />
-            <MenuBar styleClass="menubar">
+            <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, Customer" />
+            <MenuBar fx:id="menuBar" maxHeight="25.0" styleClass="menubar">
               <menus>
                 <Menu fx:id="shoppingCart" mnemonicParsing="false" styleClass="shoppingcart" text="Shopping Cart">
                 </Menu>
@@ -32,39 +32,86 @@
       </ToolBar>
       <VBox prefHeight="25.0" prefWidth="1040.0">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Flowers">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Text>
+            <HBox alignment="CENTER" prefHeight="25.0" prefWidth="1040.0" styleClass="categoryText">
+               <children>
+                  <Text fx:id="flowers" fill="WHITE" onMouseClicked="#displayFlowers" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Flowers" textAlignment="CENTER" wrappingWidth="130.0">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="bouquets" fill="WHITE" onMouseClicked="#displayBouquets" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Bouquets" textAlignment="CENTER" wrappingWidth="130.0">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="plants" fill="WHITE" onMouseClicked="#displayPlants" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Plants" textAlignment="CENTER" wrappingWidth="130.0">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="orchids" fill="WHITE" onMouseClicked="#displayOrchids" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Orchids" textAlignment="CENTER" wrappingWidth="130.0">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="wine" fill="WHITE" onMouseClicked="#displayWine" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Wine" textAlignment="CENTER" wrappingWidth="130.0">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="chocolate" fill="WHITE" onMouseClicked="#displayChocolate" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Chocolate" textAlignment="CENTER" wrappingWidth="130.0">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
          </children>
       </VBox>
-      <VBox prefHeight="25.0" prefWidth="1040.0" styleClass="onsale">
+      <VBox prefHeight="25.0" prefWidth="702.0" styleClass="onsale">
          <children>
             <Text fx:id="onSaleText" fill="#e80909" strokeType="OUTSIDE" strokeWidth="0.0" text="On Sale!">
                <font>
-                  <Font size="18.0" />
+                  <Font name="System Bold Italic" size="18.0" />
                </font>
             </Text>
          </children>
       </VBox>
       <HBox fx:id="salesHBox" layoutX="10.0" layoutY="197.0" prefHeight="226.0" prefWidth="1040.0" styleClass="onsale" />
+      <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="filterBar">
+        <items>
+            <HBox alignment="CENTER" prefHeight="25.0" prefWidth="1020.0" spacing="10.0">
+               <children>
+                  <ComboBox prefWidth="150.0" promptText="Type" />
+                  <ComboBox prefWidth="150.0" promptText="Color" />
+                  <ComboBox prefWidth="150.0" promptText="Size" />
+                  <ComboBox prefWidth="150.0" promptText="Sale" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price Range:" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="From:" />
+                  <Slider prefHeight="15.0" prefWidth="75.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To:" />
+                  <Slider prefHeight="15.0" prefWidth="75.0" />
+                <Button mnemonicParsing="false" text="Filter" />
+               </children>
+            </HBox>
+        </items>
+      </ToolBar>
       <HBox fx:id="flowerHBox" prefHeight="226.0" prefWidth="1040.0" />
       <HBox fx:id="flowerHBox2" prefHeight="226.0" prefWidth="200.0" />
       <HBox fx:id="flowerHBox3" prefHeight="226.0" prefWidth="1040.0" />
-      <HBox fx:id="flowerHBox4" maxWidth="300.0" minWidth="100.0" prefHeight="226.0" prefWidth="200.0" />
-      <HBox prefHeight="120.0" prefWidth="1040.0">
+      <HBox fx:id="flowerHBox4" prefHeight="226.0" prefWidth="1040.0" />
+      <HBox minHeight="28.0" prefHeight="28.0" prefWidth="1040.0">
          <children>
-            <HBox prefHeight="100.0" prefWidth="200.0" />
-            <HBox prefHeight="100.0" prefWidth="200.0" />
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <HBox prefHeight="25.0" prefWidth="200.0" />
+            <HBox prefHeight="25.0" prefWidth="200.0" />
+            <HBox prefHeight="25.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="previousPageButton" disable="false" mnemonicParsing="false" onMouseClicked="#previousPage" prefHeight="26.0" prefWidth="94.0" text="Previous" visible="true" />
-                  <Button fx:id="nextPageButton" disable="false" mnemonicParsing="false" onMouseClicked="#nextPage" prefHeight="26.0" prefWidth="86.0" text="Next" visible="true" />
+                  <Button fx:id="previousPageButton" alignment="CENTER" disable="false" maxHeight="25.0" maxWidth="96.0" minHeight="25.0" minWidth="96.0" mnemonicParsing="false" onMouseClicked="#previousPage" prefHeight="25.0" prefWidth="96.0" text="Previous" visible="true" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="nextPageButton" alignment="CENTER" disable="false" maxHeight="25.0" maxWidth="96.0" minHeight="25.0" minWidth="96.0" mnemonicParsing="false" onMouseClicked="#nextPage" prefHeight="25.0" prefWidth="96.0" text="Next" visible="true" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0" />
-            <HBox prefHeight="100.0" prefWidth="200.0" />
+            <HBox prefHeight="25.0" prefWidth="200.0" />
+            <HBox prefHeight="25.0" prefWidth="200.0" />
          </children>
       </HBox>
    </children>

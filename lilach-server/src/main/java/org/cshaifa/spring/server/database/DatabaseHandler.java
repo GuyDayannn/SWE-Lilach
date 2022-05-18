@@ -188,17 +188,16 @@ public class DatabaseHandler {
         List<Path> imageList = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
-
+        String[] sizes = {"large", "medium", "small"};
         for (int i = 0; i < imageList.size(); i++) {
             double randomPrice = 200 * random.nextDouble();
             int randomQuantity = random.nextInt(500);
             randomItems.add(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(),
-                    new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, false,
-                    0.0));
+                    new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, false,  0.0, sizes[i%3], "flower", "red"));
         }
         double randomPrice = 200 * random.nextDouble();
         int randomQuantity = random.nextInt(500);
-        randomItems.add(new CatalogItem("Cool flower", imageList.get(3).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, true, 50.0));
+        randomItems.add(new CatalogItem("Cool flower", imageList.get(3).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, true, 50.0, "large", "flower", "green"));
 
         for (CatalogItem item : randomItems) {
             session.save(item);
