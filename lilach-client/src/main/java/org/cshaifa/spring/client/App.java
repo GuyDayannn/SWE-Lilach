@@ -97,7 +97,6 @@ public class App extends Application {
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         if (pageName == "catalog") {
-            System.out.println("catalog");
             URL styleSheet = App.class.getResource("stylesheets/" + pageName + ".css");
             if (styleSheet != null) {
                 scene.getStylesheets().add(styleSheet.toExternalForm());

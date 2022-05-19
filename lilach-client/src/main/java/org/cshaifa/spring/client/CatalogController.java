@@ -7,11 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -26,30 +30,30 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import javax.xml.catalog.Catalog;
+
 
 public class CatalogController {
 
     @FXML    private VBox rootVBox;
 
+    @FXML    private HBox mainHBox;
+
     @FXML    private Text welcomeText;
 
     @FXML    private ToolBar toolbar;
 
-    @FXML    private HBox bottomBar;
-
     @FXML    private ImageView catalogTitle;
 
-    @FXML    private Text onSaleText;
+    @FXML    private VBox salesVBox;
 
-    @FXML    private HBox salesHBox;
+    @FXML    private VBox catalogVBox;
 
     @FXML    private HBox flowerHBox;
 
     @FXML    private HBox flowerHBox2;
 
     @FXML    private HBox flowerHBox3;
-
-    @FXML    private HBox flowerHBox4;
 
     @FXML    private Button nextPageButton;
 
@@ -59,32 +63,27 @@ public class CatalogController {
 
     @FXML    private Menu shoppingCart;
 
-    @FXML    private MenuItem item1;
-
-    @FXML private ImageView item1image;
+    @FXML    private Button filterButton;
 
     List<CatalogItem> catalogItems = null;
-
-    private int count_displayed_items = 0;
-
-    private int total_catalog_items = 0;
 
     private int current_page = 1;
 
     private String selectedType = "all";
 
+    private boolean filter_applied = false;
+
     @FXML
     void clearCatalogDisplay() {
-        count_displayed_items = 0;
         flowerHBox.getChildren().clear();
         flowerHBox2.getChildren().clear();
         flowerHBox3.getChildren().clear();
-        flowerHBox4.getChildren().clear();
     }
 
     @FXML
     void displayFlowers(MouseEvent event) {
         selectedType = "flower";
+        current_page = 1;
         clearCatalogDisplay();
         catalogDisplay();
     }
@@ -92,6 +91,7 @@ public class CatalogController {
     @FXML
     void displayBouquets(MouseEvent event) {
         selectedType = "bouquet";
+        current_page = 1;
         clearCatalogDisplay();
         catalogDisplay();
     }
@@ -99,6 +99,7 @@ public class CatalogController {
     @FXML
     void displayPlants(MouseEvent event) {
         selectedType = "plant";
+        current_page = 1;
         clearCatalogDisplay();
         catalogDisplay();
     }
@@ -106,6 +107,7 @@ public class CatalogController {
     @FXML
     void displayOrchids(MouseEvent event) {
         selectedType = "orchid";
+        current_page = 1;
         clearCatalogDisplay();
         catalogDisplay();
     }
@@ -113,6 +115,7 @@ public class CatalogController {
     @FXML
     void displayWine(MouseEvent event) {
         selectedType = "wine";
+        current_page = 1;
         clearCatalogDisplay();
         catalogDisplay();
     }
@@ -120,9 +123,19 @@ public class CatalogController {
     @FXML
     void displayChocolate(MouseEvent event) {
         selectedType = "chocolate";
+        current_page = 1;
         clearCatalogDisplay();
         catalogDisplay();
     }
+
+    @FXML
+    void displaySets(MouseEvent event) {
+        selectedType = "set";
+        current_page = 1;
+        clearCatalogDisplay();
+        catalogDisplay();
+    }
+
 
     @FXML
     void nextPage(MouseEvent event) {
@@ -139,25 +152,115 @@ public class CatalogController {
     }
 
     @FXML
+    void filter(MouseEvent event) {
+        if (filter_applied) {
+            filterButton.setText("Filter");
+            filter_applied = false;
+        }
+        else {
+            filterButton.setText("Remove Filter");
+            filter_applied = true;
+        }
+    }
+
+    @FXML
     void refreshCatalog(MouseEvent event) throws IOException {
+        selectedType = "all";
         current_page = 1;
         clearCatalogDisplay();
         toolbar.getItems().clear();
         toolbar.getItems().add(welcomeText);
         toolbar.getItems().add(menuBar);
-        salesHBox.getChildren().clear();
+        salesVBox.getChildren().clear();
         shoppingCart.getItems().clear();
         initialize();
     }
 
     @FXML
+    HBox getItemHBox(CatalogItem item) {
+        HBox hBox = new HBox();
+        VBox vBox = new VBox();
+        ImageView iv = null;
+
+        if (item.getImage() != null) {
+            try {
+                iv = new ImageView(App.getImageFromByteArray(item.getImage()));
+                iv.setFitWidth(75);
+                iv.setFitHeight(75);
+            } catch (IOException e1) {
+                // TODO: maybe log the exception somewhere
+                e1.printStackTrace();
+            }
+        }
+
+        Text itemName = new Text(item.getName());
+        double price = item.getPrice();
+        if (item.isOnSale()) {
+            price = new BigDecimal(price * 0.01 * (100 - item.getDiscount())).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        }
+        Text itemPrice = new Text(Double.toString(price));
+        itemPrice.getStyleClass().add("price-text");
+        itemPrice.setFill(Color.GREEN);
+        itemPrice.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 16));
+        vBox.getChildren().addAll(itemName, itemPrice);
+        HBox buttonBox = new HBox();
+        buttonBox.setAlignment(Pos.CENTER_LEFT);
+        Button viewButton = new Button("View Item");
+        viewButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                App.setCurrentItemDisplayed(item, itemPrice, itemName);
+                App.popUpLaunch(viewButton, "PopUp");
+            }
+        });
+        Button addCartButton = new Button();
+        viewButton.getStyleClass().add("catalog-item-buttons");
+        addCartButton.getStyleClass().add("catalog-item-buttons");
+        Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
+        ImageView ivCart = new ImageView(cartImage);
+        ivCart.setFitHeight(15);
+        ivCart.setFitWidth(15);
+        addCartButton.setGraphic(ivCart);
+        addCartButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+
+            }
+        });
+        if (App.getCurrentUser()==null) {
+            buttonBox.getChildren().add(viewButton);
+        }
+        else if (App.getCurrentUser() instanceof Customer) {
+            buttonBox.getChildren().addAll(viewButton, addCartButton);
+        }
+        else {
+            buttonBox.getChildren().add(viewButton);
+        }
+
+        vBox.getChildren().add(buttonBox);
+        if (iv != null)
+            hBox.getChildren().add(iv);
+        hBox.getChildren().add(vBox);
+        hBox.setPrefSize(200,100);
+        hBox.setSpacing(5);
+        hBox.getStyleClass().add("catalogitem");
+
+        return hBox;
+    }
+
+    @FXML
     void salesDisplay() {
+        if (!mainHBox.getChildren().contains(salesVBox)) {
+            mainHBox.getChildren().add(1, salesVBox);
+        }
+        int total_items_on_sale = 0;
         if (catalogItems == null) {
             System.out.println("Catalog is empty :(");
         }
         else {
             for (CatalogItem item : catalogItems) {
                 if (item.isOnSale()) {
+                    total_items_on_sale++;
                     HBox hBox = new HBox();
                     VBox vBox = new VBox();
                     ImageView iv = null;
@@ -175,7 +278,6 @@ public class CatalogController {
 
                     Text itemName = new Text(item.getName());
                     Text itemPrice = new Text(Double.toString(item.getPrice()));
-
                     VBox textBox = new VBox();
                     itemPrice.strikethroughProperty().setValue(true);
 
@@ -202,9 +304,17 @@ public class CatalogController {
                     hBox.setPrefSize(200,100);
                     hBox.setSpacing(5);
                     hBox.getStyleClass().add("saleitem");
-                    salesHBox.getChildren().add(hBox);
+                    salesVBox.getChildren().add(hBox);
                 }
             }
+        }
+
+        if (total_items_on_sale == 0) {
+            mainHBox.getChildren().remove(salesVBox);
+            catalogVBox.setFillWidth(true);
+        }
+        else {
+            catalogVBox.setFillWidth(false);
         }
     }
 
@@ -216,73 +326,23 @@ public class CatalogController {
             nextPageButton.disableProperty().setValue(true);
         }
         else {
-            List<CatalogItem> allTypeItems = new ArrayList<>();
-            if (selectedType == "all") {
-                allTypeItems = catalogItems;
-            }
-            else {
-                for (CatalogItem item : catalogItems) {
-                    if (item.getItemType().equals(selectedType)) {
-                        allTypeItems.add(item);
-                    }
-                }
-            }
+            int count_displayed_items = 0;
 
-            int total_catalog_type_items = allTypeItems.size();
+            int total_catalog_items = catalogItems.size();
 
-            for (CatalogItem item : allTypeItems) {
-                int itemIndex = allTypeItems.indexOf(item);
-                if (itemIndex >= ((current_page-1)*20) && itemIndex < (current_page*20)) {
-                    HBox hBox = new HBox();
-                    VBox vBox = new VBox();
-                    ImageView iv = null;
+            for (CatalogItem item : catalogItems) {
+                if (selectedType=="all" || item.getItemType().equals(selectedType)) {
+                    HBox hBox = getItemHBox(item);
 
-                    if (item.getImage() != null) {
-                        try {
-                            iv = new ImageView(App.getImageFromByteArray(item.getImage()));
-                            iv.setFitWidth(60);
-                            iv.setFitHeight(60);
-                        } catch (IOException e1) {
-                            // TODO: maybe log the exception somewhere
-                            e1.printStackTrace();
-                        }
-                    }
-
-                    Text itemName = new Text(item.getName());
-                    Text itemPrice = new Text(Double.toString(item.getPrice()));
-                    vBox.getChildren().addAll(itemName, itemPrice);
-                    Button button = new Button("View Item");
-                    button.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            App.setCurrentItemDisplayed(item, itemPrice, itemName);
-                            App.popUpLaunch(button, "PopUp");
-                        }
-                    });
-                    vBox.getChildren().add(button);
-                    if (iv != null)
-                        hBox.getChildren().add(iv);
-                    hBox.getChildren().add(vBox);
-                    hBox.setPrefSize(200,100);
-                    hBox.setSpacing(5);
-                    hBox.getStyleClass().add("catalogitem");
-
-                    if (count_displayed_items<5) {
+                    if (count_displayed_items < 4) {
                         flowerHBox.getChildren().add(hBox);
-                    }
-                    else if (count_displayed_items < 10) {
+                    } else if (count_displayed_items < 8) {
                         flowerHBox2.getChildren().add(hBox);
-                    }
-                    else if ( count_displayed_items < 15) {
+                    } else if (count_displayed_items < 12) {
                         flowerHBox3.getChildren().add(hBox);
-                    }
-                    else if (count_displayed_items < 20) {
-                        flowerHBox4.getChildren().add(hBox);
-                    }
-                    else {
+                    } else {
                         break;
                     }
-
                     count_displayed_items++;
                 }
             }
@@ -291,12 +351,23 @@ public class CatalogController {
             if (current_page == 1) {
                 previousPageButton.disableProperty().setValue(true);
             }
-            if (((current_page-1)*20)+count_displayed_items == total_catalog_type_items) {
+            else {
+                previousPageButton.disableProperty().setValue(false);
+            }
+            if (((current_page-1)*12)+count_displayed_items == total_catalog_items) {
                 nextPageButton.disableProperty().setValue(true);
+            }
+            else {
+                nextPageButton.disableProperty().setValue(false);
             }
         }
 
-        count_displayed_items = 0;
+        if (!mainHBox.getChildren().contains(salesVBox)) {
+            catalogVBox.setFillWidth(true);
+        }
+        else {
+            catalogVBox.setFillWidth(false);
+        }
     }
 
     @FXML
@@ -399,10 +470,31 @@ public class CatalogController {
         ivCart.setFitWidth(20);
         shoppingCart.setGraphic(ivCart);
 
-        //MenuItem editCart = new MenuItem("Edit Cart");
-        //MenuItem completeOrder = new MenuItem("Finish Order");
-        //shoppingCart.getItems().add(editCart);
-        //shoppingCart.getItems().add(completeOrder);
+        if (App.getCurrentUser()==null) {
+            menuBar.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    App.setWindowTitle("register");
+                    try {
+                        App.setContent("customerRegister");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        else {
+            if (true) {
+                //if cart is empty
+            }
+            else {
+                //if cart isn't empty
+                MenuItem editCart = new MenuItem("Edit Cart");
+                MenuItem completeOrder = new MenuItem("Finish Order");
+                shoppingCart.getItems().add(editCart);
+                shoppingCart.getItems().add(completeOrder);
+            }
+        }
 
         Task<GetCatalogResponse> getCatalogTask = App.createTimedTask(() -> {
             return ClientHandler.getCatalog();
@@ -423,10 +515,6 @@ public class CatalogController {
             }
 
             catalogItems = response.getCatalogItems();
-
-            if (catalogItems!=null) {
-                total_catalog_items = catalogItems.size();
-            }
 
             salesDisplay();
 
