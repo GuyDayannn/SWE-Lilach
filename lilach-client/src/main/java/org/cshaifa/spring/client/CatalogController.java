@@ -261,15 +261,15 @@ public class CatalogController {
             for (CatalogItem item : catalogItems) {
                 if (item.isOnSale()) {
                     total_items_on_sale++;
-                    HBox hBox = new HBox();
                     VBox vBox = new VBox();
+                    vBox.setAlignment(Pos.CENTER);
                     ImageView iv = null;
 
                     if (item.getImage() != null) {
                         try {
                             iv = new ImageView(App.getImageFromByteArray(item.getImage()));
-                            iv.setFitWidth(60);
-                            iv.setFitHeight(60);
+                            iv.setFitWidth(120);
+                            iv.setFitHeight(120);
                         } catch (IOException e1) {
                             // TODO: maybe log the exception somewhere
                             e1.printStackTrace();
@@ -286,9 +286,9 @@ public class CatalogController {
                     newItemPrice.setFill(Color.RED);
                     newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
                     textBox.getChildren().addAll(itemPrice, newItemPrice);
-                    vBox.getChildren().addAll(itemName, textBox);
-
+                    textBox.setAlignment(Pos.CENTER);
                     Button button = new Button("View Item");
+                    button.getStyleClass().add("sale-button");
                     button.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
@@ -297,14 +297,10 @@ public class CatalogController {
                         }
                     });
 
-                    vBox.getChildren().add(button);
-                    if (iv != null)
-                        hBox.getChildren().add(iv);
-                    hBox.getChildren().add(vBox);
-                    hBox.setPrefSize(200,100);
-                    hBox.setSpacing(5);
-                    hBox.getStyleClass().add("saleitem");
-                    salesVBox.getChildren().add(hBox);
+                    vBox.getChildren().addAll(itemName, iv, textBox, button);
+                    vBox.setSpacing(5);
+                    vBox.getStyleClass().add("saleitem");
+                    salesVBox.getChildren().add(vBox);
                 }
             }
         }

@@ -65,6 +65,14 @@
     -fx-border-color: red;
 }
 
+.button.sale-button {
+    -fx-border-radius: 2;
+    -fx-background-insets: 2;
+    -fx-border-color: red;
+    -fx-border-radius: 2;
+    -fx-border-insets: 2;
+}
+
 .catalogitem {
     -fx-padding: 5;
     -fx-border-style: solid inside;

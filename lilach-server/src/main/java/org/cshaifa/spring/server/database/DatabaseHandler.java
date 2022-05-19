@@ -215,9 +215,11 @@ public class DatabaseHandler {
 
         }
 
-        //On Sale Item
+        //On Sale Items
         randomItems.remove(0);
-        randomItems.add(0,new CatalogItem("Cool flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true, 50.0, "large", "flower", "white"));
+        randomItems.add(0,new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true, 50.0, "large", "flower", "white"));
+        randomItems.remove(1);
+        randomItems.add(1,new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true, 50.0, "medium", "flower", "yellow"));
 
         for (CatalogItem item : randomItems) {
             session.save(item);
