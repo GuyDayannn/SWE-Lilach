@@ -81,7 +81,6 @@ public class RegistrationController {
             // TODO: notify on failure
             getStoresTask.getException().printStackTrace();
             App.hideLoading();
-            return;
         });
 
         App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);

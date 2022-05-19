@@ -10,12 +10,14 @@ import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetStoresRequest;
+import org.cshaifa.spring.entities.requests.IsAliveRequest;
 import org.cshaifa.spring.entities.requests.LoginRequest;
 import org.cshaifa.spring.entities.requests.LogoutRequest;
 import org.cshaifa.spring.entities.requests.RegisterRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetStoresResponse;
+import org.cshaifa.spring.entities.responses.IsAliveResponse;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.entities.responses.LogoutResponse;
 import org.cshaifa.spring.entities.responses.RegisterResponse;
@@ -26,6 +28,7 @@ import org.cshaifa.spring.utils.Constants;
 public class ClientHandler {
     private static LilachClient client = new LilachClient("localhost", Constants.SERVER_PORT);
     public static volatile Object msgFromServer = null;
+    public static volatile boolean connectionClosed = false;
 
     private static Object waitForMsgFromServer(int requestId) {
         while (msgFromServer == null
@@ -86,10 +89,42 @@ public class ClientHandler {
         return (LogoutResponse) waitForMsgFromServer(logoutRequest.getRequestId());
     }
 
+    public static IsAliveResponse checkServerAlive() throws IOException {
+        IsAliveRequest isAliveRequest = new IsAliveRequest();
+        client.openConnection();
+        client.sendToServer(isAliveRequest);
+        return (IsAliveResponse) waitForMsgFromServer(isAliveRequest.getRequestId());
+    }
+
     public static GetStoresResponse getStores() throws IOException {
         GetStoresRequest getStoresRequest = new GetStoresRequest();
         client.openConnection();
         client.sendToServer(getStoresRequest);
         return (GetStoresResponse) waitForMsgFromServer(getStoresRequest.getRequestId());
+    }
+
+    public static String getServerHostname() {
+        return client.getHost();
+    }
+
+    public static int getServerPort() {
+        return client.getPort();
+    }
+
+    public static void changeServerDetails(String hostname, int port) {
+        client.setHost(hostname);
+        client.setPort(port);
+    }
+
+    public static IsAliveResponse changeServerDetailsAndCheckAlive(String hostname, int port) throws IOException {
+        if (client.isConnected()) {
+            client.closeConnection();
+            while (!connectionClosed)
+                Thread.onSpinWait();
+            connectionClosed = false;
+        }
+
+        changeServerDetails(hostname, port);
+        return checkServerAlive();
     }
 }
