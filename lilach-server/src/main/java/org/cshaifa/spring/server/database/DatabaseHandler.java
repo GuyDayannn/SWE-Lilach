@@ -171,11 +171,17 @@ public class DatabaseHandler {
     }
 
 
-    private static List<Path> getRandomOrderedImages() {
-        List<Path> imagesList = ImageUtils.getAllImagesFromFolder("images", DatabaseHandler.class);
-
-        Collections.shuffle(imagesList);
-        return imagesList;
+    private static List<List<Path>> getRandomOrderedImages() {
+        List<List<Path>> imagesLists = new ArrayList<>();
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/flowers", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/bouquets", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/plants", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/orchids", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/wine", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/chocolate", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/sets", DatabaseHandler.class));
+        //Collections.shuffle(imagesList);
+        return imagesLists;
     }
 
     public static void initializeDatabaseIfEmpty() throws Exception {
@@ -185,20 +191,35 @@ public class DatabaseHandler {
 
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
-        List<Path> imageList = getRandomOrderedImages();
+        List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
+        String[] sizes = {"large", "medium", "small"};
+        String[] colors = {"red", "orange", "pink"};
+        String[] itemTypes = {"flower", "bouquet", "plant", "orchid", "wine", "chocolate", "set"};
+        int typeInd = 0;
+        for (List<Path> imageList : imageLists) {
+            if (imageList!=null) {
+                for (Path imagePath : imageList) {
+                    int randomInt = random.nextInt(0,2);
+                    double randomPrice = random.nextInt(50, 500) + 0.99;
+                    int randomQuantity = random.nextInt(500);
+                    randomItems.add(new CatalogItem(
+                            "Random Item",
+                            imagePath.toUri().toString(),
+                            randomPrice, randomQuantity, false, 0.0,
+                            sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
+                }
+            }
+            typeInd++;
 
-        for (int i = 0; i < imageList.size(); i++) {
-            double randomPrice = 200 * random.nextDouble();
-            int randomQuantity = random.nextInt(500);
-            randomItems.add(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(),
-                    new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, false,
-                    0.0));
         }
-        double randomPrice = 200 * random.nextDouble();
-        int randomQuantity = random.nextInt(500);
-        randomItems.add(new CatalogItem("Cool flower", imageList.get(3).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, true, 50.0));
+
+        //On Sale Items
+        randomItems.remove(0);
+        randomItems.add(0,new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true, 50.0, "large", "flower", "white"));
+        randomItems.remove(1);
+        randomItems.add(1,new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true, 50.0, "medium", "flower", "yellow"));
 
         for (CatalogItem item : randomItems) {
             session.save(item);

@@ -58,7 +58,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        scene = new Scene(loadFXML("primary"), 1040, 700);
+        scene = new Scene(loadFXML("primary"), 800, 600);
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
@@ -97,7 +97,6 @@ public class App extends Application {
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         if (pageName == "catalog") {
-            System.out.println("catalog");
             URL styleSheet = App.class.getResource("stylesheets/" + pageName + ".css");
             if (styleSheet != null) {
                 scene.getStylesheets().add(styleSheet.toExternalForm());
