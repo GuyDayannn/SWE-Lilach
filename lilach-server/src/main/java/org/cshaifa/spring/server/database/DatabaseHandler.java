@@ -173,13 +173,13 @@ public class DatabaseHandler {
 
     private static List<List<Path>> getRandomOrderedImages() {
         List<List<Path>> imagesLists = new ArrayList<>();
-        imagesLists.add(new ArrayList<Path>(ImageUtils.getAllImagesFromFolder("images/flowers", DatabaseHandler.class)));
-        imagesLists.add(new ArrayList<Path>(ImageUtils.getAllImagesFromFolder("images/bouquets", DatabaseHandler.class)));
-        imagesLists.add(new ArrayList<Path>(ImageUtils.getAllImagesFromFolder("images/plants", DatabaseHandler.class)));
-        imagesLists.add(new ArrayList<Path>(ImageUtils.getAllImagesFromFolder("images/orchids", DatabaseHandler.class)));
-        imagesLists.add(new ArrayList<Path>(ImageUtils.getAllImagesFromFolder("images/wine", DatabaseHandler.class)));
-        imagesLists.add(new ArrayList<Path>(ImageUtils.getAllImagesFromFolder("images/chocolate", DatabaseHandler.class)));
-        imagesLists.add(new ArrayList<Path>(ImageUtils.getAllImagesFromFolder("images/sets", DatabaseHandler.class)));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/flowers", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/bouquets", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/plants", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/orchids", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/wine", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/chocolate", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/sets", DatabaseHandler.class));
         //Collections.shuffle(imagesList);
         return imagesLists;
     }
