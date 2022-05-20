@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -35,139 +39,64 @@ import javax.xml.catalog.Catalog;
 
 public class CatalogController {
 
+
+    //FXML objects
     @FXML    private VBox rootVBox;
-
     @FXML    private HBox mainHBox;
-
     @FXML    private Text welcomeText;
-
     @FXML    private ToolBar toolbar;
-
     @FXML    private ImageView catalogTitle;
-
     @FXML    private VBox salesVBox;
-
     @FXML    private VBox catalogVBox;
-
-    @FXML    private HBox flowerHBox;
-
-    @FXML    private HBox flowerHBox2;
-
-    @FXML    private HBox flowerHBox3;
-
-    @FXML    private Button nextPageButton;
-
-    @FXML    private Button previousPageButton;
-
     @FXML    private MenuBar menuBar;
-
     @FXML    private Menu shoppingCart;
+    @FXML    private ComboBox<String> selectedTypeComboBox;
+    @FXML    private ComboBox<String> selectedColorComboBox;
+    @FXML    private ComboBox<String> selectedSizeComboBox;
+    @FXML    private Slider loPrice;
+    @FXML    private Slider hiPrice;
 
-    @FXML    private Button filterButton;
-
+    //Variables
     List<CatalogItem> catalogItems = null;
-
-    private int current_page = 1;
-
-    private String selectedType = "all";
-
     private boolean filter_applied = false;
 
     @FXML
-    void clearCatalogDisplay() {
-        flowerHBox.getChildren().clear();
-        flowerHBox2.getChildren().clear();
-        flowerHBox3.getChildren().clear();
-    }
-
-    @FXML
-    void displayFlowers(MouseEvent event) {
-        selectedType = "flower";
-        current_page = 1;
-        clearCatalogDisplay();
+    void displayType(MouseEvent event) {
+        Text source = (Text)event.getSource();
+        filter_applied = true;
+        selectedTypeComboBox.valueProperty().setValue(source.getId());
+        catalogVBox.getChildren().clear();
         catalogDisplay();
     }
 
     @FXML
-    void displayBouquets(MouseEvent event) {
-        selectedType = "bouquet";
-        current_page = 1;
-        clearCatalogDisplay();
+    void filter() {
+        filter_applied = true;
+        catalogVBox.getChildren().clear();
         catalogDisplay();
     }
 
     @FXML
-    void displayPlants(MouseEvent event) {
-        selectedType = "plant";
-        current_page = 1;
-        clearCatalogDisplay();
+    void clearFilter(MouseEvent event) {
+        filter_applied = false;
+        selectedTypeComboBox.valueProperty().setValue(null);
+        selectedColorComboBox.valueProperty().setValue(null);
+        selectedSizeComboBox.valueProperty().setValue(null);
+        loPrice.valueProperty().setValue(0);
+        hiPrice.valueProperty().setValue(500);
+        catalogVBox.getChildren().clear();
         catalogDisplay();
-    }
-
-    @FXML
-    void displayOrchids(MouseEvent event) {
-        selectedType = "orchid";
-        current_page = 1;
-        clearCatalogDisplay();
-        catalogDisplay();
-    }
-
-    @FXML
-    void displayWine(MouseEvent event) {
-        selectedType = "wine";
-        current_page = 1;
-        clearCatalogDisplay();
-        catalogDisplay();
-    }
-
-    @FXML
-    void displayChocolate(MouseEvent event) {
-        selectedType = "chocolate";
-        current_page = 1;
-        clearCatalogDisplay();
-        catalogDisplay();
-    }
-
-    @FXML
-    void displaySets(MouseEvent event) {
-        selectedType = "set";
-        current_page = 1;
-        clearCatalogDisplay();
-        catalogDisplay();
-    }
-
-
-    @FXML
-    void nextPage(MouseEvent event) {
-        clearCatalogDisplay();
-        current_page++;
-        catalogDisplay();
-    }
-
-    @FXML
-    void previousPage(MouseEvent event) {
-        clearCatalogDisplay();
-        current_page--;
-        catalogDisplay();
-    }
-
-    @FXML
-    void filter(MouseEvent event) {
-        if (filter_applied) {
-            filterButton.setText("Filter");
-            filter_applied = false;
-        }
-        else {
-            filterButton.setText("Remove Filter");
-            filter_applied = true;
-        }
     }
 
     @FXML
     void refreshCatalog(MouseEvent event) throws IOException {
-        selectedType = "all";
-        current_page = 1;
-        clearCatalogDisplay();
+        filter_applied = false;
+        selectedTypeComboBox.valueProperty().setValue(null);
+        selectedColorComboBox.valueProperty().setValue(null);
+        selectedSizeComboBox.valueProperty().setValue(null);
+        loPrice.valueProperty().setValue(0);
+        hiPrice.valueProperty().setValue(500);
+        catalogVBox.getChildren().clear();
         toolbar.getItems().clear();
         toolbar.getItems().add(welcomeText);
         toolbar.getItems().add(menuBar);
@@ -198,7 +127,7 @@ public class CatalogController {
         if (item.isOnSale()) {
             price = new BigDecimal(price * 0.01 * (100 - item.getDiscount())).setScale(2, RoundingMode.HALF_UP).doubleValue();
         }
-        Text itemPrice = new Text(Double.toString(price));
+        Text itemPrice = new Text(String.format("%.2f",price));
         itemPrice.getStyleClass().add("price-text");
         itemPrice.setFill(Color.GREEN);
         itemPrice.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 16));
@@ -249,6 +178,38 @@ public class CatalogController {
     }
 
     @FXML
+    boolean isInFilter(CatalogItem item) {
+        String filterType = null;
+        if (selectedTypeComboBox.valueProperty().getValue()!=null) {
+            filterType = selectedTypeComboBox.valueProperty().getValue().toString().toLowerCase();
+        }
+        String filterColor = null;
+        if (selectedColorComboBox.valueProperty().getValue()!=null) {
+            filterColor = selectedColorComboBox.valueProperty().getValue().toString().toLowerCase();
+        }
+        String filterSize = null;
+        if (selectedSizeComboBox.valueProperty().getValue()!=null) {
+            filterSize = selectedSizeComboBox.valueProperty().getValue().toString().toLowerCase();
+        }
+        double lo = loPrice.getValue();
+        double hi = hiPrice.getValue();
+
+        if (!item.getItemType().equals(filterType) && filterType!=null) {
+            return false;
+        }
+        if (!item.getItemColor().equals(filterColor) && filterColor!=null) {
+            return false;
+        }
+        if (!item.getSize().equals(filterSize) && filterSize!=null) {
+            return false;
+        }
+        if ( !(item.getPrice()>=lo && item.getPrice()<=hi) ) {
+            return false;
+        }
+        return true;
+    }
+
+    @FXML
     void salesDisplay() {
         if (!mainHBox.getChildren().contains(salesVBox)) {
             mainHBox.getChildren().add(1, salesVBox);
@@ -282,7 +243,7 @@ public class CatalogController {
                     itemPrice.strikethroughProperty().setValue(true);
 
                     double newPrice = new BigDecimal(item.getPrice() * 0.01 * (100 - item.getDiscount())).setScale(2, RoundingMode.HALF_UP).doubleValue();
-                    Text newItemPrice = new Text(Double.toString(newPrice));
+                    Text newItemPrice = new Text(String.format("%.2f",(newPrice)));
                     newItemPrice.setFill(Color.RED);
                     newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
                     textBox.getChildren().addAll(itemPrice, newItemPrice);
@@ -317,59 +278,64 @@ public class CatalogController {
     @FXML
     void catalogDisplay() {
         if (catalogItems == null) {
+            catalogVBox.getChildren().add(new Text("Catalog is empty"));
             System.out.println("Catalog is empty :(");
-            previousPageButton.disableProperty().setValue(true);
-            nextPageButton.disableProperty().setValue(true);
         }
         else {
             int count_displayed_items = 0;
 
-            int total_catalog_items = catalogItems.size();
+            HBox newHBox = new HBox();
+            newHBox.setAlignment(Pos.CENTER_LEFT);
+            newHBox.setMinWidth(840);
+            newHBox.setPrefHeight(126);
+            newHBox.setPrefWidth(1040);
+            newHBox.setSpacing(5);
+            HBox currentRow = newHBox;
+            catalogVBox.getChildren().add(currentRow);
 
             for (CatalogItem item : catalogItems) {
-                if (selectedType=="all" || item.getItemType().equals(selectedType)) {
+                if (!filter_applied || isInFilter(item)) {
                     HBox hBox = getItemHBox(item);
 
-                    if (count_displayed_items < 4) {
-                        flowerHBox.getChildren().add(hBox);
-                    } else if (count_displayed_items < 8) {
-                        flowerHBox2.getChildren().add(hBox);
-                    } else if (count_displayed_items < 12) {
-                        flowerHBox3.getChildren().add(hBox);
-                    } else {
-                        break;
+                    if (currentRow.getChildren().size() <4) {
+                        currentRow.getChildren().add(hBox);
+                        count_displayed_items++;
                     }
-                    count_displayed_items++;
+                    else if (currentRow.getChildren().size() == 4) {
+                        //Create new row
+                        newHBox = new HBox();
+                        newHBox.setAlignment(Pos.CENTER_LEFT);
+                        newHBox.setMinWidth(840);
+                        newHBox.setPrefHeight(126);
+                        newHBox.setPrefWidth(1040);
+                        newHBox.setSpacing(5);
+                        currentRow = newHBox;
+
+                        //Add it to catalogVBox
+                        catalogVBox.getChildren().add(currentRow);
+
+                        //Add new item hBox
+                        currentRow.getChildren().add(hBox);
+                        count_displayed_items++;
+                    }
                 }
             }
 
-
-            if (current_page == 1) {
-                previousPageButton.disableProperty().setValue(true);
+            if (!mainHBox.getChildren().contains(salesVBox)) {
+                catalogVBox.setFillWidth(true);
+            } else {
+                catalogVBox.setFillWidth(false);
             }
-            else {
-                previousPageButton.disableProperty().setValue(false);
-            }
-            if (((current_page-1)*12)+count_displayed_items == total_catalog_items) {
-                nextPageButton.disableProperty().setValue(true);
-            }
-            else {
-                nextPageButton.disableProperty().setValue(false);
-            }
-        }
-
-        if (!mainHBox.getChildren().contains(salesVBox)) {
-            catalogVBox.setFillWidth(true);
-        }
-        else {
-            catalogVBox.setFillWidth(false);
         }
     }
 
     @FXML
     void initialize() throws IOException {
+        //Load Lilach Logo
         Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
         catalogTitle.setImage((image));
+
+        //Load Toolbar
         toolbar.getItems().remove(menuBar);
         Button NewOrderButton = new Button("New Order");
         NewOrderButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -459,6 +425,7 @@ public class CatalogController {
             toolbar.getItems().add(refreshButton);
             toolbar.getItems().add(contactButton);
         }
+
         toolbar.getItems().add(menuBar);
         Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
         ImageView ivCart = new ImageView(cartImage);
@@ -485,10 +452,6 @@ public class CatalogController {
             }
             else {
                 //if cart isn't empty
-                MenuItem editCart = new MenuItem("Edit Cart");
-                MenuItem completeOrder = new MenuItem("Finish Order");
-                shoppingCart.getItems().add(editCart);
-                shoppingCart.getItems().add(completeOrder);
             }
         }
 
@@ -527,6 +490,65 @@ public class CatalogController {
 
         App.showLoading(rootVBox, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
         new Thread(getCatalogTask).start();
+
+        //Init filter values
+        ObservableList<String> typeOptions = FXCollections.observableArrayList("Flower", "Bouquet", "Plant", "Orchid", "Wine", "Chocolate", "Set");
+        selectedTypeComboBox.setItems(typeOptions);
+        selectedTypeComboBox.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue ov, String t, String t1) {
+                filter();
+            }
+        });
+
+        ObservableList<String> colorOptions = FXCollections.observableArrayList("Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink", "White", "Black");
+        selectedColorComboBox.setItems(colorOptions);
+        selectedColorComboBox.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue ov, String t, String t1) {
+                filter();
+            }
+        });
+        ObservableList<String> sizeOptions = FXCollections.observableArrayList("Small", "Medium", "Large");
+        selectedSizeComboBox.setItems(sizeOptions);
+        selectedSizeComboBox.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue ov, String t, String t1) {
+                filter();
+            }
+        });
+        loPrice.minProperty().set(50);
+        loPrice.maxProperty().set(500);
+        loPrice.setMajorTickUnit(150);
+        loPrice.setSnapToTicks(true);
+        loPrice.setShowTickMarks(true);
+        loPrice.setShowTickLabels(true);
+        loPrice.setValue(100);
+        loPrice.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
+            if (! isChanging) {}
+        });
+
+        loPrice.valueProperty().addListener((obs, oldValue, newValue) -> {
+            if (! hiPrice.isValueChanging()) {
+                filter();
+            }
+        });
+        hiPrice.minProperty().set(50);
+        hiPrice.maxProperty().set(500);
+        hiPrice.setMajorTickUnit(150);
+        hiPrice.setSnapToTicks(true);
+        hiPrice.setShowTickMarks(true);
+        hiPrice.setShowTickLabels(true);
+        hiPrice.setValue(500);
+        hiPrice.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
+            if (! isChanging) {}
+        });
+
+        hiPrice.valueProperty().addListener((obs, oldValue, newValue) -> {
+            if (! hiPrice.isValueChanging()) {
+                filter();
+            }
+        });
 
     }
 
