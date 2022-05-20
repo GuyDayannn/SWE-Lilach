@@ -94,3 +94,8 @@
     -fx-background-color: linear-gradient(#519349, #90ce7f);
     -fx-text-fill: white;
 }
+
+.combo-selected{
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-text-fill: white;
+}

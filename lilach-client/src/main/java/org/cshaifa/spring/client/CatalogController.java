@@ -75,24 +75,30 @@ public class CatalogController {
         catalogVBox.getChildren().clear();
         catalogDisplay();
     }
-
+/*
     @FXML
     void clearFilter(MouseEvent event) {
         filter_applied = false;
+        selectedTypeComboBox.getStyleClass().remove("combo-selected");
         selectedTypeComboBox.valueProperty().setValue(null);
+        selectedColorComboBox.getStyleClass().remove("combo-selected");
         selectedColorComboBox.valueProperty().setValue(null);
+        selectedSizeComboBox.getStyleClass().remove("combo-selected");
         selectedSizeComboBox.valueProperty().setValue(null);
         loPrice.valueProperty().setValue(0);
         hiPrice.valueProperty().setValue(500);
         catalogVBox.getChildren().clear();
         catalogDisplay();
     }
-
+*/
     @FXML
     void refreshCatalog(MouseEvent event) throws IOException {
         filter_applied = false;
+        selectedTypeComboBox.getStyleClass().remove("combo-selected");
         selectedTypeComboBox.valueProperty().setValue(null);
+        selectedColorComboBox.getStyleClass().remove("combo-selected");
         selectedColorComboBox.valueProperty().setValue(null);
+        selectedSizeComboBox.getStyleClass().remove("combo-selected");
         selectedSizeComboBox.valueProperty().setValue(null);
         loPrice.valueProperty().setValue(0);
         hiPrice.valueProperty().setValue(500);
@@ -500,6 +506,18 @@ public class CatalogController {
                 filter();
             }
         });
+        selectedTypeComboBox.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                if (empty || item == null) {
+                    setText("Type");
+                    selectedTypeComboBox.getStyleClass().remove("combo-selected");
+                } else {
+                    setText(item);
+                    selectedTypeComboBox.getStyleClass().add("combo-selected");
+                }
+            }
+        });
 
         ObservableList<String> colorOptions = FXCollections.observableArrayList("Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Pink", "White", "Black");
         selectedColorComboBox.setItems(colorOptions);
@@ -509,6 +527,19 @@ public class CatalogController {
                 filter();
             }
         });
+        selectedColorComboBox.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                if (empty || item == null) {
+                    setText("Type");
+                    selectedColorComboBox.getStyleClass().remove("combo-selected");
+                } else {
+                    setText(item);
+                    selectedColorComboBox.getStyleClass().add("combo-selected");
+                }
+            }
+        });
+
         ObservableList<String> sizeOptions = FXCollections.observableArrayList("Small", "Medium", "Large");
         selectedSizeComboBox.setItems(sizeOptions);
         selectedSizeComboBox.valueProperty().addListener(new ChangeListener<String>() {
@@ -517,6 +548,19 @@ public class CatalogController {
                 filter();
             }
         });
+        selectedSizeComboBox.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                if (empty || item == null) {
+                    setText("Type");
+                    selectedSizeComboBox.getStyleClass().remove("combo-selected");
+                } else {
+                    setText(item);
+                    selectedSizeComboBox.getStyleClass().add("combo-selected");
+                }
+            }
+        });
+
         loPrice.minProperty().set(50);
         loPrice.maxProperty().set(500);
         loPrice.setMajorTickUnit(150);
@@ -551,6 +595,5 @@ public class CatalogController {
         });
 
     }
-
 
 }

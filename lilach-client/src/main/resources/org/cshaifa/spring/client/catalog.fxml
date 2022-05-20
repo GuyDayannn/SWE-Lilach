@@ -80,15 +80,15 @@
          <children>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <HBox alignment="CENTER" minHeight="35.0" minWidth="840.0" prefHeight="35.0" prefWidth="1040.0" spacing="10.0" styleClass="filterBar">
+                  <HBox alignment="CENTER" minHeight="40.0" minWidth="840.0" prefHeight="40.0" prefWidth="1040.0" spacing="10.0" styleClass="filterBar">
                      <children>
                         <ComboBox fx:id="selectedTypeComboBox" maxWidth="150.0" prefWidth="150.0" promptText="Type" />
                         <ComboBox fx:id="selectedColorComboBox" maxWidth="150.0" prefWidth="150.0" promptText="Color" />
                         <ComboBox fx:id="selectedSizeComboBox" maxWidth="150.0" prefWidth="150.0" promptText="Size" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price From:" />
-                        <Slider fx:id="loPrice" prefHeight="15.0" prefWidth="75.0" />
+                        <Slider fx:id="loPrice" prefHeight="15.0" prefWidth="75.0" translateY="2.0" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To:" />
-                        <Slider fx:id="hiPrice" prefHeight="15.0" prefWidth="75.0" />
+                        <Slider fx:id="hiPrice" prefHeight="15.0" prefWidth="75.0" translateY="2.0" />
                       <Button fx:id="clearFilterButton" mnemonicParsing="false" onMouseClicked="#refreshCatalog" text="Clear Filter" />
                      </children>
                      <VBox.margin>

@@ -180,7 +180,7 @@ public class DatabaseHandler {
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/wine", DatabaseHandler.class));
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/chocolate", DatabaseHandler.class));
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/sets", DatabaseHandler.class));
-        Collections.shuffle(imagesLists);
+        //Collections.shuffle(imagesLists);
         return imagesLists;
     }
 
