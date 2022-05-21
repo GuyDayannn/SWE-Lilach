@@ -9,13 +9,13 @@
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" stylesheets="@stylesheets/catalog.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
+<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" stylesheets="@stylesheets/catalog.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
    <children>
       <HBox prefHeight="61.0" prefWidth="1041.0">
          <children>
@@ -78,7 +78,7 @@
       </VBox>
       <HBox fx:id="mainHBox" prefHeight="600.0" prefWidth="1040.0">
          <children>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox fx:id="catalogVBox" prefHeight="200.0" prefWidth="100.0">
                <children>
                   <HBox alignment="CENTER" minHeight="40.0" minWidth="840.0" prefHeight="40.0" prefWidth="1040.0" spacing="10.0" styleClass="filterBar">
                      <children>
@@ -89,21 +89,16 @@
                         <Slider fx:id="loPrice" prefHeight="15.0" prefWidth="75.0" translateY="2.0" />
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To:" />
                         <Slider fx:id="hiPrice" prefHeight="15.0" prefWidth="75.0" translateY="2.0" />
-                      <Button fx:id="clearFilterButton" mnemonicParsing="false" onMouseClicked="#refreshCatalog" text="Clear Filter" />
+                      <Button fx:id="clearFilterButton" mnemonicParsing="false" onAction="#clearFilter" text="Clear Filter" />
                      </children>
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
                   </HBox>
                   <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" minWidth="840.0" prefHeight="600.0" prefWidth="1040.0">
-                    <content>
-                      <AnchorPane minWidth="840.0" prefHeight="600.0" prefWidth="1040.0">
-                           <children>
-                              <VBox fx:id="catalogVBox" minWidth="840.0" prefWidth="1040.0">
-                              </VBox>
-                           </children>
-                        </AnchorPane>
-                    </content>
+                     <content>
+                        <TilePane fx:id="tilePane" maxWidth="-Infinity" prefColumns="4" prefHeight="495.0" prefWidth="822.0" />
+                     </content>
                   </ScrollPane>
                </children>
             </VBox>
