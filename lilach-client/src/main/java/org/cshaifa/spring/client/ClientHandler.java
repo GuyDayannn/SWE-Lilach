@@ -114,8 +114,8 @@ public class ClientHandler {
     }
 
     public static CreateOrderResponse createOrder(Store store, Customer customer, List<CatalogItem> items, String greeting, Date orderDate,
-                                                  Date supplyDate) throws IOException {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate, supplyDate);
+                                                  Date supplyDate, boolean delivery) throws IOException {
+        CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate, supplyDate, delivery);
         client.openConnection();
         client.sendToServer(createOrderRequest);
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());
