@@ -34,7 +34,7 @@ public class Order {
     private double total;
 
     public Order(List<CatalogItem> items, Store store, Customer customer, String greeting, Date orderDate, Date supplyDate,
-            boolean delivery, boolean completed, double total) {
+            boolean delivery) {
         super();
         this.items = items;
         this.store = store;
@@ -43,7 +43,7 @@ public class Order {
         this.orderDate = orderDate;
         this.supplyDate = supplyDate;
         this.delivery = delivery;
-        this.completed = completed;
+        this.completed = false;
         this.total = items.stream().mapToDouble(CatalogItem::getFinalPrice).sum();
 
     }

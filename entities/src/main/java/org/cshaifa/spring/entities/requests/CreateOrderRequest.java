@@ -21,14 +21,17 @@ public class CreateOrderRequest extends Request {
 
     private Date supplyDate;
 
+    private boolean delivery;
+
     public CreateOrderRequest(Store store, Customer customer, List<CatalogItem> items, String greeting, Date orderDate,
-            Date supplyDate) {
+            Date supplyDate, boolean deilvery) {
         this.store = store;
         this.customer = customer;
         this.items = items;
         this.greeting = greeting;
         this.orderDate = orderDate;
         this.supplyDate = supplyDate;
+        this.delivery = delivery;
     }
 
     public Store getStore() {
@@ -53,6 +56,10 @@ public class CreateOrderRequest extends Request {
 
     public Date getSupplyDate() {
         return supplyDate;
+    }
+
+    public boolean getDelivery() {
+        return delivery;
     }
 
 }

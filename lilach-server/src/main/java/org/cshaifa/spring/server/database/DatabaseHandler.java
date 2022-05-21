@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.persistence.criteria.Root;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.ChainEmployee;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.User;
@@ -31,8 +33,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 /**
- * This class will handle the server requests to the db
- * like getting the catalog, updating items etc.
+ * This class will handle the server requests to the db like getting the
+ * catalog, updating items etc.
  */
 public class DatabaseHandler {
 
@@ -115,8 +117,7 @@ public class DatabaseHandler {
     }
 
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
-            List<Store> stores, SubscriptionType subscriptionType)
-            throws Exception {
+            List<Store> stores, SubscriptionType subscriptionType) throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -131,8 +132,7 @@ public class DatabaseHandler {
         try {
             String hexSalt = generateHexSalt();
             Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
-                    hexSalt, stores,
-                    false, subscriptionType);
+                    hexSalt, stores, false, subscriptionType);
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
@@ -170,6 +170,24 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
+    public static Order createOrder(Store store, Customer customer, List<CatalogItem> items, String greeting,
+            Date orderDate, Date supplyDate, boolean delivery) throws HibernateException {
+        Session session = DatabaseConnector.getSession();
+        session.beginTransaction();
+
+        Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery);
+        session.save(order);
+
+        store.addOrder(order);
+        session.merge(store);
+
+        customer.addOrder(order);
+        session.merge(customer);
+
+        tryFlushSession(session);
+
+        return order;
+    }
 
     private static List<List<Path>> getRandomOrderedImages() {
         List<List<Path>> imagesLists = new ArrayList<>();
@@ -180,7 +198,7 @@ public class DatabaseHandler {
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/wine", DatabaseHandler.class));
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/chocolate", DatabaseHandler.class));
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/sets", DatabaseHandler.class));
-        //Collections.shuffle(imagesLists);
+        // Collections.shuffle(imagesLists);
         return imagesLists;
     }
 
@@ -194,37 +212,37 @@ public class DatabaseHandler {
         List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
-        String[] sizes = {"large", "medium", "small"};
-        String[] colors = {"red", "orange", "pink"};
-        String[] itemTypes = {"flower", "bouquet", "plant", "orchid", "wine", "chocolate", "set"};
+        String[] sizes = { "large", "medium", "small" };
+        String[] colors = { "red", "orange", "pink" };
+        String[] itemTypes = { "flower", "bouquet", "plant", "orchid", "wine", "chocolate", "set" };
         int typeInd = 0;
         for (List<Path> imageList : imageLists) {
-            if (imageList!=null) {
+            if (imageList != null) {
                 for (Path imagePath : imageList) {
-                    int randomInt = random.nextInt(0,2);
+                    int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
                     int randomQuantity = random.nextInt(500);
-                    randomItems.add(new CatalogItem(
-                            "Random Item",
-                            imagePath.toUri().toString(),
-                            randomPrice, randomQuantity, false, 0.0,
-                            sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
+                    randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice,
+                            randomQuantity, false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
                 }
             }
             typeInd++;
         }
 
-        //On Sale Items
+        // On Sale Items
         randomItems.remove(0);
-        randomItems.add(0,new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true, 50.0, "large", "flower", "white"));
+        randomItems.add(0, new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true,
+                50.0, "large", "flower", "white"));
         randomItems.remove(1);
-        randomItems.add(1,new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true, 50.0, "medium", "flower", "yellow"));
+        randomItems.add(1, new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true,
+                50.0, "medium", "flower", "yellow"));
 
         for (CatalogItem item : randomItems) {
             session.save(item);
         }
 
-        Store store = new Store("Example Store", "Example Address", new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
+        Store store = new Store("Example Store", "Example Address",
+                new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
         session.save(store);
         tryFlushSession(session);
 

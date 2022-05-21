@@ -7,6 +7,12 @@ public class CreateOrderResponse extends Response {
     private Order order;
     private String message;
 
+    public CreateOrderResponse(int requestId, boolean success, String message) {
+        super(requestId, success);
+        this.order = null;
+        this.message = message;
+    }
+
     public CreateOrderResponse(int requestId, boolean success, Order order, String message) {
         super(requestId, success);
         this.order = order;

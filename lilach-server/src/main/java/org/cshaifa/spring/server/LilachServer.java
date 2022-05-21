@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.requests.CreateOrderRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetStoresRequest;
 import org.cshaifa.spring.entities.requests.IsAliveRequest;
@@ -13,6 +15,7 @@ import org.cshaifa.spring.entities.requests.LogoutRequest;
 import org.cshaifa.spring.entities.requests.RegisterRequest;
 import org.cshaifa.spring.entities.requests.Request;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
+import org.cshaifa.spring.entities.responses.CreateOrderResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetStoresResponse;
 import org.cshaifa.spring.entities.responses.IsAliveResponse;
@@ -50,6 +53,7 @@ public class LilachServer extends AbstractServer {
                         List<CatalogItem> catalogItems = DatabaseHandler.getCatalog();
                         client.sendToClient(new GetCatalogResponse(requestId, catalogItems));
                     } catch (HibernateException e) {
+                        e.printStackTrace();
                         client.sendToClient(new GetCatalogResponse(requestId, false));
                     }
                 } else if (request instanceof UpdateItemRequest updateItemRequest) {
@@ -58,6 +62,7 @@ public class LilachServer extends AbstractServer {
                         DatabaseHandler.updateItem(updatedItem);
                         client.sendToClient(new UpdateItemResponse(requestId, updatedItem));
                     } catch (HibernateException e) {
+                        e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
                     }
                 } else if (request instanceof LoginRequest loginRequest) {
@@ -70,6 +75,7 @@ public class LilachServer extends AbstractServer {
                         try {
                             DatabaseHandler.updateLoginStatus(user, true);
                         } catch (HibernateException e) {
+                            e.printStackTrace();
                             client.sendToClient(new LoginResponse(requestId, false, Constants.FAIL_MSG));
                             return;
                         }
@@ -80,8 +86,9 @@ public class LilachServer extends AbstractServer {
                     // We assume we login immediately after register
                     try {
                         String message = DatabaseHandler.registerCustomer(registerRequest.getFullName(),
-                                registerRequest.getEmail(), registerRequest.getUsername(), registerRequest.getPassword(),
-                                registerRequest.getStores(), registerRequest.getSubscriptionType());
+                                registerRequest.getEmail(), registerRequest.getUsername(),
+                                registerRequest.getPassword(), registerRequest.getStores(),
+                                registerRequest.getSubscriptionType());
                         if (message.equals(Constants.SUCCESS_MSG)) {
                             User user = DatabaseHandler.getUserByEmail(registerRequest.getEmail());
                             // TODO: maybe catch this separately
@@ -98,6 +105,7 @@ public class LilachServer extends AbstractServer {
                     try {
                         DatabaseHandler.updateLoginStatus(logoutRequest.getUser(), false);
                     } catch (HibernateException e) {
+                        e.printStackTrace();
                         client.sendToClient(new LogoutResponse(requestId, false));
                         return;
                     }
@@ -105,6 +113,17 @@ public class LilachServer extends AbstractServer {
                     client.sendToClient(new LogoutResponse(requestId, true));
                 } else if (request instanceof GetStoresRequest) {
                     client.sendToClient(new GetStoresResponse(requestId, DatabaseHandler.getStores()));
+                } else if (request instanceof CreateOrderRequest createOrderRequest) {
+                    try {
+                        Order order = DatabaseHandler.createOrder(createOrderRequest.getStore(),
+                                createOrderRequest.getCustomer(), createOrderRequest.getItems(),
+                                createOrderRequest.getGreeting(), createOrderRequest.getOrderDate(),
+                                createOrderRequest.getSupplyDate(), createOrderRequest.getDelivery());
+                        client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
+                        client.sendToClient(new CreateOrderResponse(requestId, false, Constants.FAIL_MSG));
+                    }
                 }
             } else {
                 // TODO: Return a general error message to the client
