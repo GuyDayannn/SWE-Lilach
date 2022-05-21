@@ -28,6 +28,8 @@ public class CatalogItem implements Serializable {
 
     private double discountPercent;
 
+    private boolean defaultValue; //for checkbox
+
 
     @Transient
     private byte[] image = null;
@@ -41,9 +43,10 @@ public class CatalogItem implements Serializable {
         this.quantity = 0;
         this.onSale = false;
         this.discountPercent = 0.0;
+        this.defaultValue = true;
     }
 
-    public CatalogItem(String name, String imagePath, double price, int quantity, boolean onSale, double discountPercent) {
+    public CatalogItem(String name, String imagePath, double price, int quantity, boolean onSale, double discountPercent, boolean defaultValue) {
         super();
         this.name = name;
         this.imagePath = imagePath;
@@ -51,6 +54,7 @@ public class CatalogItem implements Serializable {
         this.quantity = quantity;
         this.onSale = onSale;
         this.discountPercent = discountPercent;
+        this.defaultValue = defaultValue;
     }
 
     public long getId() {
@@ -60,6 +64,8 @@ public class CatalogItem implements Serializable {
     public double getDiscount() {
         return discountPercent;
     }
+
+    public boolean getIsDefault(){return defaultValue;}
 
     public boolean isOnSale() {
         return onSale;
@@ -72,6 +78,12 @@ public class CatalogItem implements Serializable {
     public void setDiscountPercent(double discountPercent){
         this.discountPercent = discountPercent;
     }
+
+    public void setDefaultValue(boolean defaultValue){
+
+        this.defaultValue = defaultValue;
+    }
+
 
     public String getName() {
         return name;

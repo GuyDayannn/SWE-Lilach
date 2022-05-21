@@ -45,6 +45,7 @@ public class App extends Application {
     private static Stage appStage;
 
     private static CatalogItem currentItemDisplayed;
+    private static CatalogItem itemByID;
     private static int DataBaseConnected = 0;
     private static Stage loadingStage;
     private static Node loadingRootNode;
@@ -212,6 +213,10 @@ public class App extends Application {
 
     static CatalogItem getCurrentItemDisplayed() {
         return currentItemDisplayed;
+    }
+
+    static CatalogItem getItemByID(long itemID) {
+        return itemByID;
     }
 
     public static User getCurrentUser() {
