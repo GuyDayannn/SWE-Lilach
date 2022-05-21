@@ -1,6 +1,8 @@
 package org.cshaifa.spring.entities;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,7 +36,6 @@ public class CatalogItem implements Serializable {
 
     private String itemColor;
 
-
     @Transient
     private byte[] image = null;
 
@@ -49,16 +50,8 @@ public class CatalogItem implements Serializable {
         this.discountPercent = 0.0;
     }
 
-    public CatalogItem(
-            String name,
-            String imagePath,
-            double price,
-            int quantity,
-            boolean onSale,
-            double discountPercent,
-            String size,
-            String itemType,
-            String itemColor) {
+    public CatalogItem(String name, String imagePath, double price, int quantity, boolean onSale,
+            double discountPercent, String size, String itemType, String itemColor) {
         super();
         this.name = name;
         this.imagePath = imagePath;
@@ -83,11 +76,11 @@ public class CatalogItem implements Serializable {
         return onSale;
     }
 
-    public void setOnSale(boolean isOnSale){
+    public void setOnSale(boolean isOnSale) {
         this.onSale = isOnSale;
     }
 
-    public void setDiscountPercent(double discountPercent){
+    public void setDiscountPercent(double discountPercent) {
         this.discountPercent = discountPercent;
     }
 
@@ -115,12 +108,17 @@ public class CatalogItem implements Serializable {
         this.price = price;
     }
 
+    public double getFinalPrice() {
+        return new BigDecimal(getPrice() * 0.01 * (100 - getDiscount())).setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+    }
+
     public byte[] getImage() {
-      return image;
+        return image;
     }
 
     public void setImage(byte[] image) {
-      this.image = image;
+        this.image = image;
     }
 
     public int getQuantity() {
@@ -158,11 +156,11 @@ public class CatalogItem implements Serializable {
     @Override
     public boolean equals(Object obj) {
         CatalogItem temp = (CatalogItem) obj;
-        if(temp.getId() == this.id)
+        if (temp.getId() == this.id)
             return true;
-        else if(temp.getName().equals(this.name))
+        else if (temp.getName().equals(this.name))
             return true;
-        else if(temp.getImagePath().equals(this.imagePath))
+        else if (temp.getImagePath().equals(this.imagePath))
             return true;
 
         return false;
