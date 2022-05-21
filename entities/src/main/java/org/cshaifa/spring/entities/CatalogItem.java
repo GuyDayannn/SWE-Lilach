@@ -153,6 +153,13 @@ public class CatalogItem implements Serializable {
         this.itemColor = color;
     }
 
+    public void reduceQuantity(int toReduce) {
+        if (toReduce > quantity)
+            return;
+
+        quantity -= toReduce;
+    }
+
     @Override
     public boolean equals(Object obj) {
         CatalogItem temp = (CatalogItem) obj;

@@ -173,7 +173,10 @@ public class DatabaseHandler {
 
     public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
             Timestamp orderDate, Timestamp supplyDate, boolean delivery) throws HibernateException {
-        // TODO: check stock and update stock
+        // Check stock
+        if (!items.entrySet().stream().allMatch(
+                entry -> store.getStock().contains(entry.getKey()) && entry.getValue() <= entry.getKey().getQuantity()))
+            return null;
 
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
@@ -186,6 +189,12 @@ public class DatabaseHandler {
 
         customer.addOrder(order);
         session.merge(customer);
+
+        // Update stock
+        items.forEach((item, amount) -> {
+            item.reduceQuantity(amount);
+            session.merge(item);
+        });
 
         tryFlushSession(session);
 
