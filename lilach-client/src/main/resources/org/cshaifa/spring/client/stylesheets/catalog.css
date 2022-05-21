@@ -90,11 +90,12 @@
     -fx-border-insets: 2;
 }
 
-.combo-box:hover, .combo-box:focused, .combo-box:showing{
+.combo-box:hover, .combo-box:focused{
     -fx-background-color: linear-gradient(#519349, #90ce7f);
     -fx-text-fill: white;
 }
 
-.slider {
-
+.combo-selected{
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-text-fill: white;
 }

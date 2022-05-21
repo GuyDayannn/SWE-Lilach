@@ -5,15 +5,17 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" stylesheets="@stylesheets/catalog.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
+<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" stylesheets="@stylesheets/catalog.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
    <children>
       <HBox prefHeight="61.0" prefWidth="1041.0">
          <children>
@@ -35,37 +37,37 @@
          <children>
             <HBox alignment="CENTER" prefHeight="25.0" prefWidth="1040.0" styleClass="categoryText">
                <children>
-                  <Text fx:id="flowers" fill="WHITE" onMouseClicked="#displayFlowers" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Flowers" textAlignment="CENTER" wrappingWidth="130.0">
+                  <Text fx:id="Flower" fill="WHITE" onMouseClicked="#displayType" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Flowers" textAlignment="CENTER" wrappingWidth="130.0">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Text>
-                  <Text fx:id="bouquets" fill="WHITE" onMouseClicked="#displayBouquets" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Bouquets" textAlignment="CENTER" wrappingWidth="130.0">
+                  <Text fx:id="Bouquet" fill="WHITE" onMouseClicked="#displayType" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Bouquets" textAlignment="CENTER" wrappingWidth="130.0">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Text>
-                  <Text fx:id="plants" fill="WHITE" onMouseClicked="#displayPlants" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Plants" textAlignment="CENTER" wrappingWidth="130.0">
+                  <Text fx:id="Plant" fill="WHITE" onMouseClicked="#displayType" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Plants" textAlignment="CENTER" wrappingWidth="130.0">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Text>
-                  <Text fx:id="orchids" fill="WHITE" onMouseClicked="#displayOrchids" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Orchids" textAlignment="CENTER" wrappingWidth="130.0">
+                  <Text fx:id="Orchid" fill="WHITE" onMouseClicked="#displayType" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Orchids" textAlignment="CENTER" wrappingWidth="130.0">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Text>
-                  <Text fx:id="wine" fill="WHITE" onMouseClicked="#displayWine" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Wine" textAlignment="CENTER" wrappingWidth="130.0">
+                  <Text fx:id="Wine" fill="WHITE" onMouseClicked="#displayType" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Wine" textAlignment="CENTER" wrappingWidth="130.0">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Text>
-                  <Text fx:id="sets" fill="WHITE" onMouseClicked="#displayChocolate" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Chocolate" textAlignment="CENTER" wrappingWidth="130.0">
+                  <Text fx:id="Chocolate" fill="WHITE" onMouseClicked="#displayType" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Chocolate" textAlignment="CENTER" wrappingWidth="130.0">
                      <font>
                         <Font size="24.0" />
                      </font>
                   </Text>
-                  <Text fx:id="sets" fill="WHITE" onMouseClicked="#displaySets" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Sets" textAlignment="CENTER" wrappingWidth="130.0">
+                  <Text fx:id="Set" fill="WHITE" onMouseClicked="#displayType" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="categoryText" text="Sets" textAlignment="CENTER" wrappingWidth="130.0">
                      <font>
                         <Font size="24.0" />
                      </font>
@@ -76,39 +78,28 @@
       </VBox>
       <HBox fx:id="mainHBox" prefHeight="600.0" prefWidth="1040.0">
          <children>
-            <VBox fx:id="catalogVBox" minWidth="840.0" prefWidth="1040.0">
+            <VBox fx:id="catalogVBox" prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <VBox prefHeight="35.0" prefWidth="1040.0">
+                  <HBox alignment="CENTER" minHeight="40.0" minWidth="840.0" prefHeight="40.0" prefWidth="1040.0" spacing="10.0" styleClass="filterBar">
                      <children>
-                        <HBox alignment="CENTER" minHeight="30.0" minWidth="840.0" prefHeight="30.0" prefWidth="1040.0" spacing="10.0" styleClass="filterBar">
-                           <children>
-                              <ComboBox maxWidth="150.0" prefWidth="150.0" promptText="Type" />
-                              <ComboBox maxWidth="150.0" prefWidth="150.0" promptText="Color" />
-                              <ComboBox maxWidth="150.0" prefWidth="150.0" promptText="Size" />
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price From:" />
-                              <Slider prefHeight="15.0" prefWidth="75.0" />
-                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To:" />
-                              <Slider prefHeight="15.0" prefWidth="75.0" />
-                            <Button fx:id="filterButton" mnemonicParsing="false" onMouseClicked="#filter" text="Filter" />
-                           </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </HBox>
+                        <ComboBox fx:id="selectedTypeComboBox" maxWidth="150.0" prefWidth="150.0" promptText="Type" />
+                        <ComboBox fx:id="selectedColorComboBox" maxWidth="150.0" prefWidth="150.0" promptText="Color" />
+                        <ComboBox fx:id="selectedSizeComboBox" maxWidth="150.0" prefWidth="150.0" promptText="Size" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price From:" />
+                        <Slider fx:id="loPrice" prefHeight="15.0" prefWidth="75.0" translateY="2.0" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To:" />
+                        <Slider fx:id="hiPrice" prefHeight="15.0" prefWidth="75.0" translateY="2.0" />
+                      <Button fx:id="clearFilterButton" mnemonicParsing="false" onAction="#clearFilter" text="Clear Filter" />
                      </children>
-                  </VBox>
-                  <HBox fx:id="flowerHBox" alignment="CENTER_LEFT" maxWidth="840.0" prefHeight="226.0" prefWidth="1040.0" spacing="10.0">
                      <VBox.margin>
                         <Insets />
-                     </VBox.margin></HBox>
-                  <HBox fx:id="flowerHBox2" alignment="CENTER_LEFT" maxWidth="840.0" prefHeight="226.0" prefWidth="1040.0" spacing="10.0" />
-                  <HBox fx:id="flowerHBox3" alignment="CENTER_LEFT" maxWidth="840.0" prefHeight="226.0" prefWidth="1040.0" spacing="10.0" />
-                  <HBox fx:id="bottomBarVBox" alignment="CENTER" minHeight="26.0" minWidth="840.0" prefHeight="26.0" prefWidth="1040.0">
-                     <children>
-                        <Button fx:id="previousPageButton" alignment="CENTER" disable="false" maxHeight="24.0" maxWidth="96.0" mnemonicParsing="false" onMouseClicked="#previousPage" prefHeight="24.0" prefWidth="96.0" styleClass="catalog-item-buttons" text="Previous" visible="true" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="nextPageButton" alignment="CENTER" disable="false" maxHeight="24.0" maxWidth="96.0" mnemonicParsing="false" onMouseClicked="#nextPage" prefHeight="24.0" prefWidth="96.0" styleClass="catalog-item-buttons" text="Next" visible="true" HBox.hgrow="ALWAYS" />
-                     </children>
+                     </VBox.margin>
                   </HBox>
+                  <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" minWidth="840.0" prefHeight="600.0" prefWidth="1040.0">
+                     <content>
+                        <TilePane fx:id="tilePane" maxWidth="-Infinity" prefColumns="4" prefHeight="495.0" prefWidth="822.0" />
+                     </content>
+                  </ScrollPane>
                </children>
             </VBox>
             <VBox fx:id="salesVBox" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" styleClass="onsale">
