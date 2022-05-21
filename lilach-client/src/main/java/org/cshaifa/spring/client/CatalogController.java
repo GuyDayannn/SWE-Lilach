@@ -396,11 +396,21 @@ public class CatalogController {
         viewProfileButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                App.setWindowTitle("Customer Profile");
-                try {
-                    App.setContent("customerProfile");
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (App.getCurrentUser().getClass().toString().equals("Customer")) {
+                    App.setWindowTitle("Customer Profile");
+                    try {
+                        App.setContent("customerProfile");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    App.setWindowTitle("Employee Profile");
+                    try {
+                        App.setContent("employeeProfile");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

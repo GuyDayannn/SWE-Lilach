@@ -8,12 +8,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
 
 public class ItemPopUpController {
     @FXML AnchorPane popupPane;
@@ -21,6 +23,7 @@ public class ItemPopUpController {
     @FXML Text  popupPriceText;
     @FXML Text  popupPriceText1;
     @FXML Text popupNewPriceText;
+    @FXML HBox buttonsHbox;
     @FXML Button    btnPopUpUpdate;
     @FXML Button    btnPopUpCancel;
     @FXML ImageView itemImage;
@@ -29,6 +32,12 @@ public class ItemPopUpController {
         CatalogItem currentItemDisplayed = App.getCurrentItemDisplayed();
         popUpMessageText.setText(currentItemDisplayed.getName());
         popupPriceText.setText(Double.toString(currentItemDisplayed.getPrice()));
+
+        //Change this to access permissions later
+        if (App.getCurrentUser()==null || App.getCurrentUser() instanceof Customer) {
+            buttonsHbox.getChildren().remove(btnPopUpUpdate);
+        }
+
         if (App.getCurrentItemDisplayed().isOnSale()) {
             popupPriceText.setVisible(false);
             popupPriceText1.setText(Double.toString(currentItemDisplayed.getPrice())+" ");
@@ -53,7 +62,6 @@ public class ItemPopUpController {
         });
 
         btnPopUpCancel.setOnAction(event -> {
-            System.out.println("You clicked Cancel");
             btnPopUpCancel.getScene().getWindow().hide();
         });
     }
