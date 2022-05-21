@@ -1,7 +1,7 @@
 package org.cshaifa.spring.entities.requests;
 
-import java.sql.Date;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.Map;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
@@ -13,18 +13,18 @@ public class CreateOrderRequest extends Request {
 
     private Customer customer;
 
-    private List<CatalogItem> items;
+    private Map<CatalogItem, Integer> items;
 
     private String greeting;
 
-    private Date orderDate;
+    private Timestamp orderDate;
 
-    private Date supplyDate;
+    private Timestamp supplyDate;
 
     private boolean delivery;
 
-    public CreateOrderRequest(Store store, Customer customer, List<CatalogItem> items, String greeting, Date orderDate,
-            Date supplyDate, boolean deilvery) {
+    public CreateOrderRequest(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting, Timestamp orderDate,
+            Timestamp supplyDate, boolean deilvery) {
         this.store = store;
         this.customer = customer;
         this.items = items;
@@ -42,7 +42,7 @@ public class CreateOrderRequest extends Request {
         return customer;
     }
 
-    public List<CatalogItem> getItems() {
+    public Map<CatalogItem, Integer> getItems() {
         return items;
     }
 
@@ -50,11 +50,11 @@ public class CreateOrderRequest extends Request {
         return greeting;
     }
 
-    public Date getOrderDate() {
+    public Timestamp getOrderDate() {
         return orderDate;
     }
 
-    public Date getSupplyDate() {
+    public Timestamp getSupplyDate() {
         return supplyDate;
     }
 

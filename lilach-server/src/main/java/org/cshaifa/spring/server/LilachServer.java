@@ -119,7 +119,11 @@ public class LilachServer extends AbstractServer {
                                 createOrderRequest.getCustomer(), createOrderRequest.getItems(),
                                 createOrderRequest.getGreeting(), createOrderRequest.getOrderDate(),
                                 createOrderRequest.getSupplyDate(), createOrderRequest.getDelivery());
-                        client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
+                        if (order != null) {
+                            client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
+                        } else {
+                            client.sendToClient(new CreateOrderResponse(requestId, false, Constants.FAIL_MSG));
+                        }
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new CreateOrderResponse(requestId, false, Constants.FAIL_MSG));

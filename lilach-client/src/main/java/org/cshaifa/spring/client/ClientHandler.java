@@ -2,12 +2,32 @@ package org.cshaifa.spring.client;
 
 import java.io.IOException;
 import java.net.ConnectException;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
-import org.cshaifa.spring.entities.*;
-import org.cshaifa.spring.entities.requests.*;
-import org.cshaifa.spring.entities.responses.*;
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.SubscriptionType;
+import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.requests.CreateOrderRequest;
+import org.cshaifa.spring.entities.requests.GetCatalogRequest;
+import org.cshaifa.spring.entities.requests.GetStoresRequest;
+import org.cshaifa.spring.entities.requests.IsAliveRequest;
+import org.cshaifa.spring.entities.requests.LoginRequest;
+import org.cshaifa.spring.entities.requests.LogoutRequest;
+import org.cshaifa.spring.entities.requests.RegisterRequest;
+import org.cshaifa.spring.entities.requests.UpdateItemRequest;
+import org.cshaifa.spring.entities.responses.CreateOrderResponse;
+import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.GetStoresResponse;
+import org.cshaifa.spring.entities.responses.IsAliveResponse;
+import org.cshaifa.spring.entities.responses.LoginResponse;
+import org.cshaifa.spring.entities.responses.LogoutResponse;
+import org.cshaifa.spring.entities.responses.RegisterResponse;
+import org.cshaifa.spring.entities.responses.Response;
+import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
 
 public class ClientHandler {
@@ -34,11 +54,8 @@ public class ClientHandler {
 
     /*
      * public static CatalogItem getItem(long itemID) throws IOException {
-     * client.openConnection();
-     * client.sendToServer(new GetItemRequest(itemID));
-     * CatalogItem item = (CatalogItem) waitForMsgFromServer();
-     * return item;
-     * }
+     * client.openConnection(); client.sendToServer(new GetItemRequest(itemID));
+     * CatalogItem item = (CatalogItem) waitForMsgFromServer(); return item; }
      */
 
     public static UpdateItemResponse updateItem(CatalogItem updatedItem) throws IOException, ConnectException {
@@ -57,7 +74,7 @@ public class ClientHandler {
     }
 
     public static RegisterResponse registerCustomer(String fullName, String username, String email, String password,
-                                                    List<Store> stores, SubscriptionType subscriptionType) throws IOException {
+            List<Store> stores, SubscriptionType subscriptionType) throws IOException {
         RegisterRequest registerRequest = new RegisterRequest(fullName, username, email, password, stores,
                 subscriptionType);
         client.openConnection();
@@ -113,9 +130,10 @@ public class ClientHandler {
         return checkServerAlive();
     }
 
-    public static CreateOrderResponse createOrder(Store store, Customer customer, List<CatalogItem> items, String greeting, Date orderDate,
-                                                  Date supplyDate, boolean delivery) throws IOException {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate, supplyDate, delivery);
+    public static CreateOrderResponse createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items,
+            String greeting, Timestamp orderDate, Timestamp supplyDate, boolean delivery) throws IOException {
+        CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate,
+                supplyDate, delivery);
         client.openConnection();
         client.sendToServer(createOrderRequest);
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());

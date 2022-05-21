@@ -1,9 +1,20 @@
 package org.cshaifa.spring.entities;
 
-import java.sql.Date;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyJoinColumn;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "orders")
@@ -12,8 +23,11 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<CatalogItem> items;
+    @ElementCollection
+    @CollectionTable(name = "orders_items", joinColumns = @JoinColumn(name = "order_id"))
+    @MapKeyJoinColumn(name = "item_id")
+    @Column(name = "quantity")
+    private Map<CatalogItem, Integer> items;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
@@ -23,9 +37,9 @@ public class Order {
 
     private String greeting;
 
-    private Date orderDate;
+    private Timestamp orderDate;
 
-    private Date supplyDate;
+    private Timestamp supplyDate;
 
     private boolean delivery;
 
@@ -33,8 +47,8 @@ public class Order {
 
     private double total;
 
-    public Order(List<CatalogItem> items, Store store, Customer customer, String greeting, Date orderDate, Date supplyDate,
-            boolean delivery) {
+    public Order(Map<CatalogItem, Integer> items, Store store, Customer customer, String greeting, Timestamp orderDate,
+            Timestamp supplyDate, boolean delivery) {
         super();
         this.items = items;
         this.store = store;
@@ -44,25 +58,32 @@ public class Order {
         this.supplyDate = supplyDate;
         this.delivery = delivery;
         this.completed = false;
-        this.total = items.stream().mapToDouble(CatalogItem::getFinalPrice).sum();
-
+        this.total = items.entrySet().stream().mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice())
+                .sum();
     }
 
     public Order() {
     }
 
+    public Map<CatalogItem, Integer> getItems() {
+        return items;
+    }
 
-    public List<CatalogItem> getItems() { return items; }
-
-    public void setItems(List<CatalogItem> items) {
+    public void setItems(Map<CatalogItem, Integer> items) {
         this.items = items;
     }
 
-    public Store getStore() { return store; }
+    public Store getStore() {
+        return store;
+    }
 
-    public Customer getCustomer() { return customer; }
+    public Customer getCustomer() {
+        return customer;
+    }
 
-    public void setCustomer(Customer customer) { this.customer = customer; }
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 
     public void setStore(Store store) {
         this.store = store;
@@ -76,19 +97,19 @@ public class Order {
         this.greeting = greeting;
     }
 
-    public Date getOrderDate() {
+    public Timestamp getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(Date orderDate) {
+    public void setOrderDate(Timestamp orderDate) {
         this.orderDate = orderDate;
     }
 
-    public Date getSupplyDate() {
+    public Timestamp getSupplyDate() {
         return supplyDate;
     }
 
-    public void setSupplyDate(Date supplyDate) {
+    public void setSupplyDate(Timestamp supplyDate) {
         this.supplyDate = supplyDate;
     }
 

@@ -1,17 +1,18 @@
 package org.cshaifa.spring.server.database;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URI;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -170,8 +171,10 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
-    public static Order createOrder(Store store, Customer customer, List<CatalogItem> items, String greeting,
-            Date orderDate, Date supplyDate, boolean delivery) throws HibernateException {
+    public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
+            Timestamp orderDate, Timestamp supplyDate, boolean delivery) throws HibernateException {
+        // TODO: check stock and update stock
+
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
 
@@ -254,7 +257,14 @@ public class DatabaseHandler {
         }
 
         registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
+        Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, 3);
 
+        createOrder(store, (Customer) getUserByUsername("cust1"),
+                randomItems.subList(0, 3).stream()
+                        .collect(Collectors.toMap(Function.identity(), item -> Integer.max(0, item.getQuantity() - 1))),
+                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true);
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
