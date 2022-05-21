@@ -30,6 +30,10 @@ public class CatalogItem implements Serializable {
 
     private boolean defaultValue; //for checkbox
 
+    private String size;
+    private String itemType;
+    private String itemColor;
+
 
     @Transient
     private byte[] image = null;
@@ -46,7 +50,28 @@ public class CatalogItem implements Serializable {
         this.defaultValue = true;
     }
 
-    public CatalogItem(String name, String imagePath, double price, int quantity, boolean onSale, double discountPercent, boolean defaultValue) {
+//    public CatalogItem(String name, String imagePath, double price, int quantity, boolean onSale, double discountPercent, boolean defaultValue) {
+//        super();
+//        this.name = name;
+//        this.imagePath = imagePath;
+//        this.price = price;
+//        this.quantity = quantity;
+//        this.onSale = onSale;
+//        this.discountPercent = discountPercent;
+//        this.defaultValue = defaultValue;
+//    }
+
+    public CatalogItem(
+            String name,
+            String imagePath,
+            double price,
+            int quantity,
+            boolean onSale,
+            double discountPercent,
+            String size,
+            String itemType,
+            String itemColor,
+            boolean defaultValue) {
         super();
         this.name = name;
         this.imagePath = imagePath;
@@ -54,6 +79,9 @@ public class CatalogItem implements Serializable {
         this.quantity = quantity;
         this.onSale = onSale;
         this.discountPercent = discountPercent;
+        this.size = size;
+        this.itemType = itemType;
+        this.itemColor = itemColor;
         this.defaultValue = defaultValue;
     }
 
@@ -124,6 +152,26 @@ public class CatalogItem implements Serializable {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public String getSize() {
+        return size;
+    }
+    public void setSize(String size) {
+        this.size = size;
+    }
+    public String getItemType() {
+        return itemType;
+    }
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+    public String getItemColor() {
+        return itemColor;
+    }
+    public void setItemColor(String color) {
+        this.itemColor = color;
+    }
+
 
     @Override
     public boolean equals(Object obj) {
