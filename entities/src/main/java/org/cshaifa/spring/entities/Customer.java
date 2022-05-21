@@ -3,10 +3,7 @@ package org.cshaifa.spring.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "customers")
@@ -17,12 +14,16 @@ public class Customer extends User {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Store> stores;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Order> orders;
+
     private SubscriptionType subscriptionType;
 
     public Customer(String fullName, String username, String email, String password, String passwordSalt,
             boolean frozen, SubscriptionType subscriptionType) {
         super(fullName, username, email, password, passwordSalt);
         this.stores = new ArrayList<>();
+        this.orders = new ArrayList<>();
         this.frozen = frozen;
         this.subscriptionType = subscriptionType;
     }
@@ -31,10 +32,11 @@ public class Customer extends User {
             List<Store> stores, boolean frozen, SubscriptionType subscriptionType) {
         super(fullName, username, email, password, passwordSalt);
         this.stores = stores;
-
+        this.orders = new ArrayList<>();
         this.frozen = frozen;
         this.subscriptionType = subscriptionType;
     }
+
 
     public Customer() {
         super();
@@ -52,6 +54,10 @@ public class Customer extends User {
         this.frozen = false;
     }
 
+    public List<Order> getOrders() { return orders; }
+
+    public void addOrder(Order order) {this.orders.add(order); }
+
     public List<Store> getStores() {
         return stores;
     }
@@ -67,5 +73,6 @@ public class Customer extends User {
     public void setSubscriptionType(SubscriptionType subscriptionType) {
         this.subscriptionType = subscriptionType;
     }
+
 
 }

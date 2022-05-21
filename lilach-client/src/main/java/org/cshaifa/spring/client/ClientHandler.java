@@ -2,27 +2,12 @@ package org.cshaifa.spring.client;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.sql.Date;
 import java.util.List;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.SubscriptionType;
-import org.cshaifa.spring.entities.User;
-import org.cshaifa.spring.entities.requests.GetCatalogRequest;
-import org.cshaifa.spring.entities.requests.GetStoresRequest;
-import org.cshaifa.spring.entities.requests.IsAliveRequest;
-import org.cshaifa.spring.entities.requests.LoginRequest;
-import org.cshaifa.spring.entities.requests.LogoutRequest;
-import org.cshaifa.spring.entities.requests.RegisterRequest;
-import org.cshaifa.spring.entities.requests.UpdateItemRequest;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
-import org.cshaifa.spring.entities.responses.GetStoresResponse;
-import org.cshaifa.spring.entities.responses.IsAliveResponse;
-import org.cshaifa.spring.entities.responses.LoginResponse;
-import org.cshaifa.spring.entities.responses.LogoutResponse;
-import org.cshaifa.spring.entities.responses.RegisterResponse;
-import org.cshaifa.spring.entities.responses.Response;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.entities.*;
+import org.cshaifa.spring.entities.requests.*;
+import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
 public class ClientHandler {
@@ -72,7 +57,7 @@ public class ClientHandler {
     }
 
     public static RegisterResponse registerCustomer(String fullName, String username, String email, String password,
-            List<Store> stores, SubscriptionType subscriptionType) throws IOException {
+                                                    List<Store> stores, SubscriptionType subscriptionType) throws IOException {
         RegisterRequest registerRequest = new RegisterRequest(fullName, username, email, password, stores,
                 subscriptionType);
         client.openConnection();
@@ -126,5 +111,13 @@ public class ClientHandler {
 
         changeServerDetails(hostname, port);
         return checkServerAlive();
+    }
+
+    public static CreateOrderResponse createOrder(Store store, Customer customer, List<CatalogItem> items, String greeting, Date orderDate,
+                                                  Date supplyDate) throws IOException {
+        CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate, supplyDate);
+        client.openConnection();
+        client.sendToServer(createOrderRequest);
+        return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());
     }
 }

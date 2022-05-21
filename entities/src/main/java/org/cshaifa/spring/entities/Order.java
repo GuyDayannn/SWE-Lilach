@@ -3,13 +3,7 @@ package org.cshaifa.spring.entities;
 import java.sql.Date;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "orders")
@@ -18,11 +12,14 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<CatalogItem> items;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Customer customer;
 
     private String greeting;
 
@@ -36,30 +33,36 @@ public class Order {
 
     private double total;
 
-    public Order(List<CatalogItem> items, Store store, String greeting, Date orderDate, Date supplyDate,
+    public Order(List<CatalogItem> items, Store store, Customer customer, String greeting, Date orderDate, Date supplyDate,
             boolean delivery, boolean completed, double total) {
         super();
         this.items = items;
         this.store = store;
+        this.customer = customer;
         this.greeting = greeting;
         this.orderDate = orderDate;
         this.supplyDate = supplyDate;
         this.delivery = delivery;
         this.completed = completed;
-        this.total = items.stream().mapToDouble(item -> item.getFinalPrice()).sum();
+        this.total = items.stream().mapToDouble(CatalogItem::getFinalPrice).sum();
+
     }
 
-    public List<CatalogItem> getItems() {
-        return items;
+    public Order() {
     }
+
+
+    public List<CatalogItem> getItems() { return items; }
 
     public void setItems(List<CatalogItem> items) {
         this.items = items;
     }
 
-    public Store getStore() {
-        return store;
-    }
+    public Store getStore() { return store; }
+
+    public Customer getCustomer() { return customer; }
+
+    public void setCustomer(Customer customer) { this.customer = customer; }
 
     public void setStore(Store store) {
         this.store = store;

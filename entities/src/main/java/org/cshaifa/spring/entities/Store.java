@@ -29,11 +29,15 @@ public class Store implements Serializable {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Customer> customers;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Order> orders;
+
     public Store() {
         this.name = "";
         this.address = "";
         this.stock = new ArrayList<>();
         this.customers = new ArrayList<>();
+        this.orders = new ArrayList<>();
     }
 
     public Store(String name, String address) {
@@ -41,6 +45,7 @@ public class Store implements Serializable {
         this.address = address;
         this.stock = new ArrayList<>();
         this.customers = new ArrayList<>();
+        this.orders = new ArrayList<>();
     }
 
     public Store(String name, String address, List<CatalogItem> stock) {
@@ -48,6 +53,7 @@ public class Store implements Serializable {
         this.address = address;
         this.stock = stock;
         this.customers = new ArrayList<>();
+        this.orders = new ArrayList<>();
     }
 
     public Store(String name, String address, List<CatalogItem> stock, List<Customer> customers) {
@@ -55,7 +61,17 @@ public class Store implements Serializable {
         this.address = address;
         this.stock = stock;
         this.customers = customers;
+        this.orders = new ArrayList<>();
     }
+
+    public Store(String name, String address, List<CatalogItem> stock, List<Customer> customers, List<Order> orders) {
+        this.name = name;
+        this.address = address;
+        this.stock = stock;
+        this.customers = customers;
+        this.orders = orders;
+    }
+
 
     public long getId() {
         return id;
@@ -88,4 +104,8 @@ public class Store implements Serializable {
     public void addCustomer(Customer customer) { this.customers.add(customer); }
 
     public void addItem(CatalogItem catalogItem) { this.stock.add(catalogItem); }
+
+    public void addOrder(Order order) {orders.add(order);}
+
+
 }
