@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
+   <children>
+      <Text fx:id="welcomeText" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, ___________" wrappingWidth="203.48004150390625">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Text>
+      <Button fx:id="exitButton" layoutX="548.0" layoutY="6.0" mnemonicParsing="false" onAction="#exitProfile" prefHeight="27.0" prefWidth="51.0" text="Exit" />
+      <Button fx:id="catalogButton" layoutX="481.0" layoutY="6.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="66.0" text="Catalog" />
+      <Accordion layoutY="32.0" prefHeight="368.0" prefWidth="600.0">
+        <panes>
+          <TitledPane animated="false" text="Update Item">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Text layoutX="28.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Item:">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Text>
+                        <ComboBox fx:id="itemComboBox" layoutX="28.0" layoutY="45.0" prefWidth="202.0" />
+                        <Button fx:id="editCatalogButton" layoutX="375.0" layoutY="44.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="134.0" text="Edit Catalog" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="false" text="Update Sales">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView fx:id="catalogTable" prefHeight="261.0" prefWidth="600.0">
+                          <columns>
+                              <TableColumn fx:id="selectColumn" prefWidth="50.0" style="-fx-alignment: CENTER;">
+                                  <graphic>
+                                      <CheckBox fx:id="selectAllCheckbox" mnemonicParsing="false" onAction="#selectAll" />
+                                  </graphic>
+                              </TableColumn>
+                            <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID" />
+                            <TableColumn fx:id="itemNameColumn" prefWidth="156.00001525878906" text="Item Name" />
+                              <TableColumn fx:id="itemPriceColumn" prefWidth="73.5999755859375" text="Price" />
+                              <TableColumn fx:id="onsaleColumn" prefWidth="66.4000244140625" text="On Sale" />
+                              <TableColumn fx:id="discountColumn" prefWidth="79.20001220703125" text="Discount" />
+                          </columns>
+                        </TableView>
+                        <Text layoutX="7.0" layoutY="280.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Discount:" wrappingWidth="83.73669052124023" />
+                        <TextField fx:id="discountAmount" layoutX="91.0" layoutY="263.0" prefHeight="26.0" prefWidth="79.0" />
+                        <Button fx:id="updateSalesButton" layoutX="191.0" layoutY="264.0" mnemonicParsing="false" onAction="#updateSales" text="Update" />
+                        <Button fx:id="cancelButton" layoutX="249.0" layoutY="264.0" mnemonicParsing="false" onAction="#cancelUpdate" text="Cancel" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </TitledPane>
+          <TitledPane animated="false" text="View/Handle Complaints">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ComboBox fx:id="complaintComboBox" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
+                        <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
+                        <TextArea fx:id="complaintdescription" layoutX="14.0" layoutY="90.0" prefHeight="186.0" prefWidth="262.0" text="Po yihie teur ha tluna" />
+                        <TextField fx:id="complaintresponse" layoutX="299.0" layoutY="90.0" prefHeight="92.0" prefWidth="262.0" />
+                        <Text layoutX="15.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
+                        <Text layoutX="299.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Response:" />
+                        <Button fx:id="viewComplaint" layoutX="175.0" layoutY="29.0" mnemonicParsing="false" onAction="#openComplaint" text="View" />
+                        <Text layoutX="299.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Compensation Amount:" />
+                        <TextField fx:id="compensationamount" layoutX="299.0" layoutY="219.0" />
+                        <Button fx:id="closeComplaintButton" layoutX="457.0" layoutY="218.0" mnemonicParsing="false" text="Close Complaint" />
+                        <Text layoutX="298.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Status:" />
+                        <TextField layoutX="298.0" layoutY="29.0" promptText="Open" />
+                     </children></AnchorPane>
+            </content>
+          </TitledPane>
+        </panes>
+      </Accordion>
+   </children>
+</AnchorPane>

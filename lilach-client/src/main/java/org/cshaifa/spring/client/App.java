@@ -3,6 +3,7 @@ package org.cshaifa.spring.client;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -33,6 +34,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.utils.Constants;
 
 /**
  * JavaFX App
@@ -52,15 +54,26 @@ public class App extends Application {
     private static Text currentItemPrice;
     private static Text currentItemName;
 
-    private static User currentUser;
+    private static User currentUser = null;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        scene = new Scene(loadFXML("primary"), 1040, 700);
+        scene = new Scene(loadFXML("primary"), 800, 600);
         stage.setTitle("Welcome");
         stage.setScene(scene);
         appStage = stage;
+        // TODO: logout without any loading for now, maybe change, maybe don't
+        appStage.setOnCloseRequest(e -> logoutUser());
         appStage.show();
+    }
+
+    public static void logoutUser() {
+        final User toLogout = currentUser;
+        new Thread(
+                createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT,
+                        TimeUnit.SECONDS))
+                .start();
+        currentUser = null;
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -84,8 +97,10 @@ public class App extends Application {
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         if (pageName == "catalog") {
-            System.out.println("catalog");
-            scene.getStylesheets().add(App.class.getResource("stylesheets/catalog.css").toExternalForm());
+            URL styleSheet = App.class.getResource("stylesheets/" + pageName + ".css");
+            if (styleSheet != null) {
+                scene.getStylesheets().add(styleSheet.toExternalForm());
+            }
         }
         appStage.setScene(scene);
         appStage.show();
@@ -144,7 +159,6 @@ public class App extends Application {
         vBox.setAlignment(Pos.CENTER);
         vBox.setStyle("-fx-background-color: transparent");
 
-
         loadingStage = new Stage();
         loadingStage.initStyle(StageStyle.TRANSPARENT);
         loadingStage.initOwner(appStage);
@@ -174,8 +188,8 @@ public class App extends Application {
         try {
             root = loadFXML(FXMLname);
             popUpStage.setScene(new Scene(root));
-            popUpStage.initModality(Modality.APPLICATION_MODAL);    // popup
-            if (caller!=null) {
+            popUpStage.initModality(Modality.APPLICATION_MODAL); // popup
+            if (caller != null) {
                 popUpStage.initOwner(caller.getScene().getWindow());
             }
             popUpStage.showAndWait();
@@ -199,5 +213,11 @@ public class App extends Application {
         return currentItemDisplayed;
     }
 
-    public static User getCurrentUser() { return currentUser; }
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
 }

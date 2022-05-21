@@ -2,8 +2,55 @@
 
 }
 
+.categoryText {
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-font-style: Italic;
+    -fx-font-size: 20;
+}
+.categoryText:hover, .categoryText:focused {
+    -fx-effect: dropshadow( one-pass-box , rgba(255, 255, 255, 0.5), 0, 0.0 , 1 , 1);
+}
+
+.filterBar {
+    -fx-border-color: green;
+    -fx-border-style: solid none solid none;
+}
+
+.menubar {
+    -fx-background-insets: 5;
+    -fx-background-radius: 5;
+    -fx-border-color: green;
+    -fx-border-radius: 5;
+    -fx-border-insets: 5;
+}
+.menubar:hover{
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-text-fill: white;
+}
+
+.menu-item {
+    -fx-min-width: 120;
+    -fx-background-insets: 2;
+    -fx-background-radius: 2;
+    -fx-border-color: green;
+    -fx-border-radius: 2;
+    -fx-border-insets: 2;
+}
+.menu-item:hover, .menu-item:focused, .menu-item:showing {
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-text-fill: white;
+}
+
+
 .onsale {
-    -fx-background-color: #acacac;
+    -fx-background-color: #e5e5e5;
+    -fx-border-color: green;
+    -fx-border-style: solid none none solid;
+}
+
+#onSaleText {
+    -fx-font-size: 24;
+    -fx-font-family: Arial, Helvetica, sans-serif;
 }
 
 .saleitem {
@@ -18,6 +65,14 @@
     -fx-border-color: red;
 }
 
+.button.sale-button {
+    -fx-border-radius: 2;
+    -fx-background-insets: 2;
+    -fx-border-color: red;
+    -fx-border-radius: 2;
+    -fx-border-insets: 2;
+}
+
 .catalogitem {
     -fx-padding: 5;
     -fx-border-style: solid inside;
@@ -25,4 +80,22 @@
     -fx-border-insets: 5;
     -fx-border-radius: 5;
     -fx-border-color: green;
+}
+
+.catalog-item-buttons {
+    -fx-border-radius: 2;
+    -fx-background-insets: 2;
+    -fx-border-color: green;
+    -fx-border-radius: 2;
+    -fx-border-insets: 2;
+}
+
+.combo-box:hover, .combo-box:focused{
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-text-fill: white;
+}
+
+.combo-selected{
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-text-fill: white;
 }

@@ -17,7 +17,10 @@ public class PrimaryController {
     private Button openButton;
 
     @FXML
-    private Button loginButton;
+    private Button customerLoginButton;
+
+    @FXML
+    private Button employeeLoginButton;
 
     @FXML
     private ImageView lilachLogo;
@@ -38,9 +41,15 @@ public class PrimaryController {
     }
 
     @FXML
-    void openLogin(ActionEvent event) throws InterruptedException, IOException {
-        App.setWindowTitle("Login");
+    void openCustomerLogin(ActionEvent event) throws InterruptedException, IOException {
+        App.setWindowTitle("Customer Login");
         App.setContent("customerLogin");
+    }
+
+    @FXML
+    void openEmployeeLogin(ActionEvent event) throws InterruptedException, IOException {
+        App.setWindowTitle("Employee Login");
+        App.setContent("employeeLogin");
     }
 
     @FXML

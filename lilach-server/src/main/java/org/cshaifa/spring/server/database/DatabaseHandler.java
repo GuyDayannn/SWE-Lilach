@@ -19,8 +19,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.ChainEmployee;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
@@ -46,7 +48,8 @@ public class DatabaseHandler {
         return SecureUtils.encodeHexString(salt);
     }
 
-    private static String getHashedPassword(String rawPassword, String saltHexString) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private static String getHashedPassword(String rawPassword, String saltHexString)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] salt = SecureUtils.decodeHexString(saltHexString);
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
         PBEKeySpec spec = new PBEKeySpec(rawPassword.toCharArray(), salt, PBKDF2_ITERATIONS, PASSWORD_KEY_LENGTH);
@@ -65,7 +68,7 @@ public class DatabaseHandler {
 
         try {
             query.select(root).where(builder.and(builder.equal(root.get("username"), username),
-                                                 builder.equal(root.get("password"), getHashedPassword(password, user.getPasswordSalt()))));
+                    builder.equal(root.get("password"), getHashedPassword(password, user.getPasswordSalt()))));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
@@ -86,6 +89,20 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
+    public static void updateLoginStatus(User user, boolean status) throws HibernateException {
+        Session session = DatabaseConnector.getSession();
+        if (user.isLoggedIn() == !status) {
+            if (status)
+                user.login();
+            else
+                user.logout();
+            session.beginTransaction();
+            session.merge(user);
+            tryFlushSession(session);
+        }
+
+    }
+
     public static User getUserByEmail(String email) {
         Session session = DatabaseConnector.getSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -97,7 +114,9 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
-    public static String registerCustomer(String fullName, String email, String username, String rawPassword) throws HibernateException {
+    public static String registerCustomer(String fullName, String email, String username, String rawPassword,
+            List<Store> stores, SubscriptionType subscriptionType)
+            throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -111,7 +130,35 @@ public class DatabaseHandler {
 
         try {
             String hexSalt = generateHexSalt();
-            session.save(new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt, false));
+            Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
+                    hexSalt, stores,
+                    false, subscriptionType);
+            session.save(customer);
+            for (Store store : stores) {
+                store.addCustomer(customer);
+                session.merge(store);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return Constants.SUCCESS_MSG;
+    }
+
+    public static String registerChainEmployee(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSession();
+        session.beginTransaction();
+
+        try {
+            String hexSalt = generateHexSalt();
+            session.save(
+                    new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
@@ -123,57 +170,94 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
-    private static List<Path> getRandomOrderedImages() {
-        List<Path> imagesList = ImageUtils.getAllImagesFromFolder("images", DatabaseHandler.class);
 
-        Collections.shuffle(imagesList);
-        return imagesList;
+    private static List<List<Path>> getRandomOrderedImages() {
+        List<List<Path>> imagesLists = new ArrayList<>();
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/flowers", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/bouquets", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/plants", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/orchids", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/wine", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/chocolate", DatabaseHandler.class));
+        imagesLists.add(ImageUtils.getAllImagesFromFolder("images/sets", DatabaseHandler.class));
+        //Collections.shuffle(imagesLists);
+        return imagesLists;
     }
 
-    private static void initializeDatabaseIfEmpty() throws HibernateException {
+    public static void initializeDatabaseIfEmpty() throws Exception {
+        // Assume that we initialize only if the catalog is empty
+        if (!getAllEntities(CatalogItem.class).isEmpty())
+            return;
+
         Session session = DatabaseConnector.getSession();
         session.beginTransaction();
-        List<Path> imageList = getRandomOrderedImages();
+        List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
-        for (int i = 0; i < imageList.size(); i++) {
-            double randomPrice = 200 * random.nextDouble();
-            int randomQuantity = random.nextInt(500);
-            randomItems.add(new CatalogItem("Random flower " + i, imageList.get(i).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, false, 0.0));
+        String[] sizes = {"large", "medium", "small"};
+        String[] colors = {"red", "orange", "pink"};
+        String[] itemTypes = {"flower", "bouquet", "plant", "orchid", "wine", "chocolate", "set"};
+        int typeInd = 0;
+        for (List<Path> imageList : imageLists) {
+            if (imageList!=null) {
+                for (Path imagePath : imageList) {
+                    int randomInt = random.nextInt(0,2);
+                    double randomPrice = random.nextInt(50, 500) + 0.99;
+                    int randomQuantity = random.nextInt(500);
+                    randomItems.add(new CatalogItem(
+                            "Random Item",
+                            imagePath.toUri().toString(),
+                            randomPrice, randomQuantity, false, 0.0,
+                            sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
+                }
+            }
+            typeInd++;
         }
-        double randomPrice = 200 * random.nextDouble();
-        int randomQuantity = random.nextInt(500);
-        randomItems.add(new CatalogItem("Cool flower", imageList.get(3).toUri().toString(), new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP).doubleValue(), randomQuantity, true, 50.0));
+
+        //On Sale Items
+        randomItems.remove(0);
+        randomItems.add(0,new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true, 50.0, "large", "flower", "white"));
+        randomItems.remove(1);
+        randomItems.add(1,new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true, 50.0, "medium", "flower", "yellow"));
 
         for (CatalogItem item : randomItems) {
             session.save(item);
         }
 
-        Store store = new Store("Example Store", "Example Address", randomItems.subList(0, 5));
+        Store store = new Store("Example Store", "Example Address", new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
         session.save(store);
         tryFlushSession(session);
 
+        List<Store> stores = new ArrayList<>();
+        stores.add(store);
         for (int i = 0; i < 20; i++) {
-            registerCustomer("Customer " + i, "example"+i+"@mail.com", "cust" + i, "pass" + i);
+            String email = "example" + i + "@mail.com";
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE);
         }
+
+        registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
 
     }
 
-    public static List<CatalogItem> getCatalog() throws HibernateException {
-        // We assume that we're getting the catalog when we first run our app
+    private static <T> List<T> getAllEntities(Class<T> c) {
         Session session = DatabaseConnector.getSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<CatalogItem> query = builder.createQuery(CatalogItem.class);
-        query.from(CatalogItem.class);
-        List<CatalogItem> catalogItems = session.createQuery(query).getResultList();
-        if (catalogItems.isEmpty()) {
-            initializeDatabaseIfEmpty();
-            catalogItems = session.createQuery(query).getResultList();
-        }
+        CriteriaQuery<T> query = builder.createQuery(c);
+        query.from(c);
+        return session.createQuery(query).getResultList();
+    }
+
+    public static List<Store> getStores() {
+        return getAllEntities(Store.class);
+    }
+
+    public static List<CatalogItem> getCatalog() {
+        List<CatalogItem> catalogItems = getAllEntities(CatalogItem.class);
 
         for (CatalogItem catalogItem : catalogItems) {
             try {
-                catalogItem.setImage(ImageUtils.getByteArrayFromURI(new URI(catalogItem.getImagePath()), DatabaseHandler.class));
+                catalogItem.setImage(
+                        ImageUtils.getByteArrayFromURI(new URI(catalogItem.getImagePath()), DatabaseHandler.class));
             } catch (Exception e) {
                 // TODO: maybe log the exception somewhere
                 e.printStackTrace();
@@ -181,7 +265,6 @@ public class DatabaseHandler {
         }
         return catalogItems;
     }
-
 
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSession();
@@ -195,6 +278,8 @@ public class DatabaseHandler {
             session.flush();
             session.getTransaction().commit();
         } catch (Exception e) {
+            // TODO: report somewhere
+            e.printStackTrace();
             session.getTransaction().rollback();
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
