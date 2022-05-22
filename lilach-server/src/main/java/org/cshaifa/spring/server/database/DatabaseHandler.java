@@ -262,14 +262,14 @@ public class DatabaseHandler {
         }
 
         // On Sale Items
-        // randomItems.remove(0);
-        // randomItems.add(0, new CatalogItem("Sale flower",
-        // imageLists.get(0).get(0).toUri().toString(), 249.99,
-        // new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white"));
-        // randomItems.remove(1);
-        // randomItems.add(1, new CatalogItem("Sale flower",
-        // imageLists.get(0).get(1).toUri().toString(), 149.99,
-        // new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow"));
+        randomItems.remove(0);
+        randomItems.add(0, new CatalogItem("Sale flower",
+        imageLists.get(0).get(0).toUri().toString(), 249.99,
+        new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white"));
+        randomItems.remove(1);
+        randomItems.add(1, new CatalogItem("Sale flower",
+        imageLists.get(0).get(1).toUri().toString(), 149.99,
+        new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow"));
 
         session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
@@ -296,10 +296,6 @@ public class DatabaseHandler {
                 randomItems.subList(0, 3).stream().collect(
                         Collectors.toMap(Function.identity(), item -> 2)),
                 "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true);
-        // createOrder(getAllEntities(Store.class).get(0), (Customer) getUserByUsername("cust1"),
-        //         randomItems.subList(0, 3).stream().collect(
-        //                 Collectors.toMap(Function.identity(), item -> Integer.max(0, item.getStock().get(store) - 1))),
-        //         "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true);
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
