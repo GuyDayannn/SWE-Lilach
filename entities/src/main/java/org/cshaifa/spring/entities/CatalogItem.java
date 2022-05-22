@@ -3,14 +3,23 @@ package org.cshaifa.spring.entities;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "catalog_items")
@@ -39,24 +48,29 @@ public class CatalogItem implements Serializable {
     @Transient
     private byte[] image = null;
 
-    private int quantity;
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @CollectionTable(name = "stock", joinColumns = @JoinColumn(name = "catalog_item_id"))
+    @MapKeyJoinColumn(name = "store_id")
+    @Column(name = "quantity")
+    private Map<Store, Integer> stock;
 
     public CatalogItem() {
         super();
         this.name = "";
         this.price = 0;
-        this.quantity = 0;
+        this.stock = new HashMap<>();
         this.onSale = false;
         this.discountPercent = 0.0;
     }
 
-    public CatalogItem(String name, String imagePath, double price, int quantity, boolean onSale,
+    public CatalogItem(String name, String imagePath, double price, Map<Store, Integer> quantities, boolean onSale,
             double discountPercent, String size, String itemType, String itemColor) {
         super();
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
-        this.quantity = quantity;
+        this.stock = quantities;
         this.onSale = onSale;
         this.discountPercent = discountPercent;
         this.size = size;
@@ -121,12 +135,12 @@ public class CatalogItem implements Serializable {
         this.image = image;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public Map<Store, Integer> getStock() {
+        return stock;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setStock(Map<Store, Integer> stock) {
+        this.stock = stock;
     }
 
     public String getSize() {
@@ -153,11 +167,11 @@ public class CatalogItem implements Serializable {
         this.itemColor = color;
     }
 
-    public void reduceQuantity(int toReduce) {
-        if (toReduce > quantity)
+    public void reduceQuantity(Store store, int toReduce) {
+        if (!stock.containsKey(store) || toReduce > stock.get(store))
             return;
 
-        quantity -= toReduce;
+        stock.compute(store, (__, quantity) -> quantity - toReduce);
     }
 
     @Override

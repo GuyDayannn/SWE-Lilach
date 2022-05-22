@@ -3,7 +3,13 @@ package org.cshaifa.spring.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "customers")
@@ -11,10 +17,12 @@ public class Customer extends User {
 
     private boolean frozen;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Store> stores;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Order> orders;
 
     private SubscriptionType subscriptionType;

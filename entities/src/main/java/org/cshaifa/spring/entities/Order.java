@@ -1,5 +1,6 @@
 package org.cshaifa.spring.entities;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "orders")
-public class Order {
+public class Order implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
