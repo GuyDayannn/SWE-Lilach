@@ -33,6 +33,20 @@ public class ClientHandler {
         return (GetCatalogResponse) waitForMsgFromServer(getCatalogRequest.getRequestId());
     }
 
+    public static GetCustomerResponse getCustomerResponse(long customerID) throws IOException, ConnectException {
+        GetCustomerRequest getCustomerRequest= new GetCustomerRequest(customerID);
+        client.openConnection();
+        client.sendToServer(getCustomerRequest);
+        return (GetCustomerResponse) waitForMsgFromServer(getCustomerRequest.getRequestId());
+    }
+
+    public static GetComplaintsResponse getComplaints() throws IOException, ConnectException {
+        GetComplaintsRequest getComplaintsRequest = new GetComplaintsRequest();
+        client.openConnection();
+        client.sendToServer(getComplaintsRequest);
+        return (GetComplaintsResponse) waitForMsgFromServer(getComplaintsRequest.getRequestId());
+    }
+
 
      public static GetItemResponse getItem(long itemID) throws IOException {
          GetItemRequest getItemRequest = new GetItemRequest(itemID);
@@ -57,6 +71,7 @@ public class ClientHandler {
         return (LoginResponse) waitForMsgFromServer(loginRequest.getRequestId());
 
     }
+
 
     public static RegisterResponse registerCustomer(String fullName, String username, String email, String password,
             List<Store> stores, SubscriptionType subscriptionType) throws IOException {

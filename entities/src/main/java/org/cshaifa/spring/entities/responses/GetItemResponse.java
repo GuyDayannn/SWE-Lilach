@@ -5,16 +5,18 @@ import org.cshaifa.spring.entities.CatalogItem;
 import java.util.List;
 
 public class GetItemResponse extends Response{
-    CatalogItem item = null;
+    private CatalogItem item;
     List<CatalogItem> catalogItemList = null;
 
     public GetItemResponse(int requestId, boolean success) {
         super(requestId, success);
+        this.item = null;
     }
 
-    public GetItemResponse(int requestId, long itemID) {
-        super(requestId, true);
-        this.item = catalogItemList.get((int) itemID);
+    public GetItemResponse(int requestId, boolean success, CatalogItem catalogItem) {
+        super(requestId, success);
+        this.item = catalogItem;
+        //this.item = catalogItemList.get((int) itemID);
     }
 
     public CatalogItem getItem() {

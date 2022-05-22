@@ -10,4 +10,7 @@ public class GetItemRequest extends Request {
         this.itemID = itemID;
     }
 
+    public long getItemID() {
+        return itemID;
+    }
 }

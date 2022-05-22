@@ -18,12 +18,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.ChainEmployee;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.SubscriptionType;
-import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -114,8 +109,19 @@ public class DatabaseHandler {
         return session.createQuery(query).uniqueResult();
     }
 
+    public static Customer getCustomer(long customerID) {
+        Session session = DatabaseConnector.getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Customer> query = builder.createQuery(Customer.class);
+        Root<Customer> root = query.from(Customer.class);
+
+        query.select(root).where(builder.equal(root.get("id"), customerID));
+
+        return session.createQuery(query).uniqueResult();
+    }
+
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
-            List<Store> stores, SubscriptionType subscriptionType)
+            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList)
             throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
@@ -132,7 +138,7 @@ public class DatabaseHandler {
             String hexSalt = generateHexSalt();
             Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
                     hexSalt, stores,
-                    false, subscriptionType);
+                    false, subscriptionType, complaintList);
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
@@ -223,17 +229,36 @@ public class DatabaseHandler {
             session.save(item);
         }
 
+        List<Store> stores = new ArrayList<>();
         Store store = new Store("Example Store", "Example Address", new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
+
+        stores.add(store);
         session.save(store);
+
+        List<Complaint> complaintList = new ArrayList<>();
+//        String hexSalt = generateHexSalt();
+//        Customer cust = new Customer("Customer", "cust", "example@mail.com",  getHashedPassword("pass", hexSalt),hexSalt,  stores,false,SubscriptionType.STORE, complaintList);
+//        session.save(cust);
+//        //store.addCustomer(cust);
+//        //session.save(store);
+//        session.merge(store);
+//
+//
+//        complaintList.add(0, new Complaint("first complaint", "response complaint", 0.0, true, cust));
+//        complaintList.add(1, new Complaint("second complaint", "response complaint", 1.0, false, cust));
+//        for (Complaint complaint : complaintList){
+//            session.save(complaint);
+//            cust.addComplaint(complaint);
+//            //session.merge(cust);
+//        }
+        //TODO: fix adding cust
+
         tryFlushSession(session);
 
-        List<Store> stores = new ArrayList<>();
-        stores.add(store);
         for (int i = 0; i < 20; i++) {
             String email = "example" + i + "@mail.com";
-            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE);
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE , complaintList);
         }
-
         registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
 
     }
@@ -270,6 +295,22 @@ public class DatabaseHandler {
         session.beginTransaction();
         session.merge(newItem);
         tryFlushSession(session);
+    }
+
+    public static List<Complaint> getComplaints() {
+        List<Complaint> complaintList = getAllEntities(Complaint.class);
+        return complaintList;
+    }
+
+    public static CatalogItem getItem(long itemID) throws HibernateException {
+        Session session = DatabaseConnector.getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<CatalogItem> query = builder.createQuery(CatalogItem.class);
+        Root<CatalogItem> root = query.from(CatalogItem.class);
+
+        query.select(root).where(builder.equal(root.get("id"), itemID));
+
+        return session.createQuery(query).uniqueResult();
     }
 
     public static void tryFlushSession(Session session) throws HibernateException {
