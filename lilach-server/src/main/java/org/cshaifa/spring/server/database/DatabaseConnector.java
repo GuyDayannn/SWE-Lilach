@@ -13,10 +13,9 @@ import org.hibernate.service.ServiceRegistry;
  * a static session and handling db connections
  */
 public class DatabaseConnector {
-    private static Session session = null;
     private static SessionFactory sessionFactory = null;
 
-    private static SessionFactory getSessionFactory() throws HibernateException {
+    public static SessionFactory getSessionFactory() throws HibernateException {
         if (sessionFactory != null)
             return sessionFactory;
 
@@ -35,18 +34,5 @@ public class DatabaseConnector {
 
         sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         return sessionFactory;
-    }
-
-    public static void closeSession() {
-        if (session != null)
-            session.close();
-    }
-
-    public static Session getSession() throws HibernateException {
-        if (session != null && session.isOpen())
-            return session;
-
-        session = getSessionFactory().openSession();
-        return session;
     }
 }

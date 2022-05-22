@@ -36,11 +36,6 @@ public class LilachServer extends AbstractServer {
     }
 
     @Override
-    protected void serverClosed() {
-        DatabaseHandler.closeSession();
-    }
-
-    @Override
     protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
         try {
             if (msg instanceof Request) {
