@@ -10,20 +10,14 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
-import org.cshaifa.spring.entities.responses.GetCustomerResponse;
-import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.utils.Constants;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -109,52 +103,61 @@ public class CustomerProfileController {
         App.setContent("catalog");
     }
 
-    @FXML //TODO: fix s.t complaint is saved in db on click of send complaints
+    @FXML
     void sendComplaint(ActionEvent event) throws ExecutionException, InterruptedException {
         Complaint complaint = new Complaint();
         complaint.setComplaintOpen(true);
         complaint.setComplaintDescription(complaintDescription.getText().strip());
         complaint.setComplaintResponse("");
         if (App.getCurrentUser()!=null) {
-            long custID = App.getCurrentUser().getId();
-            Customer customer = getCustomerbyID(custID);
-            if(customer!= null){ //TODO: get customer which isn't null
+            //long custID = App.getCurrentUser().getId();
+            //Customer customer = getCustomerbyID(custID);
+
+            if(App.getCurrentUser() instanceof Customer)
+            {
+                Customer customer = (Customer) App.getCurrentUser();
+                System.out.printf("customer is: ",  customer.getUsername());
+                System.out.printf("%d%n", customer.getId());
                 complaint.setCustomer(customer);
                 customer.addComplaint(complaint);
+            }
+            else{
+                invalid_customer_text.setText("failed to get customer ");
+                invalid_customer_text.setTextFill(Color.RED);
             }
         }
     }
 
-    Customer getCustomerbyID(long customerID) throws ExecutionException, InterruptedException {
-        Task<GetCustomerResponse> customerResponseTask = App.createTimedTask(() -> {
-            return ClientHandler.getCustomerResponse(customerID);
-        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        customerResponseTask.setOnSucceeded(e -> {
-            if (customerResponseTask.getValue() == null) {
-                invalid_customer_text.setText("failed customer response task");
-                invalid_customer_text.setTextFill(Color.RED);
-                App.hideLoading();
-                return;
-            }
-
-            GetCustomerResponse getCustomerResponse = customerResponseTask.getValue();
-            if (!getCustomerResponse.isSuccessful()) {
-                invalid_customer_text.setText("getCustomerResponse error");
-                invalid_customer_text.setTextFill(Color.RED);
-                App.hideLoading();
-                return;
-            }
-
-//            App.setCurrentUser(loginResponse.getUser());
-//            App.hideLoading();
-
-        });
-
-        //App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
-        new Thread(customerResponseTask).start();
-        return customerResponseTask.getValue().getCustomer(); //TODO: why it's null??
-    }
+//    Customer getCustomerbyID(long customerID) throws ExecutionException, InterruptedException {
+//        Task<GetCustomerResponse> customerResponseTask = App.createTimedTask(() -> {
+//            return ClientHandler.getCustomerResponse(customerID);
+//        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+//
+//        customerResponseTask.setOnSucceeded(e -> {
+//            if (customerResponseTask.getValue() == null) {
+//                invalid_customer_text.setText("failed customer response task");
+//                invalid_customer_text.setTextFill(Color.RED);
+//                App.hideLoading();
+//                return;
+//            }
+//
+//            GetCustomerResponse getCustomerResponse = customerResponseTask.getValue();
+//            if (!getCustomerResponse.isSuccessful()) {
+//                invalid_customer_text.setText("getCustomerResponse error");
+//                invalid_customer_text.setTextFill(Color.RED);
+//                App.hideLoading();
+//                return;
+//            }
+//
+////            App.setCurrentUser(loginResponse.getUser());
+////            App.hideLoading();
+//
+//        });
+//
+//        //App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+//        new Thread(customerResponseTask).start();
+//        return customerResponseTask.getValue().getCustomer();
+//    }
 
 
     @FXML

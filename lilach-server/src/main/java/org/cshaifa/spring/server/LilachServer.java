@@ -108,15 +108,6 @@ public class LilachServer extends AbstractServer {
                     sendToAllClients(new GetComplaintsResponse(requestId, false));
                 }
             }
-            else if (request instanceof GetCustomerRequest getCustomerRequest){
-                try {
-                    long customerID = getCustomerRequest.getCustomerID();
-                    Customer customer = DatabaseHandler.getCustomer(customerID);
-                    sendToAllClients(new GetCustomerResponse(requestId, customer != null, customer ));
-                } catch (HibernateException e) {
-                    sendToAllClients(new GetCustomerResponse(requestId, false));
-                }
-            }
 
 
         } else {
