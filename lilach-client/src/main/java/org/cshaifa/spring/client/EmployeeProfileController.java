@@ -1,7 +1,6 @@
 package org.cshaifa.spring.client;
 
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -9,23 +8,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
-import org.cshaifa.spring.entities.responses.GetItemResponse;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
 
-import javax.xml.catalog.Catalog;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 public class EmployeeProfileController {
@@ -155,82 +147,60 @@ public class EmployeeProfileController {
 
         int tableLen = catalogTable.getItems().size();
         for (int i = 0; i < tableLen; i++) {
-            if (!catalogTable.getItems().get(i).getIsDefault()) { //it's ticked
+            if (catalogTable.getItems().get(i).getIsDefault()) { //it's ticked
                 //long itemId = Long.parseLong(selectColumn.getId(i));
                 long itemId = catalogTable.getItems().get(i).getId(); //gets row and then gets column in table to access specific cell
                 //CatalogItem updatedItem = App.getItemByID(itemId);
+                CatalogItem updatedItem = catalogTable.getItems().get(i);
+                System.out.printf("catalog item is: %s", updatedItem.getName());
+                updatedItem.setOnSale(true);
+                updatedItem.setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
 
-                Task<GetItemResponse> getItemResponseTask = App.createTimedTask(() -> {
-                    return ClientHandler.getItem(itemId);
-                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+                if (!discountAmount.getText().isEmpty()) { //TODO: check catalog item isn't empty
+                    Task<UpdateItemResponse> updateItemTask = App.createTimedTask(() -> {
+                        updatedItem.setOnSale(true);
+                        updatedItem.setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
+                        //updating item on server side and on table - in UI
 
-                getItemResponseTask.setOnSucceeded(e -> {
-                    if (getItemResponseTask.getValue() == null) {
-                        App.hideLoading();
-                        System.err.println("Getting catalog failed");
-                        return;
-                    }
-                    GetItemResponse response = getItemResponseTask.getValue();
-                    if (!response.isSuccessful()) {
-                        // TODO: maybe log the specific exception somewhere
-                        App.hideLoading();
-                        System.err.println("Getting catalog failed");
-                        return;
-                    }
-                    CatalogItem updatedItem = response.getItem();
+                       // catalogTable.getItems().get(i).setOnSale(true);
+                        //catalogTable.getItems().get(i).setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
 
+                        return ClientHandler.updateItem(updatedItem);
+                    }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-                    if (!discountAmount.getText().isEmpty()) { //TODO: check catalog item isn't empty
-                        Task<UpdateItemResponse> updateItemTask = App.createTimedTask(() -> {
-                            updatedItem.setOnSale(true);
-                            updatedItem.setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
-                            return ClientHandler.updateItem(updatedItem);
-                        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+                    updateItemTask.setOnSucceeded(e2 -> {
+                        UpdateItemResponse response2 = updateItemTask.getValue();
+                        if (!response2.isSuccessful()) {
+                            // TODO: maybe log the specific exception somewhere
+                            App.hideLoading();
+                            System.err.println("Updating item failed");
+                            return;
+                        }
 
-                        updateItemTask.setOnSucceeded(e2 -> {
-                            UpdateItemResponse response2 = updateItemTask.getValue();
-                            if (!response2.isSuccessful()) {
-                                // TODO: maybe log the specific exception somewhere
-                                App.hideLoading();
-                                System.err.println("Updating item failed");
-                                return;
-                            }
+                        //App.updateCurrentItemDisplayed(response2.getUpdatedItem());
+                        //App.hideLoading();
+                        //updateSalesButton.getScene().getWindow().hide();
+                    });
 
-                            //App.updateCurrentItemDisplayed(response2.getUpdatedItem());
-                            //App.hideLoading();
-                            updateSalesButton.getScene().getWindow().hide();
-                        });
+                    updateItemTask.setOnFailed(e2 -> {
+                        //App.hideLoading();
+                        // TODO: maybe properly log it somewhere
+                        System.out.println("Update sales item failed!");
+                        updated_sales_text.setText(Constants.UPDATED_SALES_ITEM_FAILED);
+                        updated_sales_text.setTextFill(Color.RED);
+                        updateItemTask.getException().printStackTrace();
+                    });
 
-                        updateItemTask.setOnFailed(e2 -> {
-                            //App.hideLoading();
-                            // TODO: maybe properly log it somewhere
-                            System.out.println("Update sales item failed!");
-                            updated_sales_text.setText(Constants.UPDATED_SALES_ITEM_FAILED);
-                            updated_sales_text.setTextFill(Color.RED);
-                            updateItemTask.getException().printStackTrace();
-                        });
-
-                        //Stage rootStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-                        //App.showLoading(rootPane, rootStage, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
-                        new Thread(updateItemTask).start();
-                    }
-                });
-
-                getItemResponseTask.setOnFailed(e -> {
-                    // TODO: maybe log somewhere else...
-                    getItemResponseTask.getException().printStackTrace();
-                    System.out.println("Update sales item failed!");
-                    updated_sales_text.setText(Constants.UPDATED_SALES_ITEM_FAILED);
-                    updated_sales_text.setTextFill(Color.RED);
-                    //App.hideLoading();
-                });
-                new Thread(getItemResponseTask).start();
+                    new Thread(updateItemTask).start();
+                    System.out.println("Update sales item Success!");
+                    updated_sales_text.setText(Constants.UPDATED_SALES_ITEM);
+                    updated_sales_text.setTextFill(Color.GREEN);
+                }
             }
-        }System.out.println("Update sales item Success!");
-        updated_sales_text.setText(Constants.UPDATED_SALES_ITEM);
-        updated_sales_text.setTextFill(Color.GREEN);
 
-}
+
+        }
+    }
 
     @FXML
     public void initialize() {

@@ -12,9 +12,9 @@ public class GetComplaintsResponse extends Response {
         super(requestId, success);
     }
 
-    public GetComplaintsResponse(int requestId, List<Complaint> catalogItems) {
+    public GetComplaintsResponse(int requestId, List<Complaint> complaintList) {
         super(requestId, true);
-        this.complaintList = catalogItems;
+        this.complaintList = complaintList;
     }
 
     public List<Complaint> getComplaintList() {

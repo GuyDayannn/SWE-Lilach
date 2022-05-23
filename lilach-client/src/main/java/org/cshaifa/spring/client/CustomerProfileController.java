@@ -34,7 +34,7 @@ public class CustomerProfileController {
     private TextArea complaintDescription;
 
     @FXML
-    private ListView<?> complaintList;
+    private ListView<Complaint> complaintList;
 
     @FXML
     private TextField complaintOrderID;
@@ -120,6 +120,10 @@ public class CustomerProfileController {
                 System.out.printf("%d%n", customer.getId());
                 complaint.setCustomer(customer);
                 customer.addComplaint(complaint);
+                complaintList.getItems().add(complaint); //adding new complaint in UI
+//                complaintTable.get(complaintList);
+//                ObservableList<String> row = FXCollections.observableArrayList();
+//                  ListView<?> row =
             }
             else{
                 invalid_customer_text.setText("failed to get customer ");

@@ -15,7 +15,7 @@ public class Constants {
     public static final String UPDATED_SALES_ITEM = "You've successfully updated sales item";
     public static final String UPDATED_SALES_ITEM_FAILED = "Couldn't update sales item";
 
-    public static final int SERVER_PORT = 8193;
+    public static final int SERVER_PORT = 8102;
     public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
 }

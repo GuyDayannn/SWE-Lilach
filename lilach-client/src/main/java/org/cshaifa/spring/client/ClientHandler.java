@@ -33,13 +33,6 @@ public class ClientHandler {
         return (GetCatalogResponse) waitForMsgFromServer(getCatalogRequest.getRequestId());
     }
 
-    public static GetCustomerResponse getCustomerResponse(long customerID) throws IOException, ConnectException {
-        GetCustomerRequest getCustomerRequest= new GetCustomerRequest(customerID);
-        client.openConnection();
-        client.sendToServer(getCustomerRequest);
-        return (GetCustomerResponse) waitForMsgFromServer(getCustomerRequest.getRequestId());
-    }
-
     public static GetComplaintsResponse getComplaints() throws IOException, ConnectException {
         GetComplaintsRequest getComplaintsRequest = new GetComplaintsRequest();
         client.openConnection();
@@ -47,15 +40,6 @@ public class ClientHandler {
         return (GetComplaintsResponse) waitForMsgFromServer(getComplaintsRequest.getRequestId());
     }
 
-
-     public static GetItemResponse getItem(long itemID) throws IOException {
-         GetItemRequest getItemRequest = new GetItemRequest(itemID);
-         client.openConnection();
-         client.sendToServer(getItemRequest);
-         //CatalogItem item = (CatalogItem) waitForMsgFromServer( (int) itemID);
-         //return item;
-         return (GetItemResponse) waitForMsgFromServer( getItemRequest.getRequestId());
-     }
 
     public static UpdateItemResponse updateItem(CatalogItem updatedItem) throws IOException, ConnectException {
         UpdateItemRequest updateItemRequest = new UpdateItemRequest(updatedItem);
