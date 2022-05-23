@@ -137,8 +137,8 @@ public class EmployeeProfileController {
     void selectAll(ActionEvent event) {
         int tableLen = catalogTable.getItems().size();
         for (int i = 0; i < tableLen; i++) {
-            catalogTable.getItems().get(i).setDefaultValue(false);  //it's ticked
-
+            //catalogTable.getColumns().  //it's ticked
+                catalogTable.getItems().get(i).setDefault(false);
         }
     }
 
@@ -258,8 +258,6 @@ public class EmployeeProfileController {
             selectColumn.setCellValueFactory(cellData ->
                     new SimpleBooleanProperty(cellData.getValue().getIsDefault()));
             selectColumn.setCellFactory(cellData -> new CheckBoxTableCell<>());
-
-            //catalogTable.getColumns().addAll(idColumn,itemNameColumn, itemPriceColumn, onsaleColumn, discountColumn);
 
             data.addAll(catalogItems);
             catalogTable.setItems(data);

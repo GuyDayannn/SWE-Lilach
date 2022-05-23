@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.responses.GetStoresResponse;
@@ -81,7 +82,6 @@ public class RegistrationController {
             // TODO: notify on failure
             getStoresTask.getException().printStackTrace();
             App.hideLoading();
-            return;
         });
 
         App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
@@ -123,6 +123,7 @@ public class RegistrationController {
 
         Task<RegisterResponse> registerTask = App.createTimedTask(() -> {
             List<Store> registredStores = new ArrayList<>();
+            List<Complaint> complaintList = new ArrayList<>();
             int subscriptionIndex = subscriptionSelector.getSelectionModel().getSelectedIndex();
 
             if (subscriptionIndex == SubscriptionType.STORE.ordinal())
@@ -132,7 +133,7 @@ public class RegistrationController {
             return ClientHandler.registerCustomer(fullNameTxtField.getText().strip(),
                     usernameTxtField.getText().strip(),
                     emailTxtField.getText().strip(), pwdTxtField.getText().strip(),
-                    registredStores, SubscriptionType.values()[subscriptionIndex]);
+                    registredStores, SubscriptionType.values()[subscriptionIndex], complaintList);
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
         registerTask.setOnSucceeded(e -> {

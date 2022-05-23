@@ -14,7 +14,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.responses.AddComplaintResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
+import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
 
 import java.io.IOException;
@@ -118,12 +120,38 @@ public class CustomerProfileController {
                 Customer customer = (Customer) App.getCurrentUser();
                 System.out.printf("customer is: ",  customer.getUsername());
                 System.out.printf("%d%n", customer.getId());
-                complaint.setCustomer(customer);
-                customer.addComplaint(complaint);
+
                 complaintList.getItems().add(complaint); //adding new complaint in UI
-//                complaintTable.get(complaintList);
-//                ObservableList<String> row = FXCollections.observableArrayList();
-//                  ListView<?> row =
+
+                Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
+                    complaint.setCustomer(customer);
+                    customer.addComplaint(complaint);
+                    return ClientHandler.addComplaint(complaintDescription.getText().strip(), customer);
+                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+                addComplaintTask.setOnSucceeded(e2 -> {
+                    AddComplaintResponse response2 = addComplaintTask.getValue();
+                    if (!response2.isSuccessful()) {
+                        // TODO: maybe log the specific exception somewhere
+                        App.hideLoading();
+                        System.err.println("Updating item failed");
+                        return;
+                    }
+                });
+
+                addComplaintTask.setOnFailed(e2 -> {
+
+                    // TODO: maybe properly log it somewhere
+                    System.out.println("Update sales item failed!");
+//                    updated_sales_text.setText(Constants.UPDATED_SALES_ITEM_FAILED);
+//                    updated_sales_text.setTextFill(Color.RED);
+                    addComplaintTask.getException().printStackTrace();
+                });
+
+                new Thread(addComplaintTask).start();
+                System.out.println("Update sales item Success!");
+//                updated_sales_text.setText(Constants.UPDATED_SALES_ITEM);
+//                updated_sales_text.setTextFill(Color.GREEN);
             }
             else{
                 invalid_customer_text.setText("failed to get customer ");

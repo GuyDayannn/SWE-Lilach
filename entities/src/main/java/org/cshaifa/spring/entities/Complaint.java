@@ -1,11 +1,15 @@
 package org.cshaifa.spring.entities;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "complaints_table")
-public class Complaint {
+public class Complaint implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -17,6 +21,8 @@ public class Complaint {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;
+    //@LazyCollection(LazyCollectionOption.FALSE)
+
 
 
     public Complaint(){
