@@ -41,6 +41,11 @@ public class PrimaryController {
     }
 
     @FXML
+    void onSettingsClick(ActionEvent event) {
+        App.popUpLaunch((Button)event.getSource(), "settingsPopup");
+    }
+
+    @FXML
     void openCustomerLogin(ActionEvent event) throws InterruptedException, IOException {
         App.setWindowTitle("Customer Login");
         App.setContent("customerLogin");

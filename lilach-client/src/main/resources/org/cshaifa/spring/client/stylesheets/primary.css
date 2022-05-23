@@ -1,0 +1,31 @@
+.root {
+    -fx-background-color: linear-gradient(#90ce7f, #519349);
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-style: Italic;
+    -fx-font-family: "Trebuchet MS", Helvetica, sans-serif;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+    -fx-border-radius: 2;
+    -fx-background-insets: 2;
+    -fx-border-insets: 2;
+}
+
+.button.customerButton {
+    -fx-font-size: 24;
+    -fx-border-width: 5;
+    -fx-border-radius: 5;
+    -fx-background-insets: 5;
+    -fx-border-insets: 5;
+}
+
+.button.employeeButton {
+    -fx-font-size: 12;
+}
+
+.button:hover {
+    -fx-effect: dropshadow( one-pass-box , rgba(0, 0, 0, 0.5), 0, 0.0 , 1 , 1);
+}

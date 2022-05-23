@@ -83,7 +83,6 @@ public class UpdatePopUpController {
         });
 
         btnPopUpCancel.setOnAction(event -> {
-            System.out.println("You clicked Cancel");
             btnPopUpCancel.getScene().getWindow().hide();
         });
     }

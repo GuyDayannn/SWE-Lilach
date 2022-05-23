@@ -4,12 +4,13 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CustomerProfileController">
    <children>
@@ -33,6 +34,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
+
                         <ListView fx:id="complaintList" layoutY="36.0" prefHeight="200.0" prefWidth="800.0" />
                         <Button fx:id="newComplaintButton" layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#sendComplaint" text="New Complaint" />
                         <Text layoutX="22.0" layoutY="265.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
@@ -46,6 +48,19 @@
                         <TextField fx:id="complaintOrderID" layoutX="463.0" layoutY="305.0" prefHeight="26.0" prefWidth="200.0" />
                         <TextField fx:id="complaintResponse" layoutX="400.0" layoutY="380.0" prefHeight="94.0" prefWidth="378.0" />
                         <TextField fx:id="compensationAmount" layoutX="537.0" layoutY="494.0" prefHeight="26.0" prefWidth="142.0" />
+                        <AnchorPane layoutX="2.0" layoutY="36.0" prefHeight="200.0" prefWidth="695.0">
+                           <children>
+                              <TableView fx:id="complaintTable" prefHeight="200.0" prefWidth="800.0">
+                                <columns>
+                                    <TableColumn fx:id="complaintIdColumn" prefWidth="44.0" text="ID" />
+                                    <TableColumn fx:id="complaintStatusColumn" prefWidth="113.0" text="Complaint Status" />
+                                    <TableColumn fx:id="complaintDescriptionColumn" prefWidth="261.0" text="Complaint description" />
+                                    <TableColumn fx:id="complaintResponseColumn" prefWidth="191.0" text="Complaint Response" />
+                                    <TableColumn fx:id="complaintCompensationAmountColumn" prefWidth="145.0" text="Compensation Amount" />
+                                </columns>
+                              </TableView>
+                           </children>
+                        </AnchorPane>
                      </children>
                   </AnchorPane>
             </content>
