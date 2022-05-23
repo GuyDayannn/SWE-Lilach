@@ -45,6 +45,8 @@ public class CatalogItem implements Serializable {
 
     private String itemColor;
 
+    private boolean isDefault;
+
     @Transient
     private byte[] image = null;
 
@@ -65,7 +67,7 @@ public class CatalogItem implements Serializable {
     }
 
     public CatalogItem(String name, String imagePath, double price, Map<Store, Integer> quantities, boolean onSale,
-            double discountPercent, String size, String itemType, String itemColor) {
+            double discountPercent, String size, String itemType, String itemColor, boolean isDefault) {
         super();
         this.name = name;
         this.imagePath = imagePath;
@@ -76,6 +78,7 @@ public class CatalogItem implements Serializable {
         this.size = size;
         this.itemType = itemType;
         this.itemColor = itemColor;
+        this.isDefault = true;
     }
 
     public long getId() {
@@ -163,8 +166,16 @@ public class CatalogItem implements Serializable {
         return itemColor;
     }
 
+    public boolean getIsDefault() {
+        return isDefault;
+    }
+
     public void setItemColor(String color) {
         this.itemColor = color;
+    }
+
+    public void setDefault(boolean isDefault){
+        this.isDefault = isDefault;
     }
 
     public void reduceQuantity(Store store, int toReduce) {

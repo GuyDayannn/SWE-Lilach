@@ -25,6 +25,10 @@ public class Customer extends User {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Order> orders;
 
+    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<Complaint> complaintList;
+
     private SubscriptionType subscriptionType;
 
     public Customer(String fullName, String username, String email, String password, String passwordSalt,
@@ -34,15 +38,17 @@ public class Customer extends User {
         this.orders = new ArrayList<>();
         this.frozen = frozen;
         this.subscriptionType = subscriptionType;
+        this.complaintList = new ArrayList<>();
     }
 
     public Customer(String fullName, String username, String email, String password, String passwordSalt,
-            List<Store> stores, boolean frozen, SubscriptionType subscriptionType) {
+            List<Store> stores, boolean frozen, SubscriptionType subscriptionType, List<Complaint> complaintList) {
         super(fullName, username, email, password, passwordSalt);
         this.stores = stores;
         this.orders = new ArrayList<>();
         this.frozen = frozen;
         this.subscriptionType = subscriptionType;
+        this.complaintList = complaintList;
     }
 
 
@@ -82,5 +88,10 @@ public class Customer extends User {
         this.subscriptionType = subscriptionType;
     }
 
+    public void addComplaint(Complaint complaint) { this.complaintList.add(complaint); }
+
+    public List<Complaint> getComplaintList() {
+        return complaintList;
+    }
 
 }
