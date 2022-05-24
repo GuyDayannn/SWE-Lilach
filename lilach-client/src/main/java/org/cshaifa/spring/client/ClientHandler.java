@@ -6,28 +6,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.SubscriptionType;
-import org.cshaifa.spring.entities.User;
-import org.cshaifa.spring.entities.requests.CreateOrderRequest;
-import org.cshaifa.spring.entities.requests.GetCatalogRequest;
-import org.cshaifa.spring.entities.requests.GetStoresRequest;
-import org.cshaifa.spring.entities.requests.IsAliveRequest;
-import org.cshaifa.spring.entities.requests.LoginRequest;
-import org.cshaifa.spring.entities.requests.LogoutRequest;
-import org.cshaifa.spring.entities.requests.RegisterRequest;
-import org.cshaifa.spring.entities.requests.UpdateItemRequest;
-import org.cshaifa.spring.entities.responses.CreateOrderResponse;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
-import org.cshaifa.spring.entities.responses.GetStoresResponse;
-import org.cshaifa.spring.entities.responses.IsAliveResponse;
-import org.cshaifa.spring.entities.responses.LoginResponse;
-import org.cshaifa.spring.entities.responses.LogoutResponse;
-import org.cshaifa.spring.entities.responses.RegisterResponse;
-import org.cshaifa.spring.entities.responses.Response;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.entities.*;
+import org.cshaifa.spring.entities.requests.*;
+import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
 public class ClientHandler {
@@ -52,6 +33,13 @@ public class ClientHandler {
         return (GetCatalogResponse) waitForMsgFromServer(getCatalogRequest.getRequestId());
     }
 
+    public static GetComplaintsResponse getComplaints() throws IOException, ConnectException {
+        GetComplaintsRequest getComplaintsRequest = new GetComplaintsRequest();
+        client.openConnection();
+        client.sendToServer(getComplaintsRequest);
+        return (GetComplaintsResponse) waitForMsgFromServer(getComplaintsRequest.getRequestId());
+    }
+
     /*
      * public static CatalogItem getItem(long itemID) throws IOException {
      * client.openConnection(); client.sendToServer(new GetItemRequest(itemID));
@@ -74,9 +62,9 @@ public class ClientHandler {
     }
 
     public static RegisterResponse registerCustomer(String fullName, String username, String email, String password,
-            List<Store> stores, SubscriptionType subscriptionType) throws IOException {
+                                                    List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) throws IOException {
         RegisterRequest registerRequest = new RegisterRequest(fullName, username, email, password, stores,
-                subscriptionType);
+                subscriptionType, complaintList);
         client.openConnection();
         client.sendToServer(registerRequest);
         return (RegisterResponse) waitForMsgFromServer(registerRequest.getRequestId());
@@ -137,5 +125,12 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(createOrderRequest);
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());
+    }
+
+    public static AddComplaintResponse addComplaint(String complaintDescription, Customer customer) throws IOException {
+        AddComplaintRequest addComplaintRequest = new AddComplaintRequest(complaintDescription,customer);
+        client.openConnection();
+        client.sendToServer(addComplaintRequest);
+        return (AddComplaintResponse) waitForMsgFromServer(addComplaintRequest.getRequestId());
     }
 }

@@ -2,6 +2,7 @@ package org.cshaifa.spring.entities.requests;
 
 import java.util.List;
 
+import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
 
@@ -19,13 +20,16 @@ public class RegisterRequest extends Request {
 
     private SubscriptionType subscriptionType;
 
-    public RegisterRequest(String fullName, String username, String email, String password, List<Store> stores, SubscriptionType subscriptionType) {
+    private List<Complaint> complaintList;
+
+    public RegisterRequest(String fullName, String username, String email, String password, List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.password = password;
         this.stores = stores;
         this.subscriptionType = subscriptionType;
+        this.complaintList = complaintList;
     }
 
     public String getFullName() {
@@ -50,6 +54,10 @@ public class RegisterRequest extends Request {
 
     public SubscriptionType getSubscriptionType() {
         return subscriptionType;
+    }
+
+    public List<Complaint> getComplaintList() {
+        return complaintList;
     }
 
 }

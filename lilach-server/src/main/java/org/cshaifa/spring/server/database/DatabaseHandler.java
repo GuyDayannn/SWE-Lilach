@@ -21,13 +21,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.ChainEmployee;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.SubscriptionType;
-import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -126,7 +120,7 @@ public class DatabaseHandler {
     }
 
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
-            List<Store> stores, SubscriptionType subscriptionType) throws Exception {
+            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -141,7 +135,7 @@ public class DatabaseHandler {
         try {
             String hexSalt = generateHexSalt();
             Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
-                    hexSalt, stores, false, subscriptionType);
+                    hexSalt, stores, false, subscriptionType, complaintList);
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
@@ -214,6 +208,24 @@ public class DatabaseHandler {
         return order;
     }
 
+    public static Complaint addComplaint(String complaintDescription, Customer customer) throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer );
+        session.save(complaint);
+
+        customer.addComplaint(complaint);
+        session.merge(customer);
+
+        tryFlushSession(session);
+
+        return complaint;
+    }
+
+
+
     private static List<List<Path>> getRandomOrderedImages() {
         List<List<Path>> imagesLists = new ArrayList<>();
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/flowers", DatabaseHandler.class));
@@ -255,7 +267,7 @@ public class DatabaseHandler {
                     Map<Store, Integer> stock = new HashMap<>();
                     stock.put(store, randomQuantity);
                     randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
-                            false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
+                            false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
             }
             typeInd++;
@@ -265,11 +277,11 @@ public class DatabaseHandler {
         randomItems.remove(0);
         randomItems.add(0, new CatalogItem("Sale flower",
         imageLists.get(0).get(0).toUri().toString(), 249.99,
-        new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white"));
+        new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
         randomItems.remove(1);
         randomItems.add(1, new CatalogItem("Sale flower",
         imageLists.get(0).get(1).toUri().toString(), 149.99,
-        new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow"));
+        new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
 
         session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
@@ -281,10 +293,11 @@ public class DatabaseHandler {
         tryFlushSession(session);
 
         List<Store> stores = new ArrayList<>();
+        List<Complaint> complaintList = new ArrayList<>();
         stores.add(store);
         for (int i = 0; i < 20; i++) {
             String email = "example" + i + "@mail.com";
-            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE);
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
         }
 
         registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
@@ -325,6 +338,11 @@ public class DatabaseHandler {
             }
         }
         return catalogItems;
+    }
+
+    public static List<Complaint> getComplaints() {
+        List<Complaint> complaintList = getAllEntities(Complaint.class);
+        return complaintList;
     }
 
     public static void updateItem(CatalogItem newItem) throws HibernateException {
