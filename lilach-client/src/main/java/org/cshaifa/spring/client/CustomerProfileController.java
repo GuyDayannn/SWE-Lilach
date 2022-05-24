@@ -134,7 +134,7 @@ public class CustomerProfileController {
                     if (!response2.isSuccessful()) {
                         // TODO: maybe log the specific exception somewhere
                         App.hideLoading();
-                        System.err.println("Updating item failed");
+                        System.err.println("Add complaint failed!");
                         return;
                     }
                 });
@@ -142,14 +142,15 @@ public class CustomerProfileController {
                 addComplaintTask.setOnFailed(e2 -> {
 
                     // TODO: maybe properly log it somewhere
-                    System.out.println("Update sales item failed!");
+                    System.out.println("Add complaint failed!");
 //                    updated_sales_text.setText(Constants.UPDATED_SALES_ITEM_FAILED);
 //                    updated_sales_text.setTextFill(Color.RED);
                     addComplaintTask.getException().printStackTrace();
+                    return;
                 });
 
                 new Thread(addComplaintTask).start();
-                System.out.println("Update sales item Success!");
+                System.out.println("Add complaint Success!");
 //                updated_sales_text.setText(Constants.UPDATED_SALES_ITEM);
 //                updated_sales_text.setTextFill(Color.GREEN);
             }

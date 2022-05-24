@@ -11,7 +11,9 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -44,7 +46,7 @@ public class EmployeeProfileController {
     private TextField compensationamount;
 
     @FXML
-    private ComboBox<?> complaintComboBox;
+    private ComboBox<Long> complaintComboBox;
 
     @FXML
     private TextField complaintStatus;
@@ -100,7 +102,7 @@ public class EmployeeProfileController {
         System.out.println("You clicked Cancel");
         discountAmount.setText("");
         //cancelButton.getScene().getWindow().s
-                //App.setContent("employee profile");
+        //App.setContent("employee profile");
     }
 
     @FXML
@@ -124,7 +126,7 @@ public class EmployeeProfileController {
 
     @FXML
     void goCatalog(ActionEvent event) throws IOException {
-        App.setWindowTitle("catalog");
+        App.setWindowTitle("Edit Catalog");
         App.setContent("catalog");
     }
 
@@ -138,7 +140,7 @@ public class EmployeeProfileController {
         int tableLen = catalogTable.getItems().size();
         for (int i = 0; i < tableLen; i++) {
             //catalogTable.getColumns().  //it's ticked
-                catalogTable.getItems().get(i).setDefault(false);
+            catalogTable.getItems().get(i).setDefault(false);
         }
     }
 
@@ -162,7 +164,7 @@ public class EmployeeProfileController {
                         updatedItem.setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
                         //updating item on server side and on table - in UI
 
-                       // catalogTable.getItems().get(i).setOnSale(true);
+                        // catalogTable.getItems().get(i).setOnSale(true);
                         //catalogTable.getItems().get(i).setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
 
                         return ClientHandler.updateItem(updatedItem);
@@ -228,6 +230,9 @@ public class EmployeeProfileController {
                 return;
             }
 
+           // complaintComboBox.setItems(complaintListID);
+
+
             catalogTable.setEditable(true);
             List<CatalogItem> catalogItems = response.getCatalogItems();
             ObservableList<CatalogItem> data = FXCollections.observableArrayList();
@@ -280,5 +285,36 @@ public class EmployeeProfileController {
         });
         new Thread(getCatalogTask).start();
 
+    }
+
+    public void viewAllComplaints(ActionEvent event) {
+        Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
+            return ClientHandler.getComplaints();
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        getComplaintsTask.setOnSucceeded(e -> {
+            if (getComplaintsTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting catalog failed");
+                return;
+            }
+            GetComplaintsResponse response = getComplaintsTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
+                System.err.println("Getting catalog failed");
+                return;
+            }
+            List<Complaint> complaintList = response.getComplaintList();
+
+            List<Long>  complaintListID = new ArrayList<Long>();
+            ObservableList<Long> data = FXCollections.observableArrayList();
+            for (int i = 0; i < complaintList.size(); i++) {
+                Long id = (new Long(complaintList.get(i).getId()));
+                complaintListID.add(id);
+            }
+            data.addAll(complaintListID);
+            //complaintComboBox.setItems(data);
+        });
     }
 }
