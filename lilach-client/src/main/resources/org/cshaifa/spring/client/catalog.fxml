@@ -3,8 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToolBar?>
@@ -15,22 +13,17 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" stylesheets="@stylesheets/catalog.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
+<VBox fx:id="rootVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" stylesheets="@stylesheets/catalog.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CatalogController">
    <children>
       <HBox prefHeight="61.0" prefWidth="1041.0">
          <children>
             <ImageView fx:id="catalogTitle" fitHeight="108.0" fitWidth="1040.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </HBox>
-      <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0">
+      <ToolBar fx:id="toolbar" prefHeight="48.0" prefWidth="800.0">
         <items>
             <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, Customer" />
-            <MenuBar fx:id="menuBar" maxHeight="25.0" styleClass="menubar">
-              <menus>
-                <Menu fx:id="shoppingCart" mnemonicParsing="false" styleClass="shoppingcart" text="Shopping Cart">
-                </Menu>
-              </menus>
-            </MenuBar>
+            <Button fx:id="shoppingCart" mnemonicParsing="false" onAction="#openCart" styleClass="shoppingcart" text="Shopping Cart" />
         </items>
       </ToolBar>
       <VBox prefHeight="25.0" prefWidth="1040.0">

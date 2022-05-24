@@ -33,6 +33,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 

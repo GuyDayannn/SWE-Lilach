@@ -74,6 +74,8 @@ public class Order implements Serializable {
         this.items = items;
     }
 
+    public void addItem(CatalogItem catalogItem, Integer amount) { items.put(catalogItem, amount); }
+
     public Store getStore() {
         return store;
     }
