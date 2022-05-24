@@ -71,7 +71,7 @@
       </VBox>
       <HBox fx:id="mainHBox" prefHeight="600.0" prefWidth="1040.0">
          <children>
-            <VBox fx:id="catalogVBox" prefHeight="200.0" prefWidth="100.0">
+            <VBox fx:id="catalogVBox" prefHeight="200.0" prefWidth="1040.0">
                <children>
                   <HBox alignment="CENTER" minHeight="40.0" minWidth="840.0" prefHeight="40.0" prefWidth="1040.0" spacing="10.0" styleClass="filterBar">
                      <children>
@@ -88,9 +88,9 @@
                         <Insets />
                      </VBox.margin>
                   </HBox>
-                  <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" minWidth="840.0" prefHeight="600.0" prefWidth="1040.0">
+                  <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" prefHeight="600.0" prefWidth="1040.0">
                      <content>
-                        <TilePane fx:id="tilePane" maxWidth="-Infinity" prefColumns="4" prefHeight="495.0" prefWidth="822.0" />
+                        <TilePane fx:id="tilePane" prefColumns="4" prefHeight="600.0" prefWidth="1040.0" />
                      </content>
                   </ScrollPane>
                </children>

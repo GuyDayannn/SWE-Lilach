@@ -8,12 +8,12 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.ShoppingCartController">
+<AnchorPane prefHeight="500.0" prefWidth="400.0" stylesheets="@stylesheets/shoppingcart.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.ShoppingCartController">
    <children>
-      <HBox fx:id="titleHbox" prefHeight="50.0" prefWidth="400.0">
+      <HBox fx:id="titleHbox" prefHeight="50.0" prefWidth="400.0" styleClass="titleHBox">
          <children>
             <ImageView fx:id="cartImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="10.0" translateY="5.0" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Shopping Cart" translateX="20.0" translateY="10.0">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleText" text="Shopping Cart" translateX="20.0" translateY="10.0">
                <font>
                   <Font name="Trebuchet MS" size="24.0" />
                </font>
@@ -29,6 +29,6 @@
             </AnchorPane>
         </content>
       </ScrollPane>
-      <VBox fx:id="summaryVbox" prefHeight="100.0" prefWidth="400.0" translateY="400.0" />
+      <VBox fx:id="summaryVbox" prefHeight="100.0" prefWidth="400.0" styleClass="summaryVbox" translateY="400.0" />
    </children>
 </AnchorPane>

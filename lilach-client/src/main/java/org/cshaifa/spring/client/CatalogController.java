@@ -154,7 +154,7 @@ public class CatalogController {
         vBox.getChildren().addAll(itemName, itemPrice);
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_LEFT);
-        Button viewButton = new Button("View Item");
+        Button viewButton = new Button("View");
         viewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -175,7 +175,6 @@ public class CatalogController {
             public void handle(ActionEvent event) {
                 if (App.getCart().containsKey(item)) {
                     Integer quantity = App.getCart().get(item);
-                    App.getCart().remove(item);
                     App.getCart().put(item, ++quantity);
                 }
                 else {
@@ -278,17 +277,47 @@ public class CatalogController {
                     newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
                     textBox.getChildren().addAll(itemPrice, newItemPrice);
                     textBox.setAlignment(Pos.CENTER);
-                    Button button = new Button("View Item");
-                    button.getStyleClass().add("sale-button");
-                    button.setOnAction(new EventHandler<ActionEvent>() {
+
+                    HBox buttonBox = new HBox();
+                    buttonBox.setAlignment(Pos.CENTER);
+                    Button viewButton = new Button("View Item");
+                    viewButton.getStyleClass().add("sale-button");
+                    viewButton.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
                             App.setCurrentItemDisplayed(item, itemPrice, itemName);
-                            App.popUpLaunch(button, "PopUp");
+                            App.popUpLaunch(viewButton, "PopUp");
                         }
                     });
 
-                    vBox.getChildren().addAll(itemName, iv, textBox, button);
+                    Button addCartButton = new Button();
+                    addCartButton.getStyleClass().add("sale-button");
+                    Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
+                    ImageView ivCart = new ImageView(cartImage);
+                    ivCart.setFitHeight(15);
+                    ivCart.setFitWidth(15);
+                    addCartButton.setGraphic(ivCart);
+                    addCartButton.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            if (App.getCart().containsKey(item)) {
+                                Integer quantity = App.getCart().get(item);
+                                App.getCart().put(item, ++quantity);
+                            }
+                            else {
+                                App.getCart().put(item, 1);
+                            }
+                        }
+                    });
+                    if (App.getCurrentUser() == null) {
+                        buttonBox.getChildren().add(viewButton);
+                    } else if (App.getCurrentUser() instanceof Customer) {
+                        buttonBox.getChildren().addAll(viewButton, addCartButton);
+                    } else {
+                        buttonBox.getChildren().add(viewButton);
+                    }
+
+                    vBox.getChildren().addAll(itemName, iv, textBox, buttonBox);
                     vBox.setSpacing(5);
                     vBox.getStyleClass().add("saleitem");
                     salesVBox.getChildren().add(vBox);
@@ -299,8 +328,10 @@ public class CatalogController {
         if (total_items_on_sale == 0) {
             mainHBox.getChildren().remove(salesVBox);
             catalogVBox.setFillWidth(true);
+            tilePane.setPrefWidth(1040);
         } else {
             catalogVBox.setFillWidth(false);
+            tilePane.setPrefWidth(840);
         }
     }
 
