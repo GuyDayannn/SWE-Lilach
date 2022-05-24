@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Order;
+import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -168,7 +173,14 @@ public class CatalogController {
         addCartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
+                if (App.getCart().containsKey(item)) {
+                    Integer quantity = App.getCart().get(item);
+                    App.getCart().remove(item);
+                    App.getCart().put(item, ++quantity);
+                }
+                else {
+                    App.getCart().put(item, 1);
+                }
             }
         });
         if (App.getCurrentUser() == null) {

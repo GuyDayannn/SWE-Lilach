@@ -248,7 +248,9 @@ public class DatabaseHandler {
         session.beginTransaction();
 
         Store store = new Store("Example Store", "Example Address");
+        Store chainStore = new Store("Chain Store", "Everywhere");
         session.save(store);
+        session.save(chainStore);
         tryFlushSession(session);
 
         List<List<Path>> imageLists = getRandomOrderedImages();
@@ -295,6 +297,7 @@ public class DatabaseHandler {
         List<Store> stores = new ArrayList<>();
         List<Complaint> complaintList = new ArrayList<>();
         stores.add(store);
+        stores.add(chainStore);
         for (int i = 0; i < 20; i++) {
             String email = "example" + i + "@mail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);

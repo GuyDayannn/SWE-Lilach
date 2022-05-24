@@ -18,9 +18,12 @@ import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Order;
 
+import javax.xml.catalog.Catalog;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
 
 public class ShoppingCartController {
 
@@ -36,11 +39,10 @@ public class ShoppingCartController {
     @FXML
     private VBox summaryVbox;
 
-    Order currentOrder;
+    Map<CatalogItem, Integer> shoppingCart;
 
     @FXML
-    HBox getItemHBox(CatalogItem item) {
-        VBox vBox = new VBox();
+    HBox getItemHBox(CatalogItem item, Integer integer) {
         HBox hBox = new HBox();
         ImageView iv = null;
 
@@ -62,11 +64,7 @@ public class ShoppingCartController {
                     .doubleValue();
         }
         Text itemPrice = new Text(String.format("%.2f", price));
-        vBox.getChildren().addAll(itemName, itemPrice);
-
-        if (iv != null)
-            hBox.getChildren().add(iv);
-        hBox.getChildren().add(vBox);
+        hBox.getChildren().addAll(iv, itemName, itemPrice, new Text(Integer.toString(integer)));
         hBox.setPrefSize(200, 100);
         hBox.setSpacing(5);
         return hBox;
@@ -74,12 +72,18 @@ public class ShoppingCartController {
 
     @FXML
     void loadItems() {
+        for (Map.Entry<CatalogItem, Integer> entry : shoppingCart.entrySet()) {
+            CatalogItem item = entry.getKey();
+            Integer integer = entry.getValue();
+            HBox itemHBox = getItemHBox(item, integer);
 
+            itemsVbox.getChildren().add(itemHBox);
+        }
     }
 
     @FXML
     void displayTotal() {
-        double total = currentOrder.getTotal();
+        double total = shoppingCart.entrySet().stream().mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
         summaryVbox.getChildren().add(new Text("Order Total:\t" + Double.toString(total)));
     }
 
@@ -90,12 +94,13 @@ public class ShoppingCartController {
         cartImage.setFitWidth(40);
         cartImage.setFitHeight(40);
 
-        currentOrder = App.getCurrentOrder();
+        shoppingCart = App.getCart();
 
-        if (currentOrder==null) {
+        if (shoppingCart==null) {
             System.out.println("No current order");
         }
         else {
+            System.out.println("Order exists");
             loadItems();
             displayTotal();
         }
