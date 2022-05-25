@@ -40,6 +40,13 @@ public class ClientHandler {
         return (GetComplaintsResponse) waitForMsgFromServer(getComplaintsRequest.getRequestId());
     }
 
+    public static GetOrdersResponse getOrders() throws IOException, ConnectException {
+        GetOrdersRequest getOrdersRequest = new GetOrdersRequest();
+        client.openConnection();
+        client.sendToServer(getOrdersRequest);
+        return (GetOrdersResponse) waitForMsgFromServer(getOrdersRequest.getRequestId());
+    }
+
     /*
      * public static CatalogItem getItem(long itemID) throws IOException {
      * client.openConnection(); client.sendToServer(new GetItemRequest(itemID));

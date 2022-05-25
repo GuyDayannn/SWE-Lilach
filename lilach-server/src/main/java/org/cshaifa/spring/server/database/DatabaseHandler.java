@@ -348,6 +348,11 @@ public class DatabaseHandler {
         return complaintList;
     }
 
+    public static List<Order> getOrders() {
+        List<Order> orderList = getAllEntities(Order.class);
+        return orderList;
+    }
+
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();

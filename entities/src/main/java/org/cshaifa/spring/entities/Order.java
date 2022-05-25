@@ -134,4 +134,7 @@ public class Order implements Serializable {
         return total;
     }
 
+    public long getId() {
+        return id;
+    }
 }

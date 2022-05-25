@@ -38,6 +38,14 @@ public class LilachServer extends AbstractServer {
                         e.printStackTrace();
                         client.sendToClient(new GetCatalogResponse(requestId, false));
                     }
+                } else if (request instanceof GetOrdersRequest) {
+                        try {
+                            List<Order> orderList = DatabaseHandler.getOrders();
+                            client.sendToClient(new GetOrdersResponse(requestId, orderList));
+                        } catch (HibernateException e) {
+                            e.printStackTrace();
+                            client.sendToClient(new GetOrdersResponse(requestId, false));
+                        }
                 } else if (request instanceof UpdateItemRequest updateItemRequest) {
                     CatalogItem updatedItem = updateItemRequest.getUpdatedItem();
                     try {
