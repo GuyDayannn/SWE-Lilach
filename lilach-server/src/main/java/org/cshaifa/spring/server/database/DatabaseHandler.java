@@ -176,7 +176,7 @@ public class DatabaseHandler {
     }
 
     public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
-            Timestamp orderDate, Timestamp supplyDate, boolean delivery) throws HibernateException {
+            Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) throws HibernateException {
         // Check stock
         if (!items.entrySet().stream().allMatch(entry -> {
             return entry.getKey().getStock().containsKey(store)
@@ -188,7 +188,9 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery);
+        session.save(deliveryDetails);
+
+        Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery, deliveryDetails);
         session.save(order);
 
         store.addOrder(order);
@@ -311,7 +313,7 @@ public class DatabaseHandler {
         createOrder(store, (Customer) getUserByUsername("cust1"),
                 randomItems.subList(0, 3).stream().collect(
                         Collectors.toMap(Function.identity(), item -> 2)),
-                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true);
+                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true, new Delivery("Guy Dayan", "0509889939","address", "Hello There", false));
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {

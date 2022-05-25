@@ -119,9 +119,9 @@ public class ClientHandler {
     }
 
     public static CreateOrderResponse createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items,
-            String greeting, Timestamp orderDate, Timestamp supplyDate, boolean delivery) throws IOException {
+            String greeting, Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) throws IOException {
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate,
-                supplyDate, delivery);
+                supplyDate, delivery, deliveryDetails);
         client.openConnection();
         client.sendToServer(createOrderRequest);
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());

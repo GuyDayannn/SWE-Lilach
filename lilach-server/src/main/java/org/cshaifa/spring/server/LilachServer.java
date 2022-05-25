@@ -100,7 +100,7 @@ public class LilachServer extends AbstractServer {
                         Order order = DatabaseHandler.createOrder(createOrderRequest.getStore(),
                                 createOrderRequest.getCustomer(), createOrderRequest.getItems(),
                                 createOrderRequest.getGreeting(), createOrderRequest.getOrderDate(),
-                                createOrderRequest.getSupplyDate(), createOrderRequest.getDelivery());
+                                createOrderRequest.getSupplyDate(), createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
                             client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
                         } else {
