@@ -18,7 +18,7 @@ public class Customer extends User {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Store> stores;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Order> orders;
 
