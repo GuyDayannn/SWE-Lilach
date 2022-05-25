@@ -22,9 +22,9 @@
       <Button fx:id="catalogButton" layoutX="437.0" layoutY="6.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="110.0" text="Edit Catalog" />
       <Accordion layoutY="32.0" prefHeight="368.0" prefWidth="600.0">
         <panes>
-          <TitledPane animated="false" text="View Store Report">
+          <TitledPane fx:id="paneStoreReport" animated="false" text="View Store Report" visible="true">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" visible="true">
                      <children>
                         <Text layoutX="28.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Item:">
                            <font>
@@ -36,9 +36,9 @@
                   </AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="View Chain Report">
+          <TitledPane fx:id="paneChainReport" animated="false" text="View Chain Report">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane fx:id="viewChainReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
 <!--                     <children>-->
 <!--                        <Label fx:id="updated_complaint_text" layoutX="54.0" layoutY="247.0" prefHeight="18.0" prefWidth="231.0" />-->
 <!--                     </children>-->
@@ -65,6 +65,21 @@
                      </children></AnchorPane>
             </content>
           </TitledPane>
+            <TitledPane fx:id="handleUsersPane" animated="false" text="View/Handle Users">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ComboBox fx:id="complaintComboBox1" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
+                        <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select User" />
+                        <Button fx:id="viewComplaint1" layoutX="175.0" layoutY="29.0" mnemonicParsing="false" onAction="#openComplaint" text="View" />
+                        <Button fx:id="closeComplaintButton1" layoutX="457.0" layoutY="218.0" mnemonicParsing="false" onAction="#closeComplaint" text="Edit User" />
+                        <Text layoutX="298.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User Status" />
+                        <TextField fx:id="complaintStatus1" layoutX="298.0" layoutY="29.0" text="" />
+                        <Label fx:id="updated_complaint_text1" layoutX="383.0" layoutY="259.0" text="" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
         </panes>
       </Accordion>
    </children>

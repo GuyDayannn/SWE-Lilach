@@ -193,17 +193,9 @@ public class CustomerProfileController {
         }
     }
 
-    @FXML
-    Order getOrderRow(long orderID){
-//        Button cancelBtn = new Button("CancelOrder");
-//        cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent event) {
-//
-//            }
-//        });
-        Order order = customerOrderList.get((int) orderID);
-        return order;
+
+    @FXML void cancelOrder(){
+        Order order = orderTable.getSelectionModel().getSelectedItem();
     }
 
     @FXML
@@ -340,6 +332,13 @@ public class CustomerProfileController {
                     new SimpleBooleanProperty(cellData.getValue().isCompleted()));
 
             //TODO: add cancel order button
+
+//            orderTable.requestFocus();
+//            orderTable.getSelectionModel().select(0);
+//            orderTable.getFocusModel().focus(0);
+
+            Order order = orderTable.getSelectionModel().getSelectedItem();
+
 //            cancelOrderColumn.setCellFactory(cellData ->{
 //                Button cancelBtn = new Button("CancelOrder");
 //                return cancelBtn;

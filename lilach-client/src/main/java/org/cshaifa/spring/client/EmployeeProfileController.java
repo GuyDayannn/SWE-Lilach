@@ -12,8 +12,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Complaint;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
 import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
@@ -100,6 +99,15 @@ public class EmployeeProfileController {
     private Label updated_complaint_text;
 
     private List<Complaint> complaintList;
+
+    @FXML
+    private TitledPane paneStoreReport;
+
+    @FXML
+    private TitledPane paneChainReport;
+
+    @FXML
+    private TitledPane handleUsersPane;
 
 
     @FXML
@@ -196,6 +204,24 @@ public class EmployeeProfileController {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         } else {
             welcomeText.setText("Welcome, unknown employee");
+        }
+        //TODO: get all users request
+        ChainEmployee chainEmployee = new ChainEmployee();
+        StoreManager storeManager = new StoreManager();
+        SystemAdmin systemAdmin = new SystemAdmin();
+        if (App.getCurrentUser()!=null) {
+            if(App.getCurrentUser().getClass() == chainEmployee.getClass()){
+                paneStoreReport.setVisible(false);
+                paneChainReport.setVisible(false);
+                handleUsersPane.setVisible(false);
+            }
+            if(App.getCurrentUser().getClass() == storeManager.getClass()){
+                paneChainReport.setVisible(false);
+                handleUsersPane.setVisible(false);
+            }
+            else if(App.getCurrentUser().getClass() == systemAdmin.getClass()){
+                //else it's system admin and he can see all options
+            }
         }
 
         //initialize complaints below:
