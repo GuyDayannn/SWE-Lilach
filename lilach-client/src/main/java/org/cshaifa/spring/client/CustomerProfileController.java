@@ -113,7 +113,7 @@ public class CustomerProfileController {
     @FXML
     void sendComplaint(ActionEvent event) throws ExecutionException, InterruptedException {
         if (App.getCurrentUser()!=null) {
-            if(App.getCurrentUser() instanceof Customer)
+            if(App.getCurrentUser() instanceof Customer && !complaintDescription.getText().isEmpty())
             {   customer = (Customer) App.getCurrentUser();
                 Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
                     System.out.printf("customer is: ",  customer.getUsername());
@@ -130,6 +130,7 @@ public class CustomerProfileController {
 
                 addComplaintTask.setOnSucceeded(e2 -> {
                     AddComplaintResponse response2 = addComplaintTask.getValue();
+                    complaintDescription.setText("");
                     if (!response2.isSuccessful()) {
                         // TODO: maybe log the specific exception somewhere
                         App.hideLoading();

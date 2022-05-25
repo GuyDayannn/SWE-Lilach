@@ -188,9 +188,7 @@ public class EmployeeProfileController {
             complaintStatus.setText(complaintStatusStr);
             compensationamount.setText((Double.toString(complaint.getCompensationAmount())));
             complaintresponse.setText((complaint.getComplaintResponse()));
-
     }
-
 
     @FXML
     public void initialize() {
@@ -199,7 +197,6 @@ public class EmployeeProfileController {
         } else {
             welcomeText.setText("Welcome, unknown employee");
         }
-
 
         //initialize complaints below:
         Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
@@ -219,10 +216,11 @@ public class EmployeeProfileController {
                 System.err.println("Getting catalog failed");
                 return;
             }
-            complaintList = response.getComplaintList(); //TODO check it saves to list
+            complaintList = response.getComplaintList();
 
             List<Long>  complaintListID = new ArrayList<Long>();
             ObservableList<Long> data = FXCollections.observableArrayList();
+            //showing customer only his complaints
             if(complaintList.size()>=1){
                 for (int i = 0; i < complaintList.size()-1; i++) {
                     Long id = (new Long(complaintList.get(i).getId()));

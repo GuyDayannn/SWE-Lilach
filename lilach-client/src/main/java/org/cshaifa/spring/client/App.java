@@ -210,7 +210,14 @@ public class App extends Application {
     }
 
     public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
-        currentItemPrice.setText(Double.toString(updatedItem.getPrice()));
+        if(updatedItem.getDiscount()!=0){
+            double price = updatedItem.getPrice()*(1-updatedItem.getDiscount()/100);
+            currentItemPrice.setText(String.format("%.2f", price));
+        }
+        else{
+            currentItemPrice.setText(Double.toString(updatedItem.getPrice()));
+        }
+
         currentItemName.setText(updatedItem.getName());
     }
 
