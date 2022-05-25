@@ -28,6 +28,7 @@ public class DatabaseConnector {
         configuration.addAnnotatedClass(ChainEmployee.class);
         configuration.addAnnotatedClass(Order.class);
         configuration.addAnnotatedClass(Complaint.class);
+        configuration.addAnnotatedClass(Delivery.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
             .applySettings(configuration.getProperties())

@@ -4,18 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Map;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "orders")
@@ -46,10 +35,13 @@ public class Order implements Serializable {
 
     private boolean completed;
 
+    @OneToOne
+    private Delivery deliveryDetails;
+
     private double total;
 
     public Order(Map<CatalogItem, Integer> items, Store store, Customer customer, String greeting, Timestamp orderDate,
-            Timestamp supplyDate, boolean delivery) {
+            Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) {
         super();
         this.items = items;
         this.store = store;
@@ -59,6 +51,7 @@ public class Order implements Serializable {
         this.supplyDate = supplyDate;
         this.delivery = delivery;
         this.completed = false;
+        this.deliveryDetails = deliveryDetails;
         this.total = items.entrySet().stream().mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice())
                 .sum();
     }
@@ -118,21 +111,17 @@ public class Order implements Serializable {
         return delivery;
     }
 
-    public void setDelivery(boolean delivery) {
-        this.delivery = delivery;
-    }
+    public Delivery getDeliveryDetails() { return deliveryDetails; }
 
-    public boolean isCompleted() {
-        return completed;
-    }
+    public void setDelivery(boolean delivery) { this.delivery = delivery; }
 
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
+    public void setDeliveryDetails(Delivery deliveryDetails) { this.deliveryDetails = deliveryDetails; }
 
-    public double getTotal() {
-        return total;
-    }
+    public boolean isCompleted() { return completed; }
+
+    public void setCompleted(boolean completed) { this.completed = completed; }
+
+    public double getTotal() { return total; }
 
     public long getId() {
         return id;
