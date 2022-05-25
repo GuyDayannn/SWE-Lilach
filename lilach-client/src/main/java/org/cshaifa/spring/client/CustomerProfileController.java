@@ -16,10 +16,10 @@ import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.responses.AddComplaintResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -86,6 +86,11 @@ public class CustomerProfileController {
     @FXML
     private Label invalid_customer_text;
 
+    @FXML
+    private Label added_complaint_text;
+
+    private Customer customer;
+
 
     @FXML
     void closeComplaint(ActionEvent event) {
@@ -107,25 +112,19 @@ public class CustomerProfileController {
 
     @FXML
     void sendComplaint(ActionEvent event) throws ExecutionException, InterruptedException {
-        Complaint complaint = new Complaint();
-        complaint.setComplaintOpen(true);
-        complaint.setComplaintDescription(complaintDescription.getText().strip());
-        complaint.setComplaintResponse("");
         if (App.getCurrentUser()!=null) {
-            //long custID = App.getCurrentUser().getId();
-            //Customer customer = getCustomerbyID(custID);
-
             if(App.getCurrentUser() instanceof Customer)
-            {
-                Customer customer = (Customer) App.getCurrentUser();
-                System.out.printf("customer is: ",  customer.getUsername());
-                System.out.printf("%d%n", customer.getId());
-
-                complaintList.getItems().add(complaint); //adding new complaint in UI
-
+            {   customer = (Customer) App.getCurrentUser();
                 Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
-                    complaint.setCustomer(customer);
-                    customer.addComplaint(complaint);
+                    System.out.printf("customer is: ",  customer.getUsername());
+                    System.out.printf("%d%n", customer.getId());
+//                    Complaint complaint = new Complaint();
+//                    complaint.setCustomer(customer);
+//                    complaint.setComplaintOpen(true);
+//                    complaint.setComplaintDescription(complaintDescription.getText().strip());
+//                    complaint.setComplaintResponse("");
+                    //customer.addComplaint(complaint);
+                    //complaintList.getItems().add(complaint); //adding new complaint in UI
                     return ClientHandler.addComplaint(complaintDescription.getText().strip(), customer);
                 }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
@@ -135,24 +134,21 @@ public class CustomerProfileController {
                         // TODO: maybe log the specific exception somewhere
                         App.hideLoading();
                         System.err.println("Add complaint failed!");
-                        return;
                     }
                 });
 
                 addComplaintTask.setOnFailed(e2 -> {
-
                     // TODO: maybe properly log it somewhere
                     System.out.println("Add complaint failed!");
-//                    updated_sales_text.setText(Constants.UPDATED_SALES_ITEM_FAILED);
-//                    updated_sales_text.setTextFill(Color.RED);
+                    added_complaint_text.setText(Constants.UPDATED_COMPLAINT_FAILED);
+                    added_complaint_text.setTextFill(Color.RED);
                     addComplaintTask.getException().printStackTrace();
-                    return;
                 });
 
                 new Thread(addComplaintTask).start();
                 System.out.println("Add complaint Success!");
-//                updated_sales_text.setText(Constants.UPDATED_SALES_ITEM);
-//                updated_sales_text.setTextFill(Color.GREEN);
+                added_complaint_text.setText(Constants.UPDATED_COMPLAINT);
+                added_complaint_text.setTextFill(Color.GREEN);
             }
             else{
                 invalid_customer_text.setText("failed to get customer ");
@@ -160,37 +156,6 @@ public class CustomerProfileController {
             }
         }
     }
-
-//    Customer getCustomerbyID(long customerID) throws ExecutionException, InterruptedException {
-//        Task<GetCustomerResponse> customerResponseTask = App.createTimedTask(() -> {
-//            return ClientHandler.getCustomerResponse(customerID);
-//        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-//
-//        customerResponseTask.setOnSucceeded(e -> {
-//            if (customerResponseTask.getValue() == null) {
-//                invalid_customer_text.setText("failed customer response task");
-//                invalid_customer_text.setTextFill(Color.RED);
-//                App.hideLoading();
-//                return;
-//            }
-//
-//            GetCustomerResponse getCustomerResponse = customerResponseTask.getValue();
-//            if (!getCustomerResponse.isSuccessful()) {
-//                invalid_customer_text.setText("getCustomerResponse error");
-//                invalid_customer_text.setTextFill(Color.RED);
-//                App.hideLoading();
-//                return;
-//            }
-//
-////            App.setCurrentUser(loginResponse.getUser());
-////            App.hideLoading();
-//
-//        });
-//
-//        //App.showLoading(rootPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
-//        new Thread(customerResponseTask).start();
-//        return customerResponseTask.getValue().getCustomer();
-//    }
 
 
     @FXML
@@ -201,6 +166,9 @@ public class CustomerProfileController {
         else {
             welcomeText.setText("Welcome, unknown customer");
         }
+
+        added_complaint_text.setText("");
+        invalid_customer_text.setText("");
 
         Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
             return ClientHandler.getComplaints();
@@ -219,9 +187,21 @@ public class CustomerProfileController {
                 System.err.println("Getting catalog failed");
                 return;
             }
-
             complaintTable.setEditable(true);
+            if (App.getCurrentUser()!=null && App.getCurrentUser() instanceof Customer) {
+                customer = (Customer) App.getCurrentUser();
+            }
+            else{
+                invalid_customer_text.setText("failed to get customer ");
+                invalid_customer_text.setTextFill(Color.RED);
+            }
             List<Complaint> complaintList = response.getComplaintList();
+            List<Complaint> customerComplaintList = new ArrayList<>();
+            for (Complaint complaint : complaintList) {
+                if (complaint.getCustomer().getId() == customer.getId()) {
+                    customerComplaintList.add(complaint);
+                }
+            }
             ObservableList<Complaint> data = FXCollections.observableArrayList();
 
             complaintIdColumn.setCellValueFactory(cellData ->
@@ -239,7 +219,7 @@ public class CustomerProfileController {
             complaintCompensationAmountColumn.setCellValueFactory(cellData ->
                     new SimpleDoubleProperty(cellData.getValue().getCompensationAmount()).asObject());
 
-            data.addAll(complaintList);
+            data.addAll(customerComplaintList);
             complaintTable.setItems(data);
 
 //            List<Text> ids = new ArrayList<>();

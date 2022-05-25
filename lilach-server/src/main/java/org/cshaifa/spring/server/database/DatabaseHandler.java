@@ -213,7 +213,7 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer );
+        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer);
         session.save(complaint);
 
         customer.addComplaint(complaint);
@@ -349,6 +349,13 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
         session.merge(newItem);
+        tryFlushSession(session);
+    }
+
+    public static void updateComplaint(Complaint newComplaint) throws HibernateException {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.merge(newComplaint);
         tryFlushSession(session);
     }
 

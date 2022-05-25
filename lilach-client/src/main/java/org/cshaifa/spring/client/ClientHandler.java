@@ -53,6 +53,13 @@ public class ClientHandler {
         return (UpdateItemResponse) waitForMsgFromServer(updateItemRequest.getRequestId());
     }
 
+    public static UpdateComplaintResponse updateComplaint(Complaint updatedComplaint) throws IOException, ConnectException {
+        UpdateComplaintRequest updateComplaintRequest = new UpdateComplaintRequest( updatedComplaint);
+        client.openConnection();
+        client.sendToServer(updateComplaintRequest);
+        return (UpdateComplaintResponse) waitForMsgFromServer(updateComplaintRequest.getRequestId());
+    }
+
     public static LoginResponse loginUser(String username, String password) throws IOException {
         LoginRequest loginRequest = new LoginRequest(username, password);
         client.openConnection();

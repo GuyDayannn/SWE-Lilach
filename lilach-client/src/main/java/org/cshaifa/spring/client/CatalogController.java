@@ -361,7 +361,8 @@ public class CatalogController {
         viewProfileButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (App.getCurrentUser().getClass().toString().equals("Customer")) {
+                if(App.getCurrentUser().getClass().equals(Customer.class)){
+
                     App.setWindowTitle("Customer Profile");
                     try {
                         App.setContent("customerProfile");
