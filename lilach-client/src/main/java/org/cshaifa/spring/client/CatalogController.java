@@ -8,7 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.layout.Pane;
+import net.bytebuddy.asm.MemberSubstitution;
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.ChainEmployee;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
@@ -54,6 +57,8 @@ public class CatalogController {
     @FXML
     private ToolBar toolbar;
     @FXML
+    private Pane spacer;
+    @FXML
     private ImageView catalogTitle;
     @FXML
     private VBox salesVBox;
@@ -61,6 +66,8 @@ public class CatalogController {
     private VBox catalogVBox;
     @FXML
     private Button shoppingCart;
+    @FXML
+    private Button addItemButton;
     @FXML
     private ComboBox<String> selectedTypeComboBox;
     @FXML
@@ -160,6 +167,7 @@ public class CatalogController {
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_LEFT);
         Button viewButton = new Button("View");
+        viewButton.getStyleClass().add("catalog-item-buttons");
         viewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -168,7 +176,6 @@ public class CatalogController {
             }
         });
         Button addCartButton = new Button();
-        viewButton.getStyleClass().add("catalog-item-buttons");
         addCartButton.getStyleClass().add("catalog-item-buttons");
         Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
         ImageView ivCart = new ImageView(cartImage);
@@ -186,12 +193,25 @@ public class CatalogController {
                 }
             }
         });
+        Button removeItemButton = new Button();
+        removeItemButton.getStyleClass().add("catalog-item-buttons");
+        Image removeImage = new Image(getClass().getResource("images/remove.png").toString());
+        ImageView ivRemove = new ImageView(removeImage);
+        ivRemove.setFitHeight(15);
+        ivRemove.setFitWidth(15);
+        removeItemButton.setGraphic(ivRemove);
+        addCartButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // TODO: Handle item removal
+            }
+        });
         if (App.getCurrentUser() == null) {
             buttonBox.getChildren().add(viewButton);
         } else if (App.getCurrentUser() instanceof Customer) {
             buttonBox.getChildren().addAll(viewButton, addCartButton);
         } else {
-            buttonBox.getChildren().add(viewButton);
+            buttonBox.getChildren().addAll(viewButton, removeItemButton);
         }
 
         vBox.getChildren().add(buttonBox);
@@ -238,7 +258,7 @@ public class CatalogController {
     }
 
     @FXML
-    void onAddItem(ActionEvent event) {
+    void addItem(ActionEvent event) {
         FileChooser chooser = new FileChooser();
         ExtensionFilter filter = new ExtensionFilter("JPG files (*.jpg)", "*.jpeg", "*.jpg", "*.JPG");
         chooser.getExtensionFilters().add(filter);
@@ -382,7 +402,9 @@ public class CatalogController {
         catalogTitle.setImage((image));
 
         // Load Toolbar
+        toolbar.getItems().remove(spacer);
         toolbar.getItems().remove(shoppingCart);
+        toolbar.getItems().remove(addItemButton);
         Button NewOrderButton = new Button("New Order");
         NewOrderButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -436,7 +458,7 @@ public class CatalogController {
         viewProfileButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (App.getCurrentUser().getClass().equals(Customer.class)) {
+                if (App.getCurrentUser() instanceof Customer) {
 
                     App.setWindowTitle("Customer Profile");
                     try {
@@ -473,13 +495,27 @@ public class CatalogController {
             toolbar.getItems().add(registerButton);
             toolbar.getItems().add(refreshButton);
             toolbar.getItems().add(contactButton);
-        } else {
+        } else if (App.getCurrentUser() instanceof Customer) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
             toolbar.getItems().add(NewOrderButton);
             toolbar.getItems().add(viewProfileButton);
             toolbar.getItems().add(refreshButton);
             toolbar.getItems().add(contactButton);
+            toolbar.getItems().add(spacer);
             toolbar.getItems().add(shoppingCart);
+        }
+        else {
+            welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
+            toolbar.getItems().add(viewProfileButton);
+            toolbar.getItems().add(refreshButton);
+            toolbar.getItems().add(contactButton);
+            toolbar.getItems().add(spacer);
+            Image plusImage = new Image(getClass().getResource("images/plus.png").toString());
+            ImageView ivPlus = new ImageView(plusImage);
+            ivPlus.setFitHeight(20);
+            ivPlus.setFitWidth(20);
+            addItemButton.setGraphic(ivPlus);
+            toolbar.getItems().add(addItemButton);
         }
 
         Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
