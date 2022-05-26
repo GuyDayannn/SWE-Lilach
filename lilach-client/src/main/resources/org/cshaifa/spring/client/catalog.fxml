@@ -25,12 +25,7 @@
       <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0">
         <items>
             <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, Customer" />
-            <MenuBar fx:id="menuBar" maxHeight="25.0" styleClass="menubar">
-              <menus>
-                <Menu fx:id="shoppingCart" mnemonicParsing="false" styleClass="shoppingcart" text="Shopping Cart">
-                </Menu>
-              </menus>
-            </MenuBar>
+            <Button fx:id="shoppingCart" mnemonicParsing="false" onAction="#openCart" styleClass="shoppingcart" text="Shopping Cart" />
             <Button mnemonicParsing="false" onAction="#onAddItem" text="Add Item" />
         </items>
       </ToolBar>
