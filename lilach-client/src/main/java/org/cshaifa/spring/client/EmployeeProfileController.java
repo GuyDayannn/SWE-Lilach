@@ -1,6 +1,7 @@
 package org.cshaifa.spring.client;
 
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -10,8 +11,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import org.cshaifa.spring.entities.CatalogItem;
+import javafx.stage.Stage;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
+import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -44,7 +48,7 @@ public class EmployeeProfileController {
     private TextField compensationamount;
 
     @FXML
-    private ComboBox<?> complaintComboBox;
+    private ComboBox<Long> complaintComboBox;
 
     @FXML
     private TextField complaintStatus;
@@ -92,7 +96,18 @@ public class EmployeeProfileController {
     private Text welcomeText;
 
     @FXML
-    private Label updated_sales_text;
+    private Label updated_complaint_text;
+
+    private List<Complaint> complaintList;
+
+    @FXML
+    private TitledPane paneStoreReport;
+
+    @FXML
+    private TitledPane paneChainReport;
+
+    @FXML
+    private TitledPane handleUsersPane;
 
 
     @FXML
@@ -100,7 +115,7 @@ public class EmployeeProfileController {
         System.out.println("You clicked Cancel");
         discountAmount.setText("");
         //cancelButton.getScene().getWindow().s
-                //App.setContent("employee profile");
+        //App.setContent("employee profile");
     }
 
     @FXML
@@ -111,8 +126,44 @@ public class EmployeeProfileController {
     }
 
     @FXML
-    void closeComplaint(ActionEvent event) {
+    void closeComplaint(ActionEvent event) { //TODO: fix it closes the correct complaint
+        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
+        Complaint updatedComplaint = complaintList.get((int) complaintID);
+        updatedComplaint.setComplaintResponse(complaintresponse.getText());
+        updatedComplaint.setComplaintOpen(false);
+        double compensationNum  = Double.parseDouble(compensationamount.getText());
+        updatedComplaint.setCompensationAmount(compensationNum);
 
+        complaintComboBox.valueProperty().setValue(null);
+        complaintresponse.setText("");
+        compensationamount.setText("");
+        complaintStatus.setText("");
+        complaintdescription.setText("");
+
+        Task<UpdateComplaintResponse> updateComplaintTask = App.createTimedTask(() -> {
+            return ClientHandler.updateComplaint(updatedComplaint);
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        updateComplaintTask.setOnSucceeded(e -> {
+            UpdateComplaintResponse response = updateComplaintTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                System.err.println("Updating Complaint failed");
+                updated_complaint_text.setText("Failed to close complaint");
+                updated_complaint_text.setTextFill(Color.RED);
+                return;
+            }
+            updated_complaint_text.setText("You have successfully closed the complaint");
+            updated_complaint_text.setTextFill(Color.GREEN);
+        });
+
+        updateComplaintTask.setOnFailed(e -> {
+            // TODO: maybe properly log it somewhere
+            updateComplaintTask.getException().printStackTrace();
+            updated_complaint_text.setText("Failed to close complaint");
+            updated_complaint_text.setTextFill(Color.RED);
+        });
+        new Thread(updateComplaintTask).start();
     }
 
     @FXML
@@ -124,82 +175,27 @@ public class EmployeeProfileController {
 
     @FXML
     void goCatalog(ActionEvent event) throws IOException {
-        App.setWindowTitle("catalog");
+        App.setWindowTitle("Edit Catalog");
         App.setContent("catalog");
     }
 
     @FXML
-    void openComplaint(ActionEvent event) {
+    void openComplaint(ActionEvent event) { //on view complaint click
+        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
 
-    }
+            Complaint complaint = complaintList.get((int) complaintID);
 
-    @FXML
-    void selectAll(ActionEvent event) {
-        int tableLen = catalogTable.getItems().size();
-        for (int i = 0; i < tableLen; i++) {
-            //catalogTable.getColumns().  //it's ticked
-                catalogTable.getItems().get(i).setDefault(false);
-        }
-    }
-
-    @FXML
-    void updateSales(ActionEvent event) {
-
-        int tableLen = catalogTable.getItems().size();
-        for (int i = 0; i < tableLen; i++) {
-            if (catalogTable.getItems().get(i).getIsDefault()) { //it's ticked
-                //long itemId = Long.parseLong(selectColumn.getId(i));
-                long itemId = catalogTable.getItems().get(i).getId(); //gets row and then gets column in table to access specific cell
-                //CatalogItem updatedItem = App.getItemByID(itemId);
-                CatalogItem updatedItem = catalogTable.getItems().get(i);
-                System.out.printf("catalog item is: %s", updatedItem.getName());
-                updatedItem.setOnSale(true);
-                updatedItem.setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
-
-                if (!discountAmount.getText().isEmpty()) { //TODO: check catalog item isn't empty
-                    Task<UpdateItemResponse> updateItemTask = App.createTimedTask(() -> {
-                        updatedItem.setOnSale(true);
-                        updatedItem.setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
-                        //updating item on server side and on table - in UI
-
-                       // catalogTable.getItems().get(i).setOnSale(true);
-                        //catalogTable.getItems().get(i).setDiscountPercent(Double.parseDouble(discountAmount.getText().strip()));
-
-                        return ClientHandler.updateItem(updatedItem);
-                    }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-                    updateItemTask.setOnSucceeded(e2 -> {
-                        UpdateItemResponse response2 = updateItemTask.getValue();
-                        if (!response2.isSuccessful()) {
-                            // TODO: maybe log the specific exception somewhere
-                            App.hideLoading();
-                            System.err.println("Updating item failed");
-                            return;
-                        }
-
-                        //App.updateCurrentItemDisplayed(response2.getUpdatedItem());
-                        //App.hideLoading();
-                        //updateSalesButton.getScene().getWindow().hide();
-                    });
-
-                    updateItemTask.setOnFailed(e2 -> {
-                        //App.hideLoading();
-                        // TODO: maybe properly log it somewhere
-                        System.out.println("Update sales item failed!");
-                        updated_sales_text.setText(Constants.UPDATED_SALES_ITEM_FAILED);
-                        updated_sales_text.setTextFill(Color.RED);
-                        updateItemTask.getException().printStackTrace();
-                    });
-
-                    new Thread(updateItemTask).start();
-                    System.out.println("Update sales item Success!");
-                    updated_sales_text.setText(Constants.UPDATED_SALES_ITEM);
-                    updated_sales_text.setTextFill(Color.GREEN);
-                }
+            complaintdescription.setText(complaint.getComplaintDescription());
+            String complaintStatusStr = "";
+            if (complaint.getIsComplaintOpen()) {
+                complaintStatusStr = "Open";
+            } else {
+                complaintStatusStr = "Closed";
             }
 
-
-        }
+            complaintStatus.setText(complaintStatusStr);
+            compensationamount.setText((Double.toString(complaint.getCompensationAmount())));
+            complaintresponse.setText((complaint.getComplaintResponse()));
     }
 
     @FXML
@@ -209,76 +205,71 @@ public class EmployeeProfileController {
         } else {
             welcomeText.setText("Welcome, unknown employee");
         }
-        //initilization of catalog for table below
-        Task<GetCatalogResponse> getCatalogTask = App.createTimedTask(() -> {
-            return ClientHandler.getCatalog();
+        //TODO: get all users request
+        //TODO: edit so hide edit catalog for customer service employee
+        ChainEmployee chainEmployee = new ChainEmployee();
+        StoreManager storeManager = new StoreManager();
+        SystemAdmin systemAdmin = new SystemAdmin();
+        if (App.getCurrentUser()!=null) {
+            if(App.getCurrentUser().getClass() == chainEmployee.getClass()){
+                paneStoreReport.setVisible(false);
+                paneChainReport.setVisible(false);
+                handleUsersPane.setVisible(false);
+            }
+            if(App.getCurrentUser().getClass() == storeManager.getClass()){
+                paneChainReport.setVisible(false);
+                handleUsersPane.setVisible(false);
+            }
+            else if(App.getCurrentUser().getClass() == systemAdmin.getClass()){
+                //else it's system admin and he can see all options
+            }
+        }
+
+        //initialize complaints below:
+        Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
+            return ClientHandler.getComplaints();
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-        getCatalogTask.setOnSucceeded(e -> {
-            if (getCatalogTask.getValue() == null) {
+        getComplaintsTask.setOnSucceeded(e -> {
+            if (getComplaintsTask.getValue() == null) {
                 App.hideLoading();
                 System.err.println("Getting catalog failed");
                 return;
             }
-            GetCatalogResponse response = getCatalogTask.getValue();
+            GetComplaintsResponse response = getComplaintsTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
                 App.hideLoading();
                 System.err.println("Getting catalog failed");
                 return;
             }
+            complaintList = response.getComplaintList();
 
-            catalogTable.setEditable(true);
-            List<CatalogItem> catalogItems = response.getCatalogItems();
-            ObservableList<CatalogItem> data = FXCollections.observableArrayList();
-
-//            idColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Long>("id"));
-//            itemNameColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, String>("name"));
-//            itemPriceColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Double>("price"));
-//            onsaleColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Boolean>("onSale"));
-//            discountColumn.setCellValueFactory(new PropertyValueFactory<CatalogItem, Double>("discountPercent"));
-//            selectColumn.setCellValueFactory(new PropertyValueFactory<String,ObservableValue<Boolean>>(""));
-//
-
-            idColumn.setCellValueFactory(cellData ->
-                    new SimpleLongProperty(cellData.getValue().getId()).asObject());
-
-            itemNameColumn.setCellValueFactory(cellData ->
-                    new SimpleStringProperty(cellData.getValue().getName()));
-
-            itemPriceColumn.setCellValueFactory(cellData ->
-                    new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
-
-            onsaleColumn.setCellValueFactory(cellData ->
-                    new SimpleBooleanProperty(cellData.getValue().isOnSale()));
-
-            discountColumn.setCellValueFactory(cellData ->
-                    new SimpleDoubleProperty(cellData.getValue().getDiscount()).asObject());
-
-            selectColumn.setCellValueFactory(cellData ->
-                    new SimpleBooleanProperty(cellData.getValue().getIsDefault()));
-            selectColumn.setCellFactory(cellData -> new CheckBoxTableCell<>());
-
-            data.addAll(catalogItems);
-            catalogTable.setItems(data);
-
-            List<Text> ids = new ArrayList<>();
-            for (CatalogItem catalogItem : catalogItems) {
-                long id = catalogItem.getId();
-                ids.add(new Text(Long.toString(id)));
+            List<Long>  complaintListID = new ArrayList<Long>();
+            ObservableList<Long> data = FXCollections.observableArrayList();
+            //showing customer only his complaints
+            if(complaintList.size()>=1){
+                for (int i = 0; i < complaintList.size()-1; i++) {
+                    Long id = (new Long(complaintList.get(i).getId()));
+                    complaintListID.add(id);
+                }
             }
-            ObservableList<Text> itemsIds = FXCollections.observableArrayList(ids);
-            itemComboBox.setItems(itemsIds);
 
-            App.hideLoading();
+            data.addAll(complaintListID); //adding to dropdown combo
+            complaintComboBox.setItems(data);
+
         });
 
-        getCatalogTask.setOnFailed(e -> {
+        getComplaintsTask.setOnFailed(e -> {
             // TODO: maybe log somewhere else...
-            getCatalogTask.getException().printStackTrace();
-            App.hideLoading();
+            getComplaintsTask.getException().printStackTrace();
         });
-        new Thread(getCatalogTask).start();
+
+        new Thread(getComplaintsTask).start();
+
+    }
+
+    public void viewAllComplaints(ActionEvent event) {
 
     }
 }

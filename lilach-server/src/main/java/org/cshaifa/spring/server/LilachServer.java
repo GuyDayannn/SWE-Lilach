@@ -38,6 +38,14 @@ public class LilachServer extends AbstractServer {
                         e.printStackTrace();
                         client.sendToClient(new GetCatalogResponse(requestId, false));
                     }
+                } else if (request instanceof GetOrdersRequest) {
+                        try {
+                            List<Order> orderList = DatabaseHandler.getOrders();
+                            client.sendToClient(new GetOrdersResponse(requestId, orderList));
+                        } catch (HibernateException e) {
+                            e.printStackTrace();
+                            client.sendToClient(new GetOrdersResponse(requestId, false));
+                        }
                 } else if (request instanceof UpdateItemRequest updateItemRequest) {
                     CatalogItem updatedItem = updateItemRequest.getUpdatedItem();
                     try {
@@ -47,6 +55,16 @@ public class LilachServer extends AbstractServer {
                         e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
                     }
+                } else if (request instanceof UpdateComplaintRequest updateComplaintRequest) {
+                    Complaint updatedComplaint = updateComplaintRequest.getUpdatedComplaint();
+                    try {
+                        DatabaseHandler.updateComplaint(updatedComplaint);
+                        client.sendToClient(new UpdateComplaintResponse(requestId, updatedComplaint));
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
+                        client.sendToClient(new UpdateComplaintResponse(requestId, false));
+                    }
+
                 } else if (request instanceof LoginRequest loginRequest) {
                     User user = DatabaseHandler.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
                     if (user != null && user.isLoggedIn()) {
@@ -100,7 +118,7 @@ public class LilachServer extends AbstractServer {
                         Order order = DatabaseHandler.createOrder(createOrderRequest.getStore(),
                                 createOrderRequest.getCustomer(), createOrderRequest.getItems(),
                                 createOrderRequest.getGreeting(), createOrderRequest.getOrderDate(),
-                                createOrderRequest.getSupplyDate(), createOrderRequest.getDelivery());
+                                createOrderRequest.getSupplyDate(), createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
                             client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
                         } else {
@@ -122,7 +140,7 @@ public class LilachServer extends AbstractServer {
                     e.printStackTrace();
                     client.sendToClient(new AddComplaintResponse(requestId, false, Constants.FAIL_MSG));
                 }
-            }else if (request instanceof GetComplaintsRequest getComplaintRequest){
+            }else if (request instanceof GetComplaintsRequest){
                 try {
                     List<Complaint> complaintsList = DatabaseHandler.getComplaints();
                     sendToAllClients(new GetComplaintsResponse(requestId, complaintsList ));

@@ -1,0 +1,28 @@
+.item {
+    -fx-border-color: green;
+    -fx-border-style: solid none none solid;
+}
+
+.summaryVbox {
+    -fx-border-color: green;
+    -fx-border-style: solid none none none;
+}
+
+.titleHBox {
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-border-color: green;
+    -fx-border-style: none none none solid;
+    -fx-text-fill: white;
+}
+
+.titleText {
+    -fx-fill: white;
+}
+
+.button {
+    -fx-border-radius: 2;
+    -fx-background-insets: 2;
+    -fx-border-color: green;
+    -fx-border-radius: 2;
+    -fx-border-insets: 2;
+}

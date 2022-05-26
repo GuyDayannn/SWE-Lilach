@@ -40,6 +40,13 @@ public class ClientHandler {
         return (GetComplaintsResponse) waitForMsgFromServer(getComplaintsRequest.getRequestId());
     }
 
+    public static GetOrdersResponse getOrders() throws IOException, ConnectException {
+        GetOrdersRequest getOrdersRequest = new GetOrdersRequest();
+        client.openConnection();
+        client.sendToServer(getOrdersRequest);
+        return (GetOrdersResponse) waitForMsgFromServer(getOrdersRequest.getRequestId());
+    }
+
     /*
      * public static CatalogItem getItem(long itemID) throws IOException {
      * client.openConnection(); client.sendToServer(new GetItemRequest(itemID));
@@ -51,6 +58,13 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(updateItemRequest);
         return (UpdateItemResponse) waitForMsgFromServer(updateItemRequest.getRequestId());
+    }
+
+    public static UpdateComplaintResponse updateComplaint(Complaint updatedComplaint) throws IOException, ConnectException {
+        UpdateComplaintRequest updateComplaintRequest = new UpdateComplaintRequest( updatedComplaint);
+        client.openConnection();
+        client.sendToServer(updateComplaintRequest);
+        return (UpdateComplaintResponse) waitForMsgFromServer(updateComplaintRequest.getRequestId());
     }
 
     public static LoginResponse loginUser(String username, String password) throws IOException {
@@ -119,9 +133,9 @@ public class ClientHandler {
     }
 
     public static CreateOrderResponse createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items,
-            String greeting, Timestamp orderDate, Timestamp supplyDate, boolean delivery) throws IOException {
+            String greeting, Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) throws IOException {
         CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate,
-                supplyDate, delivery);
+                supplyDate, delivery, deliveryDetails);
         client.openConnection();
         client.sendToServer(createOrderRequest);
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());

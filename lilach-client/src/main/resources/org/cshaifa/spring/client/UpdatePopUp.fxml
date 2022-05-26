@@ -15,9 +15,11 @@
         </Text>
         <Button fx:id="btnPopUpUpdate" layoutX="135.0" layoutY="206.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="OK" />
         <Button fx:id="btnPopUpCancel" layoutX="295.0" layoutY="206.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="169.0" text="Cancel" />
-      <Text layoutX="135.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Item Name:" />
-      <Text layoutX="135.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Item Price:" />
-      <TextField fx:id="itemNameField" layoutX="242.0" layoutY="73.0" />
-      <TextField fx:id="itemPriceField" layoutX="242.0" layoutY="121.0" />
+      <Text layoutX="126.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Item Name:" />
+      <Text layoutX="129.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Item Price:" />
+      <Text layoutX="129.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Discount Percent:" />
+      <TextField fx:id="itemNameField" layoutX="264.0" layoutY="73.0" />
+      <TextField fx:id="itemPriceField" layoutX="264.0" layoutY="121.0" />
+      <TextField fx:id="itemDiscountField" layoutX="264.0" layoutY="164.0" />
     </children>
 </AnchorPane>

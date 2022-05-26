@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Delivery;
 import org.cshaifa.spring.entities.Store;
 
 public class CreateOrderRequest extends Request {
@@ -23,8 +24,10 @@ public class CreateOrderRequest extends Request {
 
     private boolean delivery;
 
+    private Delivery deliveryDetails;
+
     public CreateOrderRequest(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting, Timestamp orderDate,
-            Timestamp supplyDate, boolean deilvery) {
+            Timestamp supplyDate, boolean deilvery, Delivery deliveryDetails) {
         this.store = store;
         this.customer = customer;
         this.items = items;
@@ -32,6 +35,7 @@ public class CreateOrderRequest extends Request {
         this.orderDate = orderDate;
         this.supplyDate = supplyDate;
         this.delivery = delivery;
+        this.deliveryDetails = deliveryDetails;
     }
 
     public Store getStore() {
@@ -61,5 +65,7 @@ public class CreateOrderRequest extends Request {
     public boolean getDelivery() {
         return delivery;
     }
+
+    public Delivery getDeliveryDetails() { return deliveryDetails; }
 
 }

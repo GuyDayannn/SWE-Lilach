@@ -45,6 +45,7 @@ public class Complaint implements Serializable {
         this.complaintResponse = complaintResponse;
         this.compensationAmount = compensationAmount;
         this.isComplaintOpen = isComplaintOpen;
+        this.customer = customer;
     }
 
     public long getId() {

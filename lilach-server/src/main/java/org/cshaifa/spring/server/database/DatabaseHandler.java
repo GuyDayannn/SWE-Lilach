@@ -176,7 +176,7 @@ public class DatabaseHandler {
     }
 
     public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
-            Timestamp orderDate, Timestamp supplyDate, boolean delivery) throws HibernateException {
+            Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) throws HibernateException {
         // Check stock
         if (!items.entrySet().stream().allMatch(entry -> {
             return entry.getKey().getStock().containsKey(store)
@@ -188,7 +188,9 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery);
+        session.save(deliveryDetails);
+
+        Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery, deliveryDetails);
         session.save(order);
 
         store.addOrder(order);
@@ -213,7 +215,7 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer );
+        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer);
         session.save(complaint);
 
         customer.addComplaint(complaint);
@@ -248,7 +250,9 @@ public class DatabaseHandler {
         session.beginTransaction();
 
         Store store = new Store("Example Store", "Example Address");
+        Store chainStore = new Store("Chain Store", "Everywhere");
         session.save(store);
+        session.save(chainStore);
         tryFlushSession(session);
 
         List<List<Path>> imageLists = getRandomOrderedImages();
@@ -295,6 +299,7 @@ public class DatabaseHandler {
         List<Store> stores = new ArrayList<>();
         List<Complaint> complaintList = new ArrayList<>();
         stores.add(store);
+        stores.add(chainStore);
         for (int i = 0; i < 20; i++) {
             String email = "example" + i + "@mail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
@@ -308,7 +313,7 @@ public class DatabaseHandler {
         createOrder(store, (Customer) getUserByUsername("cust1"),
                 randomItems.subList(0, 3).stream().collect(
                         Collectors.toMap(Function.identity(), item -> 2)),
-                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true);
+                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true, new Delivery("Guy Dayan", "0509889939","address", "Hello There", false));
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
@@ -345,10 +350,22 @@ public class DatabaseHandler {
         return complaintList;
     }
 
+    public static List<Order> getOrders() {
+        List<Order> orderList = getAllEntities(Order.class);
+        return orderList;
+    }
+
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
         session.merge(newItem);
+        tryFlushSession(session);
+    }
+
+    public static void updateComplaint(Complaint newComplaint) throws HibernateException {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.merge(newComplaint);
         tryFlushSession(session);
     }
 

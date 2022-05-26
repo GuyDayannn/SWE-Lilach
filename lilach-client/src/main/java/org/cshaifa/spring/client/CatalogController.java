@@ -4,10 +4,17 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Order;
+import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -20,19 +27,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -57,9 +54,7 @@ public class CatalogController {
     @FXML
     private VBox catalogVBox;
     @FXML
-    private MenuBar menuBar;
-    @FXML
-    private Menu shoppingCart;
+    private Button shoppingCart;
     @FXML
     private ComboBox<String> selectedTypeComboBox;
     @FXML
@@ -83,6 +78,8 @@ public class CatalogController {
         Text source = (Text) event.getSource();
         filter_applied = true;
         selectedTypeComboBox.valueProperty().setValue(source.getId());
+        selectedSizeComboBox.valueProperty().setValue(null);
+        selectedColorComboBox.valueProperty().setValue(null);
         refreshList();
     }
 
@@ -108,9 +105,6 @@ public class CatalogController {
         selectedTypeComboBox.valueProperty().setValue(null);
         selectedSizeComboBox.valueProperty().setValue(null);
         selectedColorComboBox.valueProperty().setValue(null);
-        selectedTypeComboBox.getStyleClass().remove("combo-selected");
-        selectedColorComboBox.getStyleClass().remove("combo-selected");
-        selectedSizeComboBox.getStyleClass().remove("combo-selected");
         loPrice.valueProperty().setValue(0);
         hiPrice.valueProperty().setValue(500);
     }
@@ -126,9 +120,7 @@ public class CatalogController {
         clearFilters();
         toolbar.getItems().clear();
         toolbar.getItems().add(welcomeText);
-        toolbar.getItems().add(menuBar);
         salesVBox.getChildren().clear();
-        shoppingCart.getItems().clear();
         initialize();
     }
 
@@ -162,7 +154,7 @@ public class CatalogController {
         vBox.getChildren().addAll(itemName, itemPrice);
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_LEFT);
-        Button viewButton = new Button("View Item");
+        Button viewButton = new Button("View");
         viewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -181,7 +173,13 @@ public class CatalogController {
         addCartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
+                if (App.getCart().containsKey(item)) {
+                    Integer quantity = App.getCart().get(item);
+                    App.getCart().put(item, ++quantity);
+                }
+                else {
+                    App.getCart().put(item, 1);
+                }
             }
         });
         if (App.getCurrentUser() == null) {
@@ -236,6 +234,11 @@ public class CatalogController {
     }
 
     @FXML
+    void openCart(ActionEvent event) {
+        App.popUpLaunch(shoppingCart, "shoppingCart");
+    }
+
+    @FXML
     void salesDisplay() {
         if (!mainHBox.getChildren().contains(salesVBox)) {
             mainHBox.getChildren().add(1, salesVBox);
@@ -274,17 +277,47 @@ public class CatalogController {
                     newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
                     textBox.getChildren().addAll(itemPrice, newItemPrice);
                     textBox.setAlignment(Pos.CENTER);
-                    Button button = new Button("View Item");
-                    button.getStyleClass().add("sale-button");
-                    button.setOnAction(new EventHandler<ActionEvent>() {
+
+                    HBox buttonBox = new HBox();
+                    buttonBox.setAlignment(Pos.CENTER);
+                    Button viewButton = new Button("View Item");
+                    viewButton.getStyleClass().add("sale-button");
+                    viewButton.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
                             App.setCurrentItemDisplayed(item, itemPrice, itemName);
-                            App.popUpLaunch(button, "PopUp");
+                            App.popUpLaunch(viewButton, "PopUp");
                         }
                     });
 
-                    vBox.getChildren().addAll(itemName, iv, textBox, button);
+                    Button addCartButton = new Button();
+                    addCartButton.getStyleClass().add("sale-button");
+                    Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
+                    ImageView ivCart = new ImageView(cartImage);
+                    ivCart.setFitHeight(15);
+                    ivCart.setFitWidth(15);
+                    addCartButton.setGraphic(ivCart);
+                    addCartButton.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            if (App.getCart().containsKey(item)) {
+                                Integer quantity = App.getCart().get(item);
+                                App.getCart().put(item, ++quantity);
+                            }
+                            else {
+                                App.getCart().put(item, 1);
+                            }
+                        }
+                    });
+                    if (App.getCurrentUser() == null) {
+                        buttonBox.getChildren().add(viewButton);
+                    } else if (App.getCurrentUser() instanceof Customer) {
+                        buttonBox.getChildren().addAll(viewButton, addCartButton);
+                    } else {
+                        buttonBox.getChildren().add(viewButton);
+                    }
+
+                    vBox.getChildren().addAll(itemName, iv, textBox, buttonBox);
                     vBox.setSpacing(5);
                     vBox.getStyleClass().add("saleitem");
                     salesVBox.getChildren().add(vBox);
@@ -295,8 +328,10 @@ public class CatalogController {
         if (total_items_on_sale == 0) {
             mainHBox.getChildren().remove(salesVBox);
             catalogVBox.setFillWidth(true);
+            tilePane.setPrefWidth(1040);
         } else {
             catalogVBox.setFillWidth(false);
+            tilePane.setPrefWidth(840);
         }
     }
 
@@ -307,7 +342,7 @@ public class CatalogController {
         catalogTitle.setImage((image));
 
         // Load Toolbar
-        toolbar.getItems().remove(menuBar);
+        toolbar.getItems().remove(shoppingCart);
         Button NewOrderButton = new Button("New Order");
         NewOrderButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -361,7 +396,8 @@ public class CatalogController {
         viewProfileButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (App.getCurrentUser().getClass().toString().equals("Customer")) {
+                if(App.getCurrentUser().getClass().equals(Customer.class)){
+
                     App.setWindowTitle("Customer Profile");
                     try {
                         App.setContent("customerProfile");
@@ -403,34 +439,14 @@ public class CatalogController {
             toolbar.getItems().add(viewProfileButton);
             toolbar.getItems().add(refreshButton);
             toolbar.getItems().add(contactButton);
+            toolbar.getItems().add(shoppingCart);
         }
 
-        toolbar.getItems().add(menuBar);
         Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
         ImageView ivCart = new ImageView(cartImage);
         ivCart.setFitHeight(20);
         ivCart.setFitWidth(20);
         shoppingCart.setGraphic(ivCart);
-
-        if (App.getCurrentUser() == null) {
-            menuBar.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    App.setWindowTitle("register");
-                    try {
-                        App.setContent("customerRegister");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        } else {
-            if (true) {
-                // if cart is empty
-            } else {
-                // if cart isn't empty
-            }
-        }
 
         Task<GetCatalogResponse> getCatalogTask = App.createTimedTask(() -> {
             return ClientHandler.getCatalog();
@@ -473,19 +489,27 @@ public class CatalogController {
         ObservableList<String> typeOptions = FXCollections.observableArrayList("Flower", "Bouquet", "Plant", "Orchid",
                 "Wine", "Chocolate", "Set");
         selectedTypeComboBox.setItems(typeOptions);
-        selectedTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> filter());
+        selectedTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
+            filter();
+
+            if (t1=="Chocolate" || t1=="Set") {
+                selectedColorComboBox.setDisable(true);
+            }
+            else {
+                selectedColorComboBox.setDisable(false);
+            }
+        });
         selectedTypeComboBox.setButtonCell(new ListCell<String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 if (empty || item == null) {
                     setText("Type");
-                    selectedTypeComboBox.getStyleClass().remove("combo-selected");
                 } else {
                     setText(item);
-                    selectedTypeComboBox.getStyleClass().add("combo-selected");
                 }
             }
         });
+
 
         ObservableList<String> colorOptions = FXCollections.observableArrayList("Red", "Orange", "Yellow", "Green",
                 "Blue", "Purple", "Pink", "White", "Black");
@@ -496,10 +520,8 @@ public class CatalogController {
             protected void updateItem(String item, boolean empty) {
                 if (empty || item == null) {
                     setText("Type");
-                    selectedColorComboBox.getStyleClass().remove("combo-selected");
                 } else {
                     setText(item);
-                    selectedColorComboBox.getStyleClass().add("combo-selected");
                 }
             }
         });
@@ -516,9 +538,7 @@ public class CatalogController {
             protected void updateItem(String item, boolean empty) {
                 if (empty || item == null) {
                     setText("Type");
-                    selectedSizeComboBox.getStyleClass().remove("combo-selected");
                 } else {
-                    selectedSizeComboBox.getStyleClass().add("combo-selected");
                     setText(item);
                 }
             }

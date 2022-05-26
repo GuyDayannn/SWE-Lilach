@@ -29,12 +29,16 @@ public class UpdatePopUpController {
     private TextField itemPriceField;
 
     @FXML
+    private TextField itemDiscountField;
+
+    @FXML
     private AnchorPane rootPane;
 
     @FXML
     void initialize() {
         itemNameField.setText("");
         itemPriceField.setText("");
+        itemDiscountField.setText("");
 
         itemPriceField.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -53,6 +57,11 @@ public class UpdatePopUpController {
                     updatedItem.setName(itemNameField.getText());
                 if (!itemPriceField.getText().isEmpty())
                     updatedItem.setPrice(Double.parseDouble(itemPriceField.getText()));
+                if (!itemDiscountField.getText().isEmpty()){
+                    updatedItem.setDiscountPercent(Double.parseDouble(itemDiscountField.getText()));
+                    updatedItem.setOnSale(true);
+                }
+
 
                 return ClientHandler.updateItem(updatedItem);
             }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);

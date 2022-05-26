@@ -3,10 +3,7 @@ package org.cshaifa.spring.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -21,11 +18,11 @@ public class Customer extends User {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Store> stores;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Order> orders;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Complaint> complaintList;
 
