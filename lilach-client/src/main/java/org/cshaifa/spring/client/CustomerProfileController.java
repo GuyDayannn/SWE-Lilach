@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Customer;
@@ -121,8 +122,6 @@ public class CustomerProfileController {
 //    @FXML
 //    private TableColumn<Order, List<CatalogItem>> ordersItemsColumn;
 
-    @FXML
-    private TableColumn<Order, Button> cancelOrderColumn;
 
     private List<Order> customerOrderList = new ArrayList<>();
 
@@ -198,6 +197,43 @@ public class CustomerProfileController {
         Order order = orderTable.getSelectionModel().getSelectedItem();
     }
 
+    private void addButtonToTable() {
+        TableColumn<Order, Void> colBtn = new TableColumn("Cancel Order");
+
+        Callback<TableColumn<Order, Void>, TableCell<Order, Void>> cellFactory = new Callback<TableColumn<Order, Void>, TableCell<Order, Void>>() {
+            @Override
+            public TableCell<Order, Void> call(final TableColumn<Order, Void> param) {
+                final TableCell<Order, Void> cell = new TableCell<Order, Void>() {
+
+                    private final Button btn = new Button("Cancel");
+
+                    {
+                        btn.setOnAction((ActionEvent event) -> {
+                            Order data = getTableView().getItems().get(getIndex());
+                            System.out.println("selectedData: " + data);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        colBtn.setCellFactory(cellFactory);
+
+        orderTable.getColumns().add(colBtn);
+    }
+
+
     @FXML
     public void initialize() {
         if (App.getCurrentUser()!=null) {
@@ -262,13 +298,6 @@ public class CustomerProfileController {
             data.addAll(customerComplaintList);
             complaintTable.setItems(data);
 
-//            List<Text> ids = new ArrayList<>();
-//            for (Complaint complaint : complaintList) {
-//                long id = complaint.getId();
-//                ids.add(new Text(Long.toString(id)));
-//            }
-//            ObservableList<Text> itemsIds = FXCollections.observableArrayList(ids);
-//            itemComboBox.setItems(itemsIds);
 
             App.hideLoading();
 
@@ -339,53 +368,12 @@ public class CustomerProfileController {
 
             Order order = orderTable.getSelectionModel().getSelectedItem();
 
-//            cancelOrderColumn.setCellFactory(cellData ->{
-//                Button cancelBtn = new Button("CancelOrder");
-//                return cancelBtn;
-//                    });
-//            cancelOrderColumn.setCellFactory(newComplaintButton);
-
-           // cancelOrderColumn.setCellFactory(cellData -> new Button());
-//            {
-//                Button cancelButton = new Button("Cancel Order");
-//                //TableCell<Order, Button> cell = new TableCell<Order, Button>(){};
-////                {
-////                    @Override
-////                    public void updateItem(Person person, boolean empty) {
-////                        super.updateItem(person, empty);
-////                        if (empty) {
-////                            setGraphic(null);
-////                        } else {
-////                            setGraphic(editButton);
-////                        }
-////                    }
-////                };
 //
-//                cancelButton.setOnAction(event -> getOrderRow(cellData.getTableRow().getItem().getId()));
-//
-//                return cell ;
-//            });
-
-//            supplyDateColumn.setCellValueFactory(cellData ->{
-//                SimpleDateFormat format =new SimpleDateFormat("dd.MM.yyyy hh:mm");
-//                        SimpleDateFormat supplyFormat = new SimpleDateFormat(format.format(cellData.getValue().getSupplyDate()));
-//                    //new SimpleDateFormat(cellData.getValue().getSupplyDate().toString()));
-//                    return (ObservableValue<Date>) supplyFormat;
-//
-//            });
-
-
-
-//            cancelOrderColumn.setCellValueFactory(cellData ->
-//                    new SimpleBooleanProperty(cellData.getValue().isCompleted()));
-
-//            ordersItemsColumn.setCellValueFactory(cellData ->
-//                    new SimpleStringProperty(cellData.getValue().getItems()));
-
-
 
             data.addAll(customerOrderList);
             orderTable.setItems(data);
+
+            addButtonToTable();
 
             App.hideLoading();
 

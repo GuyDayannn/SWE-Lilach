@@ -206,6 +206,7 @@ public class EmployeeProfileController {
             welcomeText.setText("Welcome, unknown employee");
         }
         //TODO: get all users request
+        //TODO: edit so hide edit catalog for customer service employee
         ChainEmployee chainEmployee = new ChainEmployee();
         StoreManager storeManager = new StoreManager();
         SystemAdmin systemAdmin = new SystemAdmin();

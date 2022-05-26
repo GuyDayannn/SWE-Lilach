@@ -34,7 +34,7 @@
                               <TableColumn fx:id="supplyDateColumn" prefWidth="75.0" text="Supply Date" />
                               <TableColumn fx:id="isCompletedColumn" prefWidth="96.0" text="Is Completed" />
 <!--                              <TableColumn fx:id="ordersItemsColumn" prefWidth="199.0" text="Order's Items" />-->
-                              <TableColumn fx:id="cancelOrderColumn" prefWidth="91.0" text="Cancel Order" />
+<!--                              <TableColumn fx:id="cancelOrderColumn" prefWidth="91.0" text="Cancel Order" />-->
                           </columns>
                         </TableView>
                      </children>
