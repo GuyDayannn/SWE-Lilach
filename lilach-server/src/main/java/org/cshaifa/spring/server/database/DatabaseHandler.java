@@ -1,14 +1,14 @@
 package org.cshaifa.spring.server.database;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -31,8 +31,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 /**
- * This class will handle the server requests to the db
- * like getting the catalog, updating items etc.
+ * This class will handle the server requests to the db like getting the
+ * catalog, updating items etc.
  */
 public class DatabaseHandler {
 
@@ -115,8 +115,7 @@ public class DatabaseHandler {
     }
 
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
-            List<Store> stores, SubscriptionType subscriptionType)
-            throws Exception {
+            List<Store> stores, SubscriptionType subscriptionType) throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -131,8 +130,7 @@ public class DatabaseHandler {
         try {
             String hexSalt = generateHexSalt();
             Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
-                    hexSalt, stores,
-                    false, subscriptionType);
+                    hexSalt, stores, false, subscriptionType);
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
@@ -170,7 +168,6 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
-
     private static List<List<Path>> getRandomOrderedImages() {
         List<List<Path>> imagesLists = new ArrayList<>();
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/flowers", DatabaseHandler.class));
@@ -180,7 +177,7 @@ public class DatabaseHandler {
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/wine", DatabaseHandler.class));
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/chocolate", DatabaseHandler.class));
         imagesLists.add(ImageUtils.getAllImagesFromFolder("images/sets", DatabaseHandler.class));
-        //Collections.shuffle(imagesLists);
+        // Collections.shuffle(imagesLists);
         return imagesLists;
     }
 
@@ -194,37 +191,38 @@ public class DatabaseHandler {
         List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
-        String[] sizes = {"large", "medium", "small"};
-        String[] colors = {"red", "orange", "pink"};
-        String[] itemTypes = {"flower", "bouquet", "plant", "orchid", "wine", "chocolate", "set"};
+        String[] sizes = { "large", "medium", "small" };
+        String[] colors = { "red", "orange", "pink" };
+        String[] itemTypes = { "flower", "bouquet", "plant", "orchid", "wine", "chocolate", "set" };
         int typeInd = 0;
         for (List<Path> imageList : imageLists) {
-            if (imageList!=null) {
+            if (imageList != null) {
                 for (Path imagePath : imageList) {
-                    int randomInt = random.nextInt(0,2);
+                    System.out.println(imagePath.toString());
+                    int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
                     int randomQuantity = random.nextInt(500);
-                    randomItems.add(new CatalogItem(
-                            "Random Item",
-                            imagePath.toUri().toString(),
-                            randomPrice, randomQuantity, false, 0.0,
-                            sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
+                    randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice,
+                            randomQuantity, false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
                 }
             }
             typeInd++;
         }
 
-        //On Sale Items
+        // On Sale Items
         randomItems.remove(0);
-        randomItems.add(0,new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true, 50.0, "large", "flower", "white"));
+        randomItems.add(0, new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true,
+                50.0, "large", "flower", "white"));
         randomItems.remove(1);
-        randomItems.add(1,new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true, 50.0, "medium", "flower", "yellow"));
+        randomItems.add(1, new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true,
+                50.0, "medium", "flower", "yellow"));
 
         for (CatalogItem item : randomItems) {
             session.save(item);
         }
 
-        Store store = new Store("Example Store", "Example Address", new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
+        Store store = new Store("Example Store", "Example Address",
+                new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
         session.save(store);
         tryFlushSession(session);
 
@@ -236,6 +234,8 @@ public class DatabaseHandler {
         }
 
         registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
+        createItem("Flora", 40, false, 0, "large", "flower", "white",
+                ImageUtils.getByteArrayFromURI(imageLists.get(0).get(0).toUri(), DatabaseHandler.class));
 
     }
 
@@ -264,6 +264,44 @@ public class DatabaseHandler {
             }
         }
         return catalogItems;
+    }
+
+    public static CatalogItem createItem(String name, double price, boolean onSale, double discountPercent, String size,
+            String itemType, String itemColor, byte[] image) throws HibernateException {
+        CatalogItem catalogItem = new CatalogItem(name, "", price, 1, onSale, discountPercent, size, itemType,
+                itemColor);
+        catalogItem.setImage(image);
+        Session session = DatabaseConnector.getSession();
+        session.beginTransaction();
+        session.save(catalogItem);
+
+        Path imagesPath = Paths.get(System.getProperty("user.home")).resolve("server-images");
+        if (!Files.exists(imagesPath))
+            try {
+                Files.createDirectory(imagesPath);
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                session.delete(catalogItem);
+                tryFlushSession(session);
+                return null;
+            }
+
+        try {
+            catalogItem.setImagePath(
+                    ImageUtils.saveImage(image, Paths.get(System.getProperty("user.home")).resolve("server-images"),
+                            catalogItem.getId() + ".jpg").toUri().toString());
+        } catch (IOException e) {
+            // Couldn't create image
+            e.printStackTrace();
+            session.delete(catalogItem);
+            tryFlushSession(session);
+            return null;
+        }
+
+        tryFlushSession(session);
+
+        return catalogItem;
     }
 
     public static void updateItem(CatalogItem newItem) throws HibernateException {

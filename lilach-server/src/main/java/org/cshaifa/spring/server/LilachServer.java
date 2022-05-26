@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.requests.CreateItemRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetStoresRequest;
 import org.cshaifa.spring.entities.requests.LoginRequest;
@@ -11,6 +12,7 @@ import org.cshaifa.spring.entities.requests.LogoutRequest;
 import org.cshaifa.spring.entities.requests.RegisterRequest;
 import org.cshaifa.spring.entities.requests.Request;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
+import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetStoresResponse;
 import org.cshaifa.spring.entities.responses.LoginResponse;
@@ -99,6 +101,14 @@ public class LilachServer extends AbstractServer {
                 sendToAllClients(new LogoutResponse(requestId, true));
             } else if (request instanceof GetStoresRequest) {
                 sendToAllClients(new GetStoresResponse(requestId, DatabaseHandler.getStores()));
+            } else if (request instanceof CreateItemRequest createItemRequest) {
+                try {
+                    CatalogItem item = DatabaseHandler.createItem(createItemRequest.getName(), createItemRequest.getPrice(), createItemRequest.isOnSale(), createItemRequest.getDiscountPercent(), createItemRequest.getSize(), createItemRequest.getItemType(), createItemRequest.getItemColor(), createItemRequest.getImage());
+                    sendToAllClients(new CreateItemResponse(requestId, item != null, item));
+                } catch (HibernateException e) {
+                    e.printStackTrace();
+                    sendToAllClients(new CreateItemResponse(requestId, false));
+                }
             }
         } else {
             // TODO: Return a general error message to the client

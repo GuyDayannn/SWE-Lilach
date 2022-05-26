@@ -1,5 +1,6 @@
 package org.cshaifa.spring.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -8,8 +9,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
+import org.cshaifa.spring.utils.ImageUtils;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -38,6 +41,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class CatalogController {
 
@@ -76,7 +81,7 @@ public class CatalogController {
     // Variables
     List<CatalogItem> catalogItems = null;
     private boolean filter_applied = false;
-    private FilteredList<HBox> itemCells = null;
+    private ObservableList<HBox> itemCells = null;
 
     @FXML
     void displayType(MouseEvent event) {
@@ -87,14 +92,12 @@ public class CatalogController {
     }
 
     void refreshList() {
-        itemCells.setPredicate(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.getSource().indexOf(s))));
-        tilePane.getChildren().setAll(itemCells);
+        tilePane.getChildren().setAll(itemCells.filtered(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.indexOf(s)))));
     }
 
     void listDisplay() {
-        itemCells = new FilteredList<HBox>(FXCollections.observableArrayList(catalogItems.stream()
-                .filter(item -> !filter_applied || isInFilter(item)).map(item -> getItemHBox(item)).toList()));
-        tilePane.getChildren().setAll(itemCells);
+        itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item -> getItemHBox(item)).toList());
+        refreshList();
     }
 
     @FXML
@@ -233,6 +236,44 @@ public class CatalogController {
             return false;
         }
         return true;
+    }
+
+    @FXML
+    void onAddItem(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        ExtensionFilter filter = new ExtensionFilter("JPG files (*.jpg)", "*.jpeg", "*.jpg", "*.JPG");
+        chooser.getExtensionFilters().add(filter);
+        File selectedFile = chooser.showOpenDialog(null);
+        if (selectedFile == null)
+            return;
+
+        Task<CreateItemResponse> createItemTask = App.createTimedTask(
+                () -> ClientHandler.createItem("Example", 400, false, 0, "large", "flower", "white",
+                        ImageUtils.getByteArrayFromURI(selectedFile.toURI())),
+                Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        createItemTask.setOnSucceeded(e -> {
+            if (createItemTask.getValue() == null || !createItemTask.getValue().isSuccessful()) {
+                App.hideLoading();
+                return;
+            }
+
+            CreateItemResponse response = createItemTask.getValue();
+            catalogItems.add(response.getItem());
+
+            itemCells.add(getItemHBox(response.getItem()));
+            refreshList();
+            App.hideLoading();
+        });
+
+        createItemTask.setOnFailed(e -> {
+            createItemTask.getException().printStackTrace();
+            App.hideLoading();
+        });
+
+        App.showLoading(rootVBox, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+        new Thread(createItemTask).start();
+
     }
 
     @FXML

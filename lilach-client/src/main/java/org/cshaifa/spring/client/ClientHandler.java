@@ -8,12 +8,14 @@ import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.requests.CreateItemRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetStoresRequest;
 import org.cshaifa.spring.entities.requests.LoginRequest;
 import org.cshaifa.spring.entities.requests.LogoutRequest;
 import org.cshaifa.spring.entities.requests.RegisterRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
+import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetStoresResponse;
 import org.cshaifa.spring.entities.responses.LoginResponse;
@@ -58,6 +60,13 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(updateItemRequest);
         return (UpdateItemResponse) waitForMsgFromServer(updateItemRequest.getRequestId());
+    }
+
+    public static CreateItemResponse createItem(String name, double price, boolean onSale, double discountPercent, String size, String itemType, String itemColor, byte[] image) throws IOException {
+        CreateItemRequest createItemRequest = new CreateItemRequest(name, price, onSale, discountPercent, size, itemType, itemColor, image);
+        client.openConnection();
+        client.sendToServer(createItemRequest);
+        return (CreateItemResponse) waitForMsgFromServer(createItemRequest.getRequestId());
     }
 
     public static LoginResponse loginUser(String username, String password) throws IOException {

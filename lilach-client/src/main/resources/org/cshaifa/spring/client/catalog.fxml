@@ -31,6 +31,7 @@
                 </Menu>
               </menus>
             </MenuBar>
+            <Button mnemonicParsing="false" onAction="#onAddItem" text="Add Item" />
         </items>
       </ToolBar>
       <VBox prefHeight="25.0" prefWidth="1040.0">
