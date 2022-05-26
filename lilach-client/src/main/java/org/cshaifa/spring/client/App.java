@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -45,6 +47,7 @@ public class App extends Application {
     private static Stage appStage;
 
     private static CatalogItem currentItemDisplayed;
+    private static CatalogItem itemByID;
     private static int DataBaseConnected = 0;
     private static Stage loadingStage;
     private static Node loadingRootNode;
@@ -55,6 +58,8 @@ public class App extends Application {
     private static Text currentItemName;
 
     private static User currentUser = null;
+
+    private static Map<CatalogItem, Integer> shoppingCart = new HashMap<>();
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -205,12 +210,23 @@ public class App extends Application {
     }
 
     public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
-        currentItemPrice.setText(Double.toString(updatedItem.getPrice()));
+        if(updatedItem.getDiscount()!=0){
+            double price = updatedItem.getPrice()*(1-updatedItem.getDiscount()/100);
+            currentItemPrice.setText(String.format("%.2f", price));
+        }
+        else{
+            currentItemPrice.setText(Double.toString(updatedItem.getPrice()));
+        }
+
         currentItemName.setText(updatedItem.getName());
     }
 
     static CatalogItem getCurrentItemDisplayed() {
         return currentItemDisplayed;
+    }
+
+    static CatalogItem getItemByID(long itemID) {
+        return itemByID;
     }
 
     public static User getCurrentUser() {
@@ -219,5 +235,13 @@ public class App extends Application {
 
     public static void setCurrentUser(User user) {
         currentUser = user;
+    }
+
+    public static Map<CatalogItem, Integer> getCart() {
+        return shoppingCart;
+    }
+
+    public static void addToCart(CatalogItem item, int quantity) {
+        shoppingCart.put(item, quantity);
     }
 }

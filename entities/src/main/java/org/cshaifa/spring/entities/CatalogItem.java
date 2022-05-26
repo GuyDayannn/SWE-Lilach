@@ -1,14 +1,26 @@
 package org.cshaifa.spring.entities;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name = "catalog_items")
@@ -34,41 +46,40 @@ public class CatalogItem implements Serializable {
 
     private String itemColor;
 
+    private boolean isDefault;
 
     @Transient
     private byte[] image = null;
 
-    private int quantity;
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @CollectionTable(name = "stock", joinColumns = @JoinColumn(name = "catalog_item_id"))
+    @MapKeyJoinColumn(name = "store_id")
+    @Column(name = "quantity")
+    private Map<Store, Integer> stock;
 
     public CatalogItem() {
         super();
         this.name = "";
         this.price = 0;
-        this.quantity = 0;
+        this.stock = new HashMap<>();
         this.onSale = false;
         this.discountPercent = 0.0;
     }
 
-    public CatalogItem(
-            String name,
-            String imagePath,
-            double price,
-            int quantity,
-            boolean onSale,
-            double discountPercent,
-            String size,
-            String itemType,
-            String itemColor) {
+    public CatalogItem(String name, String imagePath, double price, Map<Store, Integer> quantities, boolean onSale,
+            double discountPercent, String size, String itemType, String itemColor, boolean isDefault) {
         super();
         this.name = name;
         this.imagePath = imagePath;
         this.price = price;
-        this.quantity = quantity;
+        this.stock = quantities;
         this.onSale = onSale;
         this.discountPercent = discountPercent;
         this.size = size;
         this.itemType = itemType;
         this.itemColor = itemColor;
+        this.isDefault = true;
     }
 
     public long getId() {
@@ -83,11 +94,11 @@ public class CatalogItem implements Serializable {
         return onSale;
     }
 
-    public void setOnSale(boolean isOnSale){
+    public void setOnSale(boolean isOnSale) {
         this.onSale = isOnSale;
     }
 
-    public void setDiscountPercent(double discountPercent){
+    public void setDiscountPercent(double discountPercent) {
         this.discountPercent = discountPercent;
     }
 
@@ -115,20 +126,25 @@ public class CatalogItem implements Serializable {
         this.price = price;
     }
 
+    public double getFinalPrice() {
+        return new BigDecimal(getPrice() * 0.01 * (100 - getDiscount())).setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+    }
+
     public byte[] getImage() {
-      return image;
+        return image;
     }
 
     public void setImage(byte[] image) {
-      this.image = image;
+        this.image = image;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public Map<Store, Integer> getStock() {
+        return stock;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setStock(Map<Store, Integer> stock) {
+        this.stock = stock;
     }
 
     public String getSize() {
@@ -151,18 +167,33 @@ public class CatalogItem implements Serializable {
         return itemColor;
     }
 
+    public boolean getIsDefault() {
+        return isDefault;
+    }
+
     public void setItemColor(String color) {
         this.itemColor = color;
+    }
+
+    public void setDefault(boolean isDefault){
+        this.isDefault = isDefault;
+    }
+
+    public void reduceQuantity(Store store, int toReduce) {
+        if (!stock.containsKey(store) || toReduce > stock.get(store))
+            return;
+
+        stock.compute(store, (__, quantity) -> quantity - toReduce);
     }
 
     @Override
     public boolean equals(Object obj) {
         CatalogItem temp = (CatalogItem) obj;
-        if(temp.getId() == this.id)
+        if (temp.getId() == this.id)
             return true;
-        else if(temp.getName().equals(this.name))
+        else if (temp.getName().equals(this.name))
             return true;
-        else if(temp.getImagePath().equals(this.imagePath))
+        else if (temp.getImagePath().equals(this.imagePath))
             return true;
 
         return false;

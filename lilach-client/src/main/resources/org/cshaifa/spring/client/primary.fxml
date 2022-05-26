@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
 <Pane fx:id="loadingtitle" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@stylesheets/primary.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PrimaryController">
    <children>
+      <Button layoutX="719.0" layoutY="14.0" mnemonicParsing="false" onAction="#onSettingsClick" prefHeight="33.0" prefWidth="31.0">
+         <graphic>
+            <ImageView fitHeight="41.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/cog.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
       <ImageView fx:id="lilachLogo" fitHeight="112.0" fitWidth="401.0" layoutX="200.0" layoutY="98.0" pickOnBounds="true" preserveRatio="true" />
       <VBox layoutX="240.0" layoutY="262.0" prefHeight="240.0" prefWidth="320.0" spacing="8.0">
          <children>

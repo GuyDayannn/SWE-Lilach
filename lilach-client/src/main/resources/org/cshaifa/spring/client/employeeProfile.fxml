@@ -2,10 +2,8 @@
 
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
@@ -21,47 +19,29 @@
          </font>
       </Text>
       <Button fx:id="exitButton" layoutX="548.0" layoutY="6.0" mnemonicParsing="false" onAction="#exitProfile" prefHeight="27.0" prefWidth="51.0" text="Exit" />
-      <Button fx:id="catalogButton" layoutX="481.0" layoutY="6.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="66.0" text="Catalog" />
+      <Button fx:id="catalogButton" layoutX="437.0" layoutY="6.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="110.0" text="Edit Catalog" />
       <Accordion layoutY="32.0" prefHeight="368.0" prefWidth="600.0">
         <panes>
-          <TitledPane animated="false" text="Update Item">
+          <TitledPane fx:id="paneStoreReport" animated="false" text="View Store Report" visible="true">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" visible="true">
                      <children>
                         <Text layoutX="28.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Item:">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Text>
-                        <ComboBox fx:id="itemComboBox" layoutX="28.0" layoutY="45.0" prefWidth="202.0" />
-                        <Button fx:id="editCatalogButton" layoutX="375.0" layoutY="44.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="134.0" text="Edit Catalog" />
+                        <ComboBox fx:id="itemComboBox" layoutX="28.0" layoutY="45.0" onAction="#showCatalogIds" prefWidth="202.0" />
                      </children>
                   </AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="Update Sales">
+          <TitledPane fx:id="paneChainReport" animated="false" text="View Chain Report">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <TableView fx:id="catalogTable" prefHeight="261.0" prefWidth="600.0">
-                          <columns>
-                              <TableColumn fx:id="selectColumn" prefWidth="50.0" style="-fx-alignment: CENTER;">
-                                  <graphic>
-                                      <CheckBox fx:id="selectAllCheckbox" mnemonicParsing="false" onAction="#selectAll" />
-                                  </graphic>
-                              </TableColumn>
-                            <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID" />
-                            <TableColumn fx:id="itemNameColumn" prefWidth="156.00001525878906" text="Item Name" />
-                              <TableColumn fx:id="itemPriceColumn" prefWidth="73.5999755859375" text="Price" />
-                              <TableColumn fx:id="onsaleColumn" prefWidth="66.4000244140625" text="On Sale" />
-                              <TableColumn fx:id="discountColumn" prefWidth="79.20001220703125" text="Discount" />
-                          </columns>
-                        </TableView>
-                        <Text layoutX="7.0" layoutY="280.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Discount:" wrappingWidth="83.73669052124023" />
-                        <TextField fx:id="discountAmount" layoutX="91.0" layoutY="263.0" prefHeight="26.0" prefWidth="79.0" />
-                        <Button fx:id="updateSalesButton" layoutX="191.0" layoutY="264.0" mnemonicParsing="false" onAction="#updateSales" text="Update" />
-                        <Button fx:id="cancelButton" layoutX="249.0" layoutY="264.0" mnemonicParsing="false" onAction="#cancelUpdate" text="Cancel" />
-                     </children>
+              <AnchorPane fx:id="viewChainReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+<!--                     <children>-->
+<!--                        <Label fx:id="updated_complaint_text" layoutX="54.0" layoutY="247.0" prefHeight="18.0" prefWidth="231.0" />-->
+<!--                     </children>-->
                   </AnchorPane>
             </content>
           </TitledPane>
@@ -71,19 +51,35 @@
                      <children>
                         <ComboBox fx:id="complaintComboBox" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
                         <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
-                        <TextArea fx:id="complaintdescription" layoutX="14.0" layoutY="90.0" prefHeight="186.0" prefWidth="262.0" text="Po yihie teur ha tluna" />
-                        <TextField fx:id="complaintresponse" layoutX="299.0" layoutY="90.0" prefHeight="92.0" prefWidth="262.0" />
+                        <TextArea fx:id="complaintdescription" layoutX="14.0" layoutY="90.0" prefHeight="186.0" prefWidth="262.0" />
+                        <TextField fx:id="complaintresponse" layoutX="299.0" layoutY="90.0" prefHeight="92.0" prefWidth="262.0" text="" />
                         <Text layoutX="15.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
                         <Text layoutX="299.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Response:" />
                         <Button fx:id="viewComplaint" layoutX="175.0" layoutY="29.0" mnemonicParsing="false" onAction="#openComplaint" text="View" />
                         <Text layoutX="299.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Compensation Amount:" />
-                        <TextField fx:id="compensationamount" layoutX="299.0" layoutY="219.0" />
-                        <Button fx:id="closeComplaintButton" layoutX="457.0" layoutY="218.0" mnemonicParsing="false" text="Close Complaint" />
+                        <TextField fx:id="compensationamount" layoutX="299.0" layoutY="219.0" text="" />
+                        <Button fx:id="closeComplaintButton" layoutX="457.0" layoutY="218.0" mnemonicParsing="false" onAction="#closeComplaint" text="Close Complaint" />
                         <Text layoutX="298.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Status:" />
-                        <TextField layoutX="298.0" layoutY="29.0" promptText="Open" />
+                        <TextField fx:id="complaintStatus" layoutX="298.0" layoutY="29.0" text="" />
+                        <Label fx:id="updated_complaint_text" layoutX="383.0" layoutY="259.0" text="" />
                      </children></AnchorPane>
             </content>
           </TitledPane>
+            <TitledPane fx:id="handleUsersPane" animated="false" text="View/Handle Users">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ComboBox fx:id="complaintComboBox1" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
+                        <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select User" />
+                        <Button fx:id="viewComplaint1" layoutX="175.0" layoutY="29.0" mnemonicParsing="false" onAction="#openComplaint" text="View" />
+                        <Button fx:id="closeComplaintButton1" layoutX="457.0" layoutY="218.0" mnemonicParsing="false" onAction="#closeComplaint" text="Edit User" />
+                        <Text layoutX="298.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User Status" />
+                        <TextField fx:id="complaintStatus1" layoutX="298.0" layoutY="29.0" text="" />
+                        <Label fx:id="updated_complaint_text1" layoutX="383.0" layoutY="259.0" text="" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
         </panes>
       </Accordion>
    </children>

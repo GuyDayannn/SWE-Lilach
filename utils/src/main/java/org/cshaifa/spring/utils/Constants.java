@@ -12,8 +12,10 @@ public class Constants {
     public static final String REGISTER_SUCCESS = "You have successfully registered for LiLach";
     public static final String LOGIN_SUCCESS = "You have successfully logged in to LiLach";
     public static final String ALREADY_LOGGED_IN = "You're already logged in on another device. Please log out, then try again";
+    public static final String UPDATED_COMPLAINT = "You've successfully updated complaint";
+    public static final String UPDATED_COMPLAINT_FAILED = "Couldn't update complaint";
 
-    public static final int SERVER_PORT = 8072;
-    public static final long REQUEST_TIMEOUT = 10;
+    public static final int SERVER_PORT = 8166;
+    public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
 }

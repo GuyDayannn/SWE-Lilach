@@ -12,4 +12,10 @@ public class LilachClient extends AbstractClient {
     protected void handleMessageFromServer(Object msg) {
         ClientHandler.msgFromServer = msg;
     }
+
+    @Override
+    protected void connectionClosed() {
+        super.connectionClosed();
+        ClientHandler.connectionClosed = true;
+    }
 }

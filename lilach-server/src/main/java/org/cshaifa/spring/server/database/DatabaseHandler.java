@@ -8,9 +8,15 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -20,7 +26,10 @@ import javax.persistence.criteria.Root;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.ChainEmployee;
+import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Delivery;
+import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.User;
@@ -61,7 +70,7 @@ public class DatabaseHandler {
         if (user == null)
             return null;
 
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<User> query = builder.createQuery(User.class);
         Root<User> root = query.from(User.class);
@@ -75,22 +84,26 @@ public class DatabaseHandler {
             return null;
         }
 
-        return session.createQuery(query).uniqueResult();
+        User userFound = session.createQuery(query).uniqueResult();
+        session.close();
+        return userFound;
     }
 
     public static User getUserByUsername(String username) {
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<User> query = builder.createQuery(User.class);
         Root<User> root = query.from(User.class);
 
         query.select(root).where(builder.equal(root.get("username"), username));
 
-        return session.createQuery(query).uniqueResult();
+        User user = session.createQuery(query).uniqueResult();
+        session.close();
+        return user;
     }
 
     public static void updateLoginStatus(User user, boolean status) throws HibernateException {
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         if (user.isLoggedIn() == !status) {
             if (status)
                 user.login();
@@ -99,23 +112,26 @@ public class DatabaseHandler {
             session.beginTransaction();
             session.merge(user);
             tryFlushSession(session);
-        }
+        } else
+            session.close();
 
     }
 
     public static User getUserByEmail(String email) {
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<User> query = builder.createQuery(User.class);
         Root<User> root = query.from(User.class);
 
         query.select(root).where(builder.equal(root.get("email"), email));
 
-        return session.createQuery(query).uniqueResult();
+        User user = session.createQuery(query).uniqueResult();
+        session.close();
+        return user;
     }
 
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
-            List<Store> stores, SubscriptionType subscriptionType) throws Exception {
+            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -124,13 +140,13 @@ public class DatabaseHandler {
             return Constants.USERNAME_EXISTS;
         }
 
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
         try {
             String hexSalt = generateHexSalt();
             Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
-                    hexSalt, stores, false, subscriptionType);
+                    hexSalt, stores, false, subscriptionType, complaintList);
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
@@ -139,6 +155,7 @@ public class DatabaseHandler {
 
         } catch (Exception e) {
             e.printStackTrace();
+            session.close();
             throw new HibernateException(Constants.FAIL_MSG);
         }
 
@@ -150,7 +167,7 @@ public class DatabaseHandler {
     public static String registerChainEmployee(String fullName, String email, String username, String rawPassword)
             throws HibernateException {
 
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
         try {
@@ -160,6 +177,7 @@ public class DatabaseHandler {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
+            session.close();
             throw new HibernateException(Constants.FAIL_MSG);
         }
 
@@ -167,6 +185,59 @@ public class DatabaseHandler {
 
         return Constants.SUCCESS_MSG;
     }
+
+    public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
+            Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) throws HibernateException {
+        // Check stock
+        if (!items.entrySet().stream().allMatch(entry -> {
+            return entry.getKey().getStock().containsKey(store)
+                    && entry.getValue() <= entry.getKey().getStock().get(store);
+        })) {
+            return null;
+        }
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        session.save(deliveryDetails);
+
+        Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery, deliveryDetails);
+        session.save(order);
+
+        store.addOrder(order);
+        session.merge(store);
+
+        customer.addOrder(order);
+        session.merge(customer);
+
+        // Update stock
+        items.forEach((item, amount) -> {
+            item.reduceQuantity(store, amount);
+            session.merge(item);
+        });
+
+        tryFlushSession(session);
+
+        return order;
+    }
+
+    public static Complaint addComplaint(String complaintDescription, Customer customer) throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer);
+        session.save(complaint);
+
+        customer.addComplaint(complaint);
+        session.merge(customer);
+
+        tryFlushSession(session);
+
+        return complaint;
+    }
+
+
 
     private static List<List<Path>> getRandomOrderedImages() {
         List<List<Path>> imagesLists = new ArrayList<>();
@@ -186,8 +257,15 @@ public class DatabaseHandler {
         if (!getAllEntities(CatalogItem.class).isEmpty())
             return;
 
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
+
+        Store store = new Store("Example Store", "Example Address");
+        Store chainStore = new Store("Chain Store", "Everywhere");
+        session.save(store);
+        session.save(chainStore);
+        tryFlushSession(session);
+
         List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
@@ -198,12 +276,13 @@ public class DatabaseHandler {
         for (List<Path> imageList : imageLists) {
             if (imageList != null) {
                 for (Path imagePath : imageList) {
-                    System.out.println(imagePath.toString());
                     int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
                     int randomQuantity = random.nextInt(500);
-                    randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice,
-                            randomQuantity, false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt]));
+                    Map<Store, Integer> stock = new HashMap<>();
+                    stock.put(store, randomQuantity);
+                    randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
+                            false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
             }
             typeInd++;
@@ -211,40 +290,51 @@ public class DatabaseHandler {
 
         // On Sale Items
         randomItems.remove(0);
-        randomItems.add(0, new CatalogItem("Sale flower", imageLists.get(0).get(0).toUri().toString(), 249.99, 10, true,
-                50.0, "large", "flower", "white"));
+        randomItems.add(0, new CatalogItem("Sale flower",
+        imageLists.get(0).get(0).toUri().toString(), 249.99,
+        new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
         randomItems.remove(1);
-        randomItems.add(1, new CatalogItem("Sale flower", imageLists.get(0).get(1).toUri().toString(), 149.99, 10, true,
-                50.0, "medium", "flower", "yellow"));
+        randomItems.add(1, new CatalogItem("Sale flower",
+        imageLists.get(0).get(1).toUri().toString(), 149.99,
+        new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
+
+        session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
 
         for (CatalogItem item : randomItems) {
             session.save(item);
         }
 
-        Store store = new Store("Example Store", "Example Address",
-                new ArrayList<CatalogItem>(randomItems.subList(0, 5)));
-        session.save(store);
         tryFlushSession(session);
 
         List<Store> stores = new ArrayList<>();
+        List<Complaint> complaintList = new ArrayList<>();
         stores.add(store);
+        stores.add(chainStore);
         for (int i = 0; i < 20; i++) {
             String email = "example" + i + "@mail.com";
-            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE);
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
         }
 
         registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
-        createItem("Flora", 40, false, 0, "large", "flower", "white",
-                ImageUtils.getByteArrayFromURI(imageLists.get(0).get(0).toUri(), DatabaseHandler.class));
+        Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, 3);
 
+        createOrder(store, (Customer) getUserByUsername("cust1"),
+                randomItems.subList(0, 3).stream().collect(
+                        Collectors.toMap(Function.identity(), item -> 2)),
+                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true, new Delivery("Guy Dayan", "0509889939","address", "Hello There", false));
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<T> query = builder.createQuery(c);
         query.from(c);
-        return session.createQuery(query).getResultList();
+        List<T> data = session.createQuery(query).getResultList();
+        session.close();
+        return data;
     }
 
     public static List<Store> getStores() {
@@ -266,12 +356,12 @@ public class DatabaseHandler {
         return catalogItems;
     }
 
-    public static CatalogItem createItem(String name, double price, boolean onSale, double discountPercent, String size,
-            String itemType, String itemColor, byte[] image) throws HibernateException {
-        CatalogItem catalogItem = new CatalogItem(name, "", price, 1, onSale, discountPercent, size, itemType,
-                itemColor);
+    public static CatalogItem createItem(String name, double price, Map<Store, Integer> quantities, boolean onSale, double discountPercent, String size,
+            String itemType, String itemColor, boolean isDefault, byte[] image) throws HibernateException {
+        CatalogItem catalogItem = new CatalogItem(name, "", price, quantities, onSale, discountPercent, size, itemType,
+                itemColor, isDefault);
         catalogItem.setImage(image);
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
         session.save(catalogItem);
 
@@ -304,10 +394,27 @@ public class DatabaseHandler {
         return catalogItem;
     }
 
+    public static List<Complaint> getComplaints() {
+        List<Complaint> complaintList = getAllEntities(Complaint.class);
+        return complaintList;
+    }
+
+    public static List<Order> getOrders() {
+        List<Order> orderList = getAllEntities(Order.class);
+        return orderList;
+    }
+
     public static void updateItem(CatalogItem newItem) throws HibernateException {
-        Session session = DatabaseConnector.getSession();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
         session.merge(newItem);
+        tryFlushSession(session);
+    }
+
+    public static void updateComplaint(Complaint newComplaint) throws HibernateException {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.merge(newComplaint);
         tryFlushSession(session);
     }
 
@@ -315,19 +422,13 @@ public class DatabaseHandler {
         try {
             session.flush();
             session.getTransaction().commit();
+            session.close();
         } catch (Exception e) {
             // TODO: report somewhere
             e.printStackTrace();
             session.getTransaction().rollback();
+            session.close();
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
-    }
-
-    public static void closeSession() {
-        DatabaseConnector.closeSession();
-    }
-
-    public static void openSession() throws HibernateException {
-        DatabaseConnector.getSession();
     }
 }

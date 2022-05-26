@@ -16,14 +16,14 @@
     -fx-border-style: solid none solid none;
 }
 
-.menubar {
+.shoppingcart {
     -fx-background-insets: 5;
     -fx-background-radius: 5;
     -fx-border-color: green;
     -fx-border-radius: 5;
     -fx-border-insets: 5;
 }
-.menubar:hover{
+.shoppingcart:hover{
     -fx-background-color: linear-gradient(#519349, #90ce7f);
     -fx-text-fill: white;
 }
