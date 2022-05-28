@@ -1,7 +1,8 @@
 package org.cshaifa.spring.client;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import java.io.IOException;
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
@@ -30,5 +31,19 @@ public class PaymentDetailsController {
             if (!newValue.isEmpty() && !newValue.matches("^([2-5][0-9])$") && !newValue.matches("^[2-5]$"))
                 expYearField.setText(oldValue);
         });
+    }
+
+    @FXML
+    private void goBack(ActionEvent event) {
+        try {
+            App.setContent("deliveryDetails");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void proceed(ActionEvent event) {
+        // TODO: save details and proceed to final order summary screen
     }
 }
