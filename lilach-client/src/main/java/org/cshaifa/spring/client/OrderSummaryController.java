@@ -197,7 +197,11 @@ public class OrderSummaryController {
             finishButton.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
-                    // TODO: add tranistion to next window
+                    try {
+                        App.setContent("deliveryDetails");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             buttonsBox.getChildren().addAll(backButton, finishButton);
