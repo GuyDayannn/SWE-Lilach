@@ -241,20 +241,35 @@ public class DatabaseHandler {
         return imagesLists;
     }
 
-    public static void initializeDatabaseIfEmpty() throws Exception {
-        // Assume that we initialize only if the catalog is empty
-        if (!getAllEntities(CatalogItem.class).isEmpty())
-            return;
-
+    public static void saveStores(List<Store> stores) {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
-
-        Store store = new Store("Example Store", "Example Address");
-        Store chainStore = new Store("Chain Store", "Everywhere");
-        session.save(store);
-        session.save(chainStore);
+        for (Store store : stores) {
+            session.save(store);
+        }
         tryFlushSession(session);
+    }
 
+    public static void saveItems(List<CatalogItem> items) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        for (CatalogItem item : items) {
+            session.save(item);
+        }
+        tryFlushSession(session);
+    }
+
+    public static List<Store> initStores() {
+        List<Store> stores = new ArrayList<>();
+        for (int i = 0; i<10; i++) {
+            stores.add(new Store("Store"+i, "Address"+i));
+        }
+        stores.add(new Store("Lilach Chain Store", "Everywhere"));
+        return stores;
+    }
+
+    public static List<CatalogItem> initItems(List<Store> stores) {
+        Store store = stores.get(0);
         List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
@@ -267,7 +282,7 @@ public class DatabaseHandler {
                 for (Path imagePath : imageList) {
                     int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
-                    int randomQuantity = random.nextInt(500);
+                    int randomQuantity = random.nextInt(5000,10000);
                     Map<Store, Integer> stock = new HashMap<>();
                     stock.put(store, randomQuantity);
                     randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
@@ -278,42 +293,80 @@ public class DatabaseHandler {
         }
 
         // On Sale Items
-        randomItems.remove(0);
-        randomItems.add(0, new CatalogItem("Sale flower",
-        imageLists.get(0).get(0).toUri().toString(), 249.99,
-        new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
-        randomItems.remove(1);
-        randomItems.add(1, new CatalogItem("Sale flower",
-        imageLists.get(0).get(1).toUri().toString(), 149.99,
-        new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
+        //randomItems.remove(0);
+        //randomItems.add(0, new CatalogItem("Sale flower",
+        //imageLists.get(0).get(0).toUri().toString(), 249.99,
+        //new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
+        //randomItems.remove(1);
+        //randomItems.add(1, new CatalogItem("Sale flower",
+        //imageLists.get(0).get(1).toUri().toString(), 149.99,
+        //new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
 
-        session = DatabaseConnector.getSessionFactory().openSession();
+        return randomItems;
+    }
+
+    public static void createOrders(List<Store> stores, List<CatalogItem> items) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        for (CatalogItem item : randomItems) {
-            session.save(item);
-        }
-
-        tryFlushSession(session);
-
-        List<Store> stores = new ArrayList<>();
-        List<Complaint> complaintList = new ArrayList<>();
-        stores.add(store);
-        stores.add(chainStore);
-        for (int i = 0; i < 20; i++) {
-            String email = "example" + i + "@mail.com";
-            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
-        }
-
-        registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
         Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, 3);
 
-        createOrder(store, (Customer) getUserByUsername("cust1"),
-                randomItems.subList(0, 3).stream().collect(
-                        Collectors.toMap(Function.identity(), item -> 2)),
-                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true, new Delivery("Guy Dayan", "0509889939","address", "Hello There", false));
+        Random random = new Random();
+
+        createOrder(stores.get(random.nextInt(1,15)), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+                items.subList(0, random.nextInt(1,15)).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+                "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
+                new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+
+        /*
+        for (int i=0; i<100; i++) {
+            int store_index = random.nextInt(stores.size());
+            Store store = stores.get(store_index);
+            int item_index = random.nextInt(items.size());
+            createOrder(store, (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+                    items.subList(0, item_index).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+                    "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
+                    new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+        }
+        */
+    }
+
+    public static void createUsers(List<Store> stores) throws Exception {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        List<Complaint> complaintList = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            String email = "example" + i + "@mail.com";
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
+        }
+        for (int i = 1; i <= 20; i++) {
+            registerChainEmployee("Employee"+i, "Employee"+i+"@lilach.co.il", "Employee"+i, "Employee"+i);
+        }
+    }
+
+    public static void initializeDatabaseIfEmpty() throws Exception {
+        // Assume that we initialize only if the catalog is empty
+        if (!getAllEntities(CatalogItem.class).isEmpty())
+            return;
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        List<Store> stores = initStores();
+        saveStores(stores);
+        List<CatalogItem> items = initItems(stores);
+        saveItems(items);
+
+        session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        createUsers(stores);
+        createOrders(stores, items);
+
+
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {

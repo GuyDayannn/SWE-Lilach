@@ -62,7 +62,7 @@
                         </Text>
                         <DatePicker fx:id="endDatePicker" layoutX="332.0" layoutY="122.0" onAction="#setEndDate" />
                         <Button fx:id="generateReportButton" layoutX="28.0" layoutY="187.0" mnemonicParsing="false" onAction="#generateReport" prefWidth="110.0" text="Generate Report" />
-                        <Button fx:id="viewReportButton" disable="false" layoutX="149.0" layoutY="187.0" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
+                        <Button fx:id="viewReportButton" disable="true" layoutX="149.0" layoutY="187.0" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
                      </children>
                   </AnchorPane>
             </content>

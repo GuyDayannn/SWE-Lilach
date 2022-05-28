@@ -294,6 +294,7 @@ public class EmployeeProfileController {
             storesList = response.getStores();
 
             for (Store store : storesList) {
+                System.out.println(store.getName());
                 storeComboBox.getItems().add(store.getName());
             }
         });
