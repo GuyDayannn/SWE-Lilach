@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -60,6 +61,20 @@ public class App extends Application {
     private static User currentUser = null;
 
     private static Map<CatalogItem, Integer> shoppingCart = new HashMap<>();
+
+    private static String recipientFirstName = null;
+
+    private static String recipientLastName = null;
+
+    private static String recipientAddress = null;
+
+    private static String message = null;
+
+    private static String customerPhoneNumber = null;
+
+    private static Timestamp supplyDate = null;
+
+
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -244,4 +259,28 @@ public class App extends Application {
     public static void addToCart(CatalogItem item, int quantity) {
         shoppingCart.put(item, quantity);
     }
+
+    public static String getRecipientFirstName() { return recipientFirstName; }
+
+    public static void setRecipientFirstName(String firstName) { App.recipientFirstName = firstName; }
+
+    public static String getRecipientLastName() { return recipientLastName; }
+
+    public static void setRecipientLastName(String lastName) { App.recipientLastName = lastName; }
+
+    public static String getRecipientAddress() { return recipientAddress; }
+
+    public static void setRecipientAddress(String address) { App.recipientAddress = address; }
+
+    public static String getMessage() { return message; }
+
+    public static void setMessage(String message) { App.message = message; }
+
+    public static String getCustomerPhoneNumber() { return customerPhoneNumber; }
+
+    public static void setCustomerPhoneNumber(String phoneNumber) { App.customerPhoneNumber = phoneNumber; }
+
+    public static Timestamp getSupplyDate() { return supplyDate; }
+
+    public static void setSupplyDate(Timestamp supplyDate) { App.supplyDate = supplyDate; }
 }
