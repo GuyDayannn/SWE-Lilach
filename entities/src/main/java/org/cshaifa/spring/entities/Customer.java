@@ -67,6 +67,8 @@ public class Customer extends User {
 
     public List<Order> getOrders() { return orders; }
 
+    public void removeOrder(Order order) { orders.remove(order); }
+
     public void addOrder(Order order) {this.orders.add(order); }
 
     public List<Store> getStores() {

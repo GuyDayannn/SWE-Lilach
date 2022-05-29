@@ -409,6 +409,30 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
+    public static void updateOrders(Order order) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        Customer customer = order.getCustomer();
+        customer.removeOrder(order);
+        order.deleteCustomer();
+        Store store = order.getStore();
+        store.removeOrder(order);
+
+        try {
+            session.update(customer);
+            session.update(order);
+            session.update(store);
+            session.delete(order);
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.merge(customer);
+            session.merge(order);
+            session.merge(store);
+        }
+        //updateDB(session, order);
+        tryFlushSession(session);
+    }
+
     private static <T> void updateDB(Session session, T toUpdate) {
         try {
             session.update(toUpdate);
@@ -431,4 +455,6 @@ public class DatabaseHandler {
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
     }
+
+
 }

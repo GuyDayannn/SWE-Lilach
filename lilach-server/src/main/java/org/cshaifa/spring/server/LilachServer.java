@@ -64,6 +64,15 @@ public class LilachServer extends AbstractServer {
                         e.printStackTrace();
                         client.sendToClient(new UpdateComplaintResponse(requestId, false));
                     }
+                }else if (request instanceof UpdateOrdersRequest updateOrdersRequest) {
+                    Order order = updateOrdersRequest.getUpdatedOrders();
+                    try {
+                        DatabaseHandler.updateOrders(order);
+                        client.sendToClient(new UpdateOrdersResponse(requestId, order));
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
+                        client.sendToClient(new UpdateOrdersResponse(requestId, false));
+                    }
 
                 } else if (request instanceof LoginRequest loginRequest) {
                     User user = DatabaseHandler.loginUser(loginRequest.getUsername(), loginRequest.getPassword());

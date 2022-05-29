@@ -29,10 +29,10 @@
                         <TableView fx:id="orderTable" layoutY="18.0" prefHeight="363.0" prefWidth="687.0">
                           <columns>
                             <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="Order ID" />
-                            <TableColumn fx:id="orderSumColumn" prefWidth="75.0" text="Order Sum" />
-                              <TableColumn fx:id="orderDateColumn" prefWidth="75.0" text="Order Date" />
-                              <TableColumn fx:id="supplyDateColumn" prefWidth="75.0" text="Supply Date" />
-                              <TableColumn fx:id="isCompletedColumn" prefWidth="96.0" text="Is Completed" />
+                            <TableColumn fx:id="orderSumColumn" prefWidth="95.0" text="Order Sum" />
+                              <TableColumn fx:id="orderDateColumn" prefWidth="121.0" text="Order Date" />
+                              <TableColumn fx:id="supplyDateColumn" prefWidth="127.0" text="Supply Date" />
+                              <TableColumn fx:id="isCompletedColumn" prefWidth="151.0" text="Is Completed" />
 <!--                              <TableColumn fx:id="ordersItemsColumn" prefWidth="199.0" text="Order's Items" />-->
 <!--                              <TableColumn fx:id="cancelOrderColumn" prefWidth="91.0" text="Cancel Order" />-->
                           </columns>
@@ -73,5 +73,6 @@
       </TabPane>
       <Button fx:id="signOutButton" layoutX="723.0" layoutY="3.0" mnemonicParsing="false" onAction="#logOut" text="Sign Out" />
       <Button fx:id="viewCatalogButton" layoutX="623.0" layoutY="3.0" mnemonicParsing="false" onAction="#openCatalog" text="View Catalog" />
+      <Button fx:id="refreshBtn" layoutX="555.0" layoutY="4.0" mnemonicParsing="false" onAction="#refreshProfile" text="Refresh" />
    </children>
 </AnchorPane>
