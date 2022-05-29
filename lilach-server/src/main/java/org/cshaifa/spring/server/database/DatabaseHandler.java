@@ -269,7 +269,6 @@ public class DatabaseHandler {
     }
 
     public static List<CatalogItem> initItems(List<Store> stores) {
-        Store store = stores.get(0);
         List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
@@ -282,9 +281,7 @@ public class DatabaseHandler {
                 for (Path imagePath : imageList) {
                     int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
-                    int randomQuantity = random.nextInt(5000,10000);
-                    Map<Store, Integer> stock = new HashMap<>();
-                    stock.put(store, randomQuantity);
+                    Map<Store, Integer> stock = stores.stream().collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
                     randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
                             false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
@@ -306,17 +303,14 @@ public class DatabaseHandler {
     }
 
     public static void createOrders(List<Store> stores, List<CatalogItem> items) {
-        Session session = DatabaseConnector.getSessionFactory().openSession();
-        session.beginTransaction();
-
         Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, 3);
 
         Random random = new Random();
 
-        createOrder(stores.get(random.nextInt(1,15)), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
-                items.subList(0, random.nextInt(1,15)).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+        createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+                items.subList(0, random.nextInt(1, items.size())).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
                 "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
                 new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
 
@@ -334,9 +328,6 @@ public class DatabaseHandler {
     }
 
     public static void createUsers(List<Store> stores) throws Exception {
-        Session session = DatabaseConnector.getSessionFactory().openSession();
-        session.beginTransaction();
-
         List<Complaint> complaintList = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
             String email = "example" + i + "@mail.com";
@@ -352,21 +343,13 @@ public class DatabaseHandler {
         if (!getAllEntities(CatalogItem.class).isEmpty())
             return;
 
-        Session session = DatabaseConnector.getSessionFactory().openSession();
-        session.beginTransaction();
-
         List<Store> stores = initStores();
         saveStores(stores);
         List<CatalogItem> items = initItems(stores);
         saveItems(items);
 
-        session = DatabaseConnector.getSessionFactory().openSession();
-        session.beginTransaction();
-
         createUsers(stores);
         createOrders(stores, items);
-
-
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
