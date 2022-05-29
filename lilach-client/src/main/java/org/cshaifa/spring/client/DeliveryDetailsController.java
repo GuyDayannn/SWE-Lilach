@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -50,31 +51,52 @@ public class DeliveryDetailsController {
     @FXML
     private Label notificationLabel;
 
+    private void recoverSavedData() {
+        if (!App.isEnteredSupplyDetails())
+            return;
+
+        if (App.isOrderDelivery()) {
+            supplyMethodSelector.getSelectionModel().selectLast();
+            deliveryDetailsVBox.setVisible(true);
+        } else {
+            supplyMethodSelector.getSelectionModel().selectFirst();
+            return;
+        }
+
+        firstNameField.setText(App.getRecipientFirstName());
+        lastNameField.setText(App.getRecipientLastName());
+        deliveryAddressField.setText(App.getRecipientAddress());
+        messageField.setText(App.getMessage());
+        phoneNumberField.setText(App.getCustomerPhoneNumber());
+        deliveryDatePicker.setValue(App.getSupplyDate().toLocalDateTime().toLocalDate());
+        deliveryTimeSelector.setValue(new SimpleDateFormat("HH:mm").format(App.getSupplyDate()));
+    }
+
     @FXML
     void initialize() {
         supplyMethodSelector.setItems(FXCollections.observableArrayList("Self Pickup - 0$", "Delivery - 30$"));
         supplyMethodSelector.getSelectionModel().selectFirst();
         deliveryDetailsVBox.setVisible(false);
-        //function printing all hours in day intervals of 30 minutes from 'current'
-        //TODO: need to start from 3 hours from now and put it in list
+        // function printing all hours in day intervals of 30 minutes from 'current'
+        // TODO: need to start from 3 hours from now and put it in list
         DateFormat df = new SimpleDateFormat("HH:mm");
-        Calendar current = Calendar.getInstance();
-        current.set(Calendar.HOUR_OF_DAY, 0);
-        current.set(Calendar.MINUTE, 0);
-        current.set(Calendar.SECOND, 0);
-        System.out.println(df.format(current.getTime()));
-        current.add(Calendar.HOUR_OF_DAY, 3);
-        Calendar cal = Calendar.getInstance();
-        System.out.println("BARRIER!!!");
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        int startDate = cal.get(Calendar.DATE);
-        while (cal.get(Calendar.DATE) == startDate) {
-            if(cal.after(current) || cal.equals(current))
-                System.out.println(df.format(cal.getTime()));
-            cal.add(Calendar.MINUTE, 30);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.add(Calendar.HOUR_OF_DAY, 3);
+        int startDate = calendar.get(Calendar.DATE);
+        List<String> times = new ArrayList<>();
+        while (calendar.get(Calendar.DATE) == startDate) {
+            times.add(df.format(calendar.getTime()));
+            calendar.add(Calendar.MINUTE, 30);
         }
+
+        deliveryTimeSelector.setItems(FXCollections.observableArrayList(times));
+        phoneNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d{0,10}"))
+                phoneNumberField.setText(oldValue);
+        });
+
+        recoverSavedData();
     }
 
     @FXML
@@ -93,11 +115,15 @@ public class DeliveryDetailsController {
 
     @FXML
     private void proceed(ActionEvent event) {
-        if(supplyMethodSelector.getSelectionModel().getSelectedIndex() == 1) {
-            if(firstNameField.getText().isEmpty() || lastNameField.getText().isEmpty() || deliveryAddressField.getText().isEmpty()
-            || phoneNumberField.getText().isEmpty() || phoneNumberField.getText().isEmpty() || deliveryAddressField.getText().isEmpty()) {
-                System.out.println("Do not leave any field empty");
-                notificationLabel.setText("Do not leave any field except message empty");
+        boolean delivery = supplyMethodSelector.getSelectionModel().getSelectedIndex() == 1;
+        App.setOrderDelivery(delivery);
+        if (delivery) {
+            if (firstNameField.getText().isEmpty() || lastNameField.getText().isEmpty()
+                    || deliveryAddressField.getText().isEmpty() || !phoneNumberField.getText().matches("\\d{9,10}")
+                    || phoneNumberField.getText().isEmpty() || deliveryAddressField.getText().isEmpty()
+                    || deliveryDatePicker.getValue() == null) {
+                System.out.println("Not all fields are valid");
+                notificationLabel.setText("Not all fields are valid");
                 notificationLabel.setTextFill(Color.RED);
                 return;
             }
@@ -107,22 +133,12 @@ public class DeliveryDetailsController {
             App.setRecipientAddress(deliveryAddressField.getText().strip());
             App.setMessage(messageField.getText().strip());
             App.setCustomerPhoneNumber(phoneNumberField.getText().strip());
-            App.setSupplyDate(Timestamp.valueOf(deliveryDatePicker.getValue().atTime(15, 30)));
-            /*
-            System.out.println(App.getRecipientFirstName() + " " + App.getRecipientLastName());
-            System.out.println(App.getRecipientAddress());
-            System.out.println(App.getMessage());
-            System.out.println(App.getCustomerPhoneNumber());
-            System.out.println(App.getSupplyDate());
-             */
-        } else {
-            App.setRecipientFirstName(null);
-            App.setRecipientLastName(null);
-            App.setRecipientAddress(null);
-            App.setMessage(null);
-            App.setCustomerPhoneNumber(null);
-            App.setSupplyDate(null);
+            // TODO: add times of delivery
+            App.setSupplyDate(Timestamp.valueOf(deliveryDatePicker.getValue()
+                    .atTime(LocalTime.parse(deliveryTimeSelector.getValue(), DateTimeFormatter.ofPattern("HH:mm")))));
         }
+
+        App.setEnteredSupplyDetails(true);
 
         try {
             App.setContent("paymentDetails");
@@ -130,7 +146,5 @@ public class DeliveryDetailsController {
             e.printStackTrace();
         }
     }
-
-
 
 }

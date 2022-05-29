@@ -74,7 +74,15 @@ public class App extends Application {
 
     private static Timestamp supplyDate = null;
 
+    private static boolean orderDelivery;
 
+    private static String cardNumber;
+
+    private static String cardCvv;
+
+    private static String cardExpDate;
+
+    private static boolean enteredSupplyDetails = false;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -283,4 +291,45 @@ public class App extends Application {
     public static Timestamp getSupplyDate() { return supplyDate; }
 
     public static void setSupplyDate(Timestamp supplyDate) { App.supplyDate = supplyDate; }
+
+    public static boolean isOrderDelivery() {
+        return orderDelivery;
+    }
+
+    public static void setOrderDelivery(boolean orderDelivery) {
+        App.orderDelivery = orderDelivery;
+    }
+
+    public static String getCardNumber() {
+        return cardNumber;
+    }
+
+    public static void setCardNumber(String cardNumber) {
+        App.cardNumber = cardNumber;
+    }
+
+    public static String getCardCvv() {
+        return cardCvv;
+    }
+
+    public static void setCardCvv(String cardCvv) {
+        App.cardCvv = cardCvv;
+    }
+
+    public static String getCardExpDate() {
+        return cardExpDate;
+    }
+
+    public static void setCardExpDate(String cardExpDate) {
+        App.cardExpDate = cardExpDate;
+    }
+
+    public static boolean isEnteredSupplyDetails() {
+        return enteredSupplyDetails;
+    }
+
+    public static void setEnteredSupplyDetails(boolean enteredSupplyDetails) {
+        App.enteredSupplyDetails = enteredSupplyDetails;
+    }
+
 }
