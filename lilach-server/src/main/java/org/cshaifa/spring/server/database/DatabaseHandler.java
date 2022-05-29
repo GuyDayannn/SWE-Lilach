@@ -8,7 +8,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -21,7 +20,15 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.*;
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.ChainEmployee;
+import org.cshaifa.spring.entities.Complaint;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Delivery;
+import org.cshaifa.spring.entities.Order;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.SubscriptionType;
+import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -99,7 +106,7 @@ public class DatabaseHandler {
             else
                 user.logout();
             session.beginTransaction();
-            session.merge(user);
+            updateDB(session, user);
             tryFlushSession(session);
         } else
             session.close();
@@ -139,7 +146,7 @@ public class DatabaseHandler {
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
-                session.merge(store);
+                updateDB(session, store);
             }
 
         } catch (Exception e) {
@@ -194,15 +201,15 @@ public class DatabaseHandler {
         session.save(order);
 
         store.addOrder(order);
-        session.merge(store);
+        updateDB(session, store);
 
         customer.addOrder(order);
-        session.merge(customer);
+        updateDB(session, customer);
 
         // Update stock
         items.forEach((item, amount) -> {
             item.reduceQuantity(store, amount);
-            session.merge(item);
+            updateDB(session, item);
         });
 
         tryFlushSession(session);
@@ -219,7 +226,7 @@ public class DatabaseHandler {
         session.save(complaint);
 
         customer.addComplaint(complaint);
-        session.merge(customer);
+        updateDB(session, customer);
 
         tryFlushSession(session);
 
@@ -309,22 +316,19 @@ public class DatabaseHandler {
 
         Random random = new Random();
 
-        createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
-                items.subList(0, random.nextInt(1, items.size())).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
-                "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
-                new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+        // createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+        //         items.subList(0, random.nextInt(1, items.size())).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+        //         "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
+        //         new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
 
-        /*
+
         for (int i=0; i<100; i++) {
-            int store_index = random.nextInt(stores.size());
-            Store store = stores.get(store_index);
             int item_index = random.nextInt(items.size());
-            createOrder(store, (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+            createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
                     items.subList(0, item_index).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
                     "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
                     new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
         }
-        */
     }
 
     public static void createUsers(List<Store> stores) throws Exception {
@@ -394,15 +398,24 @@ public class DatabaseHandler {
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
-        session.merge(newItem);
+        updateDB(session, newItem);
         tryFlushSession(session);
     }
 
     public static void updateComplaint(Complaint newComplaint) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
-        session.merge(newComplaint);
+        updateDB(session, newComplaint);
         tryFlushSession(session);
+    }
+
+    private static <T> void updateDB(Session session, T toUpdate) {
+        try {
+            session.update(toUpdate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.merge(toUpdate);
+        }
     }
 
     public static void tryFlushSession(Session session) throws HibernateException {
