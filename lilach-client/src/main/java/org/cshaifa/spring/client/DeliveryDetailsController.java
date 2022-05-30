@@ -15,10 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -56,6 +53,9 @@ public class DeliveryDetailsController {
     private ComboBox<String> deliveryTimeSelector;
 
     @FXML
+    private CheckBox immediateCheckbox;
+
+    @FXML
     private ComboBox<String> storeSelector;
 
     @FXML
@@ -73,8 +73,11 @@ public class DeliveryDetailsController {
         if (App.isOrderDelivery()) {
             supplyMethodSelector.getSelectionModel().selectLast();
             deliveryDetailsVBox.setVisible(true);
+            storeSelector.setVisible(false);
         } else {
             supplyMethodSelector.getSelectionModel().selectFirst();
+            deliveryDetailsVBox.setVisible(false);
+            storeSelector.setVisible(true);
             return;
         }
 
@@ -130,6 +133,14 @@ public class DeliveryDetailsController {
     }
 
     @FXML
+    private void changeImmediate(ActionEvent event) {
+        deliveryTimeSelector.setDisable(immediateCheckbox.isSelected());
+        if(immediateCheckbox.isSelected()) {
+            deliveryTimeSelector.setValue(deliveryTimeSelector.getItems().get(0));
+        }
+    }
+
+    @FXML
     private void goBack(ActionEvent event) {
         try {
             App.setContent("orderSummary");
@@ -159,8 +170,9 @@ public class DeliveryDetailsController {
             App.setMessage(messageField.getText().strip());
             App.setCustomerPhoneNumber(phoneNumberField.getText().strip());
             // TODO: add times of delivery
+            String chosenTime = immediateCheckbox.isSelected() ? deliveryTimeSelector.getItems().get(0) : deliveryTimeSelector.getValue();
             App.setSupplyDate(Timestamp.valueOf(deliveryDatePicker.getValue()
-                    .atTime(LocalTime.parse(deliveryTimeSelector.getValue(), DateTimeFormatter.ofPattern("HH:mm")))));
+                    .atTime(LocalTime.parse(chosenTime, DateTimeFormatter.ofPattern("HH:mm")))));
         } else {
             App.setPickupStore(stores.get(storeSelector.getSelectionModel().getSelectedIndex()));
         }
