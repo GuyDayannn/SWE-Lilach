@@ -152,6 +152,22 @@ public class OrderConfirmationController {
         }
     }
 
+    private void clearCart() {
+        App.getCart().clear();
+        App.setRecipientFirstName(null);
+        App.setRecipientLastName(null);
+        App.setRecipientAddress(null);
+        App.setMessage(null);
+        App.setCustomerPhoneNumber(null);
+        App.setSupplyDate(null);
+        App.setPickupStore(null);
+        App.setEnteredSupplyDetails(false);
+
+        App.setCardNumber(null);
+        App.setCardExpDate(null);
+        App.setCardCvv(null);
+    }
+
     @FXML
     private void placeOrder(ActionEvent event) {
         // TODO: add store
@@ -180,6 +196,8 @@ public class OrderConfirmationController {
             }
 
             ((Customer) App.getCurrentUser()).addOrder(createOrderTask.getValue().getOrder());
+            clearCart();
+
             App.hideLoading();
             try {
                 App.setContent("catalog");
