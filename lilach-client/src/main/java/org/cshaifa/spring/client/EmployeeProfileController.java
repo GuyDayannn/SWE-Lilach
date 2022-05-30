@@ -335,10 +335,12 @@ public class EmployeeProfileController {
             getStoresTask.getException().printStackTrace();
         });
         try {
-            Thread t = new Thread(getComplaintsTask);
-            t.start();
-            t.join();
-            new Thread(getStoresTask).start();
+            Thread t1 = new Thread(getComplaintsTask);
+            t1.start();
+            t1.join();
+            Thread t2 = new Thread(getStoresTask);
+            t2.start();
+            t2.join();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
 

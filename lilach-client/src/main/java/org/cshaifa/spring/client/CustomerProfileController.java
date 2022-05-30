@@ -94,6 +94,9 @@ public class CustomerProfileController {
     private TableColumn<Complaint, Double> complaintCompensationAmountColumn;
 
     @FXML
+    private TableColumn<Order, Void> colBtn = new TableColumn("Cancel Order");
+
+    @FXML
     private Label invalid_customer_text;
 
     @FXML
@@ -130,9 +133,10 @@ public class CustomerProfileController {
 
 
     @FXML
-    void refreshProfile(ActionEvent event) throws IOException {
+    void refreshProfile(ActionEvent event)  {
         customerOrderList.clear();
         customerComplaintList.clear();
+        orderTable.getColumns().remove(colBtn);
         initialize();
     }
 
@@ -151,134 +155,133 @@ public class CustomerProfileController {
 
     @FXML
     void sendComplaint(ActionEvent event) throws ExecutionException, InterruptedException {
-       if(customer!=null&& !complaintDescription.getText().isEmpty())
-            {   int storeID = storesComboBox.getValue().intValue();
-                Store store = storeList.get(storeID);
-                Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
-                    System.out.printf("customer is: ",  customer.getUsername());
-                    System.out.printf("%d%n", customer.getId());
+        if (customer != null && !complaintDescription.getText().isEmpty()) {
+            int storeID = storesComboBox.getValue().intValue();
+            Store store = storeList.get(storeID);
+            Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
+                System.out.printf("customer is: ", customer.getUsername());
+                System.out.printf("%d%n", customer.getId());
 //                    Complaint complaint = new Complaint();
 //                    complaint.setCustomer(customer);
 //                    complaint.setComplaintOpen(true);
 //                    complaint.setComplaintDescription(complaintDescription.getText().strip());
 //                    complaint.setComplaintResponse("");
-                    //customer.addComplaint(complaint);
-                    //complaintList.getItems().add(complaint); //adding new complaint in UI
-                    return ClientHandler.addComplaint(complaintDescription.getText().strip(), customer, store);
-                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+                //customer.addComplaint(complaint);
+                //complaintList.getItems().add(complaint); //adding new complaint in UI
+                return ClientHandler.addComplaint(complaintDescription.getText().strip(), customer, store);
+            }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-                addComplaintTask.setOnSucceeded(e2 -> {
-                    AddComplaintResponse response2 = addComplaintTask.getValue();
-                    complaintDescription.setText("");
-                    storesComboBox.valueProperty().setValue(null);
-                    if (!response2.isSuccessful()) {
-                        // TODO: maybe log the specific exception somewhere
-                        App.hideLoading();
-                        System.err.println("Add complaint failed!");
-                    }
-                });
+            addComplaintTask.setOnSucceeded(e2 -> {
+                AddComplaintResponse response2 = addComplaintTask.getValue();
+                complaintDescription.setText("");
+                storesComboBox.valueProperty().setValue(null);
+                if (!response2.isSuccessful()) {
+                    // TODO: maybe log the specific exception somewhere
+                    App.hideLoading();
+                    System.err.println("Add complaint failed!");
+                }
+            });
 
-                addComplaintTask.setOnFailed(e2 -> {
-                    // TODO: maybe properly log it somewhere
-                    System.out.println("Add complaint failed!");
-                    added_complaint_text.setText(Constants.UPDATED_COMPLAINT_FAILED);
-                    added_complaint_text.setTextFill(Color.RED);
-                    addComplaintTask.getException().printStackTrace();
-                });
-
-                new Thread(addComplaintTask).start();
-                System.out.println("Add complaint Success!");
-                added_complaint_text.setText(Constants.UPDATED_COMPLAINT);
-                added_complaint_text.setTextFill(Color.GREEN);
+            addComplaintTask.setOnFailed(e2 -> {
+                // TODO: maybe properly log it somewhere
+                System.out.println("Add complaint failed!");
+                added_complaint_text.setText(Constants.UPDATED_COMPLAINT_FAILED);
+                added_complaint_text.setTextFill(Color.RED);
+                addComplaintTask.getException().printStackTrace();
+            });
+            try {
+                Thread t = new Thread(addComplaintTask);
+                t.start();
+                t.join();
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
             }
-            else{
-                invalid_customer_text.setText("failed to get customer ");
-                invalid_customer_text.setTextFill(Color.RED);
-            }
+
+            System.out.println("Add complaint Success!");
+            added_complaint_text.setText(Constants.UPDATED_COMPLAINT);
+            added_complaint_text.setTextFill(Color.GREEN);
+        } else {
+            invalid_customer_text.setText("failed to get customer ");
+            invalid_customer_text.setTextFill(Color.RED);
         }
-
+    }
 
 
     private void addButtonToTable() { //adding cancel order button
 
-        TableColumn<Order, Void> colBtn = new TableColumn("Cancel Order");
-        if (!orderTable.getColumns().contains(colBtn)) {
-            Callback<TableColumn<Order, Void>, TableCell<Order, Void>> cellFactory = new Callback<TableColumn<Order, Void>, TableCell<Order, Void>>() {
-                @Override
-                public TableCell<Order, Void> call(final TableColumn<Order, Void> param) {
-                    final TableCell<Order, Void> cell = new TableCell<Order, Void>() {
+        Callback<TableColumn<Order, Void>, TableCell<Order, Void>> cellFactory = new Callback<TableColumn<Order, Void>, TableCell<Order, Void>>() {
+            @Override
+            public TableCell<Order, Void> call(final TableColumn<Order, Void> param) {
+                final TableCell<Order, Void> cell = new TableCell<Order, Void>() {
 
-                        private final Button btn = new Button("Cancel");
-                        {
-                            btn.setOnAction((ActionEvent event) -> {
-                                Order data = getTableView().getItems().get(getIndex());
+                    private final Button btn = new Button("Cancel");
 
-                                Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                                if(nowTimestamp.getTime() - data.getSupplyDate().getTime()>=3 ){
-                                        //return customer full amount
-                                    //TODO
-                                    }
-                                else if(nowTimestamp.getTime() - data.getSupplyDate().getTime()>=1 ){
-                                    //return customer 50% of order sum
+                    {
+                        btn.setOnAction((ActionEvent event) -> {
+                            Order data = getTableView().getItems().get(getIndex());
+
+                            Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                            if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 3) {
+                                //return customer full amount
+                                //TODO
+                            } else if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 1) {
+                                //return customer 50% of order sum
+                            } else {
+                                //not returning customer
+                            }
+
+                            Task<UpdateOrdersResponse> removeOrderTask = App.createTimedTask(() -> {
+                                return ClientHandler.updateOrders(data);
+                            }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+                            removeOrderTask.setOnSucceeded(e -> {
+                                UpdateOrdersResponse response = removeOrderTask.getValue();
+                                ordersList.remove(data);//remove in UI locally
+                                customerOrderList.remove(data);
+                                cancelOrderText.setText(Constants.CANCEL_ORDER);
+                                cancelOrderText.setTextFill(Color.GREEN);
+
+                                //TODO: remove in UI
+                                if (!response.isSuccessful()) {
+                                    // TODO: maybe log the specific exception somewhere
+                                    App.hideLoading();
+                                    System.err.println("Cancel oeder failed!");
                                 }
-                                else{
-                                    //not returning customer
-                                }
-
-                                Task<UpdateOrdersResponse> removeOrderTask = App.createTimedTask(() -> {
-                                    return ClientHandler.updateOrders(data);
-                                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-                                removeOrderTask.setOnSucceeded(e -> {
-                                    UpdateOrdersResponse response = removeOrderTask.getValue();
-                                    ordersList.remove(data);//remove in UI locally
-                                    customerOrderList.remove(data);
-                                    cancelOrderText.setText(Constants.CANCEL_ORDER);
-                                    cancelOrderText.setTextFill(Color.GREEN);
-
-                                    //TODO: remove in UI
-                                    if (!response.isSuccessful()) {
-                                        // TODO: maybe log the specific exception somewhere
-                                        App.hideLoading();
-                                        System.err.println("Cancel oeder failed!");
-                                    }
-                                });
-
-                                removeOrderTask.setOnFailed(e -> {
-                                    // TODO: maybe properly log it somewhere
-                                    System.out.println("Cancel oeder failed!");
-                                added_complaint_text.setText(Constants.CANCEL_ORDER_FAILED);
-                                added_complaint_text.setTextFill(Color.RED);
-                                    removeOrderTask.getException().printStackTrace();
-                                });
-
-                                new Thread(removeOrderTask).start();
-
                             });
 
+                            removeOrderTask.setOnFailed(e -> {
+                                // TODO: maybe properly log it somewhere
+                                System.out.println("Cancel oeder failed!");
+                                added_complaint_text.setText(Constants.CANCEL_ORDER_FAILED);
+                                added_complaint_text.setTextFill(Color.RED);
+                                removeOrderTask.getException().printStackTrace();
+                            });
+
+                            new Thread(removeOrderTask).start();
+
+                        });
+
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
                         }
-                        @Override
-                        public void updateItem(Void item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (empty) {
-                                setGraphic(null);
-                            } else {
-                                setGraphic(btn);
-                            }
-                        }
-                    };
-                    return cell;
-                }
-            };
-            colBtn.setCellFactory(cellFactory);
+                    }
+                };
+                return cell;
+            }
+        };
+        colBtn.setCellFactory(cellFactory);
+        if (orderTable.getColumns().contains(colBtn)==false)
             orderTable.getColumns().add(colBtn);
-
-
-
-        }
     }
 
-    public void getComplaints(){
+    public void getComplaints() {
         Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
             return ClientHandler.getComplaints();
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
@@ -297,10 +300,9 @@ public class CustomerProfileController {
                 return;
             }
             complaintTable.setEditable(true);
-            if (App.getCurrentUser()!=null && App.getCurrentUser() instanceof Customer) {
+            if (App.getCurrentUser() != null && App.getCurrentUser() instanceof Customer) {
                 customer = (Customer) App.getCurrentUser();
-            }
-            else{
+            } else {
                 invalid_customer_text.setText("failed to get customer ");
                 invalid_customer_text.setTextFill(Color.RED);
             }
@@ -341,10 +343,17 @@ public class CustomerProfileController {
             getComplaintsTask.getException().printStackTrace();
             App.hideLoading();
         });
-        new Thread(getComplaintsTask).start();
+        try {
+            Thread t = new Thread(getComplaintsTask);
+            t.start();
+            t.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
     }
 
-    public void getOrders(){
+
+    public void getOrders() {
         Task<GetOrdersResponse> getOrdersTask = App.createTimedTask(() -> {
             return ClientHandler.getOrders();
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
@@ -405,12 +414,19 @@ public class CustomerProfileController {
             getOrdersTask.getException().printStackTrace();
             App.hideLoading();
         });
-        new Thread(getOrdersTask).start();
+
+        try {
+            Thread t = new Thread(getOrdersTask);
+            t.start();
+            t.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
     }
 
 
     @FXML
-    public void initialize() {
+    public void initialize()  {
         if (App.getCurrentUser()!=null) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         }
@@ -444,7 +460,6 @@ public class CustomerProfileController {
 
         if(customer!=null){
             storeList = customer.getStores();
-
             List<Long>  storesListID = new ArrayList<Long>();
             ObservableList<Long> data = FXCollections.observableArrayList();
             //showing customer only his complaints
@@ -458,9 +473,6 @@ public class CustomerProfileController {
             data.addAll(storesListID); //adding to dropdown combo
             storesComboBox.setItems(data);
         }
-
-
-        //getStores();
     }
 
     public void selectStore(ActionEvent event) {
