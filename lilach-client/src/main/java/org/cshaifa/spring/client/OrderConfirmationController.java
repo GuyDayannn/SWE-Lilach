@@ -3,10 +3,18 @@ package org.cshaifa.spring.client;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Delivery;
+import org.cshaifa.spring.entities.responses.CreateOrderResponse;
+import org.cshaifa.spring.utils.Constants;
 
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -14,7 +22,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -112,7 +119,8 @@ public class OrderConfirmationController {
         App.getCart().forEach((item, quantity) -> itemsVbox.getChildren().add(getItemHBox(item, quantity)));
 
         addressLabel.setText(App.getRecipientAddress());
-        cardNumberLabel.setText(App.getCardNumber().substring(App.getCardNumber().length() - 4, App.getCardNumber().length()));
+        cardNumberLabel
+                .setText(App.getCardNumber().substring(App.getCardNumber().length() - 4, App.getCardNumber().length()));
         expDateLabel.setText(App.getCardExpDate());
         // TODO: change to actual first name
         firstNamePaymentLabel.setText("Yaakov");
@@ -146,6 +154,48 @@ public class OrderConfirmationController {
 
     @FXML
     private void placeOrder(ActionEvent event) {
-        // TODO: place the order...
+        // TODO: add store
+        Task<CreateOrderResponse> createOrderTask = App.createTimedTask(
+                () -> ClientHandler.createOrder(App.isOrderDelivery() ? null : App.getPickupStore(),
+                        (Customer) App.getCurrentUser(), App.getCart(), "Mazal Tov",
+                        new Timestamp(Calendar.getInstance().getTime().getTime()), App.getSupplyDate(),
+                        App.isOrderDelivery(),
+                        new Delivery(App.getRecipientFirstName() + " " + App.getRecipientLastName(),
+                                App.getCustomerPhoneNumber(), App.getRecipientAddress(), App.getMessage(), false)),
+                Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        createOrderTask.setOnSucceeded(e -> {
+            if (createOrderTask.getValue() == null) {
+                System.out.println("Order failed");
+                // TODO: flash msg
+                App.hideLoading();
+                return;
+            }
+
+            if (!createOrderTask.getValue().isSuccessful()) {
+                System.out.println(createOrderTask.getMessage());
+                App.hideLoading();
+                // TODO: flash msg
+                return;
+            }
+
+            ((Customer) App.getCurrentUser()).addOrder(createOrderTask.getValue().getOrder());
+            App.hideLoading();
+            try {
+                App.setContent("catalog");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            // TODO: maybe add order success screen
+        });
+
+        createOrderTask.setOnFailed(e -> {
+            createOrderTask.getException().printStackTrace();
+            App.hideLoading();
+            // TODO: flash msg
+        });
+
+        App.showLoading(anchorPane, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+        new Thread(createOrderTask).start();
     }
 }
