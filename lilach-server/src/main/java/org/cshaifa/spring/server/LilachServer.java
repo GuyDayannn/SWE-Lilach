@@ -139,7 +139,7 @@ public class LilachServer extends AbstractServer {
                     }
                 } else if (request instanceof AddComplaintRequest addComplaintRequest) {
                 try {
-                    Complaint complaint = DatabaseHandler.addComplaint( addComplaintRequest.getComplaintDescription(), addComplaintRequest.getCustomer());
+                    Complaint complaint = DatabaseHandler.addComplaint(addComplaintRequest.getComplaintDescription(), addComplaintRequest.getCustomer(), addComplaintRequest.getStore());
                     if (complaint != null) {
                         client.sendToClient(new AddComplaintResponse(requestId, true, complaint, Constants.SUCCESS_MSG));
                     } else {

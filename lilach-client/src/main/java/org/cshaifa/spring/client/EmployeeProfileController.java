@@ -17,7 +17,10 @@ import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -80,10 +83,21 @@ public class EmployeeProfileController {
     private TitledPane handleUsersPane;
     @FXML
     private ComboBox<String> storeComboBox;
+    @FXML
+    private ComboBox<String> reportTypeComboBox;
+    @FXML
+    private DatePicker startDatePicker;
+    @FXML
+    private DatePicker endDatePicker;
 
     // Variables
     private List<Complaint> complaintList;
     private List<Store> storesList;
+
+    private LocalDate reportStartDate;
+    private LocalDate reportEndDate;
+    private ReportType reportType;
+    private Store reportStore;
 
 
 
@@ -98,7 +112,6 @@ public class EmployeeProfileController {
     @FXML
     void showCatalogIds(ActionEvent event) {
         long selectedId = Long.parseLong(itemComboBox.getValue().toString());
-
 
     }
 
@@ -177,32 +190,51 @@ public class EmployeeProfileController {
 
     @FXML
     void selectStore(ActionEvent event) {
-
+        String storeName = storeComboBox.getValue();
+        for(Store store: storesList){
+            if(store.getName()==storeName){
+                reportStore = store;
+                break;
+            }
+        }
     }
 
     @FXML
     void selectReportType(ActionEvent event) {
+        String report = reportTypeComboBox.getValue();
+        if(report == "Orders")
+            reportType = ReportType.ORDERS;
+        else if (report == "Revenue")
+            reportType = ReportType.REVENUE;
+        else if(report == "Complaints")
+            reportType = ReportType.COMPLAINTS;
 
     }
 
     @FXML
     void setStartDate(ActionEvent event) {
-
+        reportStartDate = startDatePicker.getValue();
+//        Date startDate = (Date) event.getSource();
+//        reportStartDate = LocalDate.ofInstant(startDate.toInstant(), ZoneId.systemDefault());
     }
 
     @FXML
     void setEndDate(ActionEvent event) {
-
+//        Date endDate =(Date) event.getSource();
+//        reportEndDate = LocalDate.ofInstant(endDate.toInstant(), ZoneId.systemDefault());
+        reportEndDate = endDatePicker.getValue();
     }
 
     @FXML
     void generateReport(ActionEvent event) {
+        Report report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
+        report.generateHistogram();
 
     }
 
     @FXML
     void viewReport(ActionEvent event) {
-
+        //TODO: open popup and open image report
     }
 
     @FXML
@@ -217,18 +249,17 @@ public class EmployeeProfileController {
         ChainEmployee chainEmployee = new ChainEmployee();
         StoreManager storeManager = new StoreManager();
         SystemAdmin systemAdmin = new SystemAdmin();
-        if (App.getCurrentUser()!=null) {
+        if (App.getCurrentUser() != null) {
             /*
             if(App.getCurrentUser().getClass() == chainEmployee.getClass()){
                 paneStoreReport.setVisible(false);
                 paneChainReport.setVisible(false);
                 handleUsersPane.setVisible(false);
             }*/
-            if(App.getCurrentUser().getClass() == storeManager.getClass()){
+            if (App.getCurrentUser().getClass() == storeManager.getClass()) {
                 paneChainReport.setVisible(false);
                 handleUsersPane.setVisible(false);
-            }
-            else if(App.getCurrentUser().getClass() == systemAdmin.getClass()){
+            } else if (App.getCurrentUser().getClass() == systemAdmin.getClass()) {
                 //else it's system admin and he can see all options
             }
         }
@@ -253,11 +284,11 @@ public class EmployeeProfileController {
             }
             complaintList = response.getComplaintList();
 
-            List<Long>  complaintListID = new ArrayList<Long>();
+            List<Long> complaintListID = new ArrayList<Long>();
             ObservableList<Long> data = FXCollections.observableArrayList();
             //showing customer only his complaints
-            if(complaintList.size()>=1){
-                for (int i = 0; i < complaintList.size()-1; i++) {
+            if (complaintList.size() >= 1) {
+                for (int i = 0; i < complaintList.size() - 1; i++) {
                     Long id = (complaintList.get(i).getId());
                     complaintListID.add(id);
                 }
@@ -299,16 +330,20 @@ public class EmployeeProfileController {
             }
         });
 
-        getStoresTask.setOnFailed( e -> {
+        getStoresTask.setOnFailed(e -> {
             // TODO: maybe log somewhere else...
             getStoresTask.getException().printStackTrace();
         });
+        try {
+            Thread t = new Thread(getComplaintsTask);
+            t.start();
+            t.join();
+            new Thread(getStoresTask).start();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
 
-        new Thread(getComplaintsTask).start();
-        new Thread(getStoresTask).start();
-
+        }
     }
-
     public void viewAllComplaints(ActionEvent event) {
 
     }

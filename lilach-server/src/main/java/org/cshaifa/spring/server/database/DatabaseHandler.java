@@ -217,12 +217,13 @@ public class DatabaseHandler {
         return order;
     }
 
-    public static Complaint addComplaint(String complaintDescription, Customer customer) throws HibernateException {
+    public static Complaint addComplaint(String complaintDescription, Customer customer, Store store) throws HibernateException {
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer);
+        Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer, store, nowTimestamp);
         session.save(complaint);
 
         customer.addComplaint(complaint);
