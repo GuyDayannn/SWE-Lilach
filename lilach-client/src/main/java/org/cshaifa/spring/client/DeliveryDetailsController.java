@@ -9,16 +9,23 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.responses.GetStoresResponse;
+import org.cshaifa.spring.utils.Constants;
 
 public class DeliveryDetailsController {
     @FXML
@@ -49,7 +56,15 @@ public class DeliveryDetailsController {
     private ComboBox<String> deliveryTimeSelector;
 
     @FXML
+    private ComboBox<String> storeSelector;
+
+    @FXML
     private Label notificationLabel;
+
+    @FXML
+    private AnchorPane anchorPane;
+
+    private List<Store> stores = null;
 
     private void recoverSavedData() {
         if (!App.isEnteredSupplyDetails())
@@ -79,6 +94,10 @@ public class DeliveryDetailsController {
         deliveryDetailsVBox.setVisible(false);
         // function printing all hours in day intervals of 30 minutes from 'current'
         // TODO: need to start from 3 hours from now and put it in list
+
+        stores = ((Customer) App.getCurrentUser()).getStores();
+        storeSelector.getItems().addAll(stores.stream().map(Store::getName).toList());
+
         DateFormat df = new SimpleDateFormat("HH:mm");
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MINUTE, 0);
@@ -102,6 +121,12 @@ public class DeliveryDetailsController {
     @FXML
     private void selectSupplyMethod(ActionEvent event) {
         deliveryDetailsVBox.setVisible(supplyMethodSelector.getSelectionModel().getSelectedIndex() == 1);
+        storeSelector.setVisible(supplyMethodSelector.getSelectionModel().getSelectedIndex() == 0);
+    }
+
+    @FXML
+    private void selectStore(ActionEvent event) {
+
     }
 
     @FXML
@@ -136,6 +161,8 @@ public class DeliveryDetailsController {
             // TODO: add times of delivery
             App.setSupplyDate(Timestamp.valueOf(deliveryDatePicker.getValue()
                     .atTime(LocalTime.parse(deliveryTimeSelector.getValue(), DateTimeFormatter.ofPattern("HH:mm")))));
+        } else {
+            App.setPickupStore(stores.get(storeSelector.getSelectionModel().getSelectedIndex()));
         }
 
         App.setEnteredSupplyDetails(true);

@@ -36,6 +36,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 
@@ -73,6 +74,8 @@ public class App extends Application {
     private static String customerPhoneNumber = null;
 
     private static Timestamp supplyDate = null;
+
+    private static Store pickupStore = null;
 
     private static boolean orderDelivery;
 
@@ -328,8 +331,9 @@ public class App extends Application {
         return enteredSupplyDetails;
     }
 
-    public static void setEnteredSupplyDetails(boolean enteredSupplyDetails) {
-        App.enteredSupplyDetails = enteredSupplyDetails;
-    }
+    public static void setEnteredSupplyDetails(boolean enteredSupplyDetails) { App.enteredSupplyDetails = enteredSupplyDetails; }
 
+    public static Store getPickupStore() { return pickupStore; }
+
+    public static void setPickupStore(Store pickupStore) { App.pickupStore = pickupStore; }
 }
