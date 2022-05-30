@@ -198,7 +198,7 @@ public class DatabaseHandler {
     public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
             Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails)
             throws HibernateException {
-        if (delivery) {
+        if (!delivery) {
             // Check stock
             if (!items.entrySet().stream().allMatch(entry -> {
                 return entry.getKey().getStock().containsKey(store)
@@ -222,7 +222,7 @@ public class DatabaseHandler {
         customer.addOrder(order);
         updateDB(session, customer);
 
-        if (delivery) {
+        if (!delivery) {
             // Update stock
             items.forEach((item, amount) -> {
                 item.reduceQuantity(store, amount);
