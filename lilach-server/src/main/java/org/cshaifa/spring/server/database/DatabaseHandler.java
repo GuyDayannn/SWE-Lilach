@@ -182,14 +182,30 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
+    public static Store getWarehouseStore() {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Store> query = builder.createQuery(Store.class);
+        Root<Store> root = query.from(Store.class);
+
+        query.select(root).where(builder.equal(root.get("name"), Constants.WAREHOUSE_NAME));
+
+        Store store = session.createQuery(query).uniqueResult();
+        session.close();
+        return store;
+    }
+
     public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
-            Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) throws HibernateException {
-        // Check stock
-        if (!items.entrySet().stream().allMatch(entry -> {
-            return entry.getKey().getStock().containsKey(store)
-                    && entry.getValue() <= entry.getKey().getStock().get(store);
-        })) {
-            return null;
+            Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails)
+            throws HibernateException {
+        if (delivery) {
+            // Check stock
+            if (!items.entrySet().stream().allMatch(entry -> {
+                return entry.getKey().getStock().containsKey(store)
+                        && entry.getValue() <= entry.getKey().getStock().get(store);
+            })) {
+                return null;
+            }
         }
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
@@ -206,11 +222,13 @@ public class DatabaseHandler {
         customer.addOrder(order);
         updateDB(session, customer);
 
-        // Update stock
-        items.forEach((item, amount) -> {
-            item.reduceQuantity(store, amount);
-            updateDB(session, item);
-        });
+        if (delivery) {
+            // Update stock
+            items.forEach((item, amount) -> {
+                item.reduceQuantity(store, amount);
+                updateDB(session, item);
+            });
+        }
 
         tryFlushSession(session);
 
@@ -232,8 +250,6 @@ public class DatabaseHandler {
 
         return complaint;
     }
-
-
 
     private static List<List<Path>> getRandomOrderedImages() {
         List<List<Path>> imagesLists = new ArrayList<>();
@@ -268,10 +284,10 @@ public class DatabaseHandler {
 
     public static List<Store> initStores() {
         List<Store> stores = new ArrayList<>();
-        for (int i = 0; i<10; i++) {
-            stores.add(new Store("Store"+i, "Address"+i));
+        for (int i = 0; i < 10; i++) {
+            stores.add(new Store("Store" + i, "Address" + i));
         }
-        stores.add(new Store("Lilach Chain Store", "Everywhere"));
+        stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere"));
         return stores;
     }
 
@@ -288,7 +304,8 @@ public class DatabaseHandler {
                 for (Path imagePath : imageList) {
                     int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
-                    Map<Store, Integer> stock = stores.stream().collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
+                    Map<Store, Integer> stock = stores.stream()
+                            .collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
                     randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
                             false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
@@ -297,14 +314,16 @@ public class DatabaseHandler {
         }
 
         // On Sale Items
-        //randomItems.remove(0);
-        //randomItems.add(0, new CatalogItem("Sale flower",
-        //imageLists.get(0).get(0).toUri().toString(), 249.99,
-        //new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
-        //randomItems.remove(1);
-        //randomItems.add(1, new CatalogItem("Sale flower",
-        //imageLists.get(0).get(1).toUri().toString(), 149.99,
-        //new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
+        // randomItems.remove(0);
+        // randomItems.add(0, new CatalogItem("Sale flower",
+        // imageLists.get(0).get(0).toUri().toString(), 249.99,
+        // new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white",
+        // true));
+        // randomItems.remove(1);
+        // randomItems.add(1, new CatalogItem("Sale flower",
+        // imageLists.get(0).get(1).toUri().toString(), 149.99,
+        // new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow",
+        // true));
 
         return randomItems;
     }
@@ -316,18 +335,22 @@ public class DatabaseHandler {
 
         Random random = new Random();
 
-        // createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
-        //         items.subList(0, random.nextInt(1, items.size())).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
-        //         "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
-        //         new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+        // createOrder(stores.get(random.nextInt(stores.size())),
+        // (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+        // items.subList(0, random.nextInt(1,
+        // items.size())).stream().collect(Collectors.toMap(Function.identity(), item ->
+        // random.nextInt(1,4))),
+        // "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
+        // new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There",
+        // false));
 
-
-        for (int i=0; i<100; i++) {
+        for (int i = 0; i < 20; i++) {
             int item_index = random.nextInt(items.size());
-            createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
-                    items.subList(0, item_index).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+            createOrder(stores.get(stores.size() - 1), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)),
+                    items.subList(0, item_index).stream()
+                            .collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1, 4))),
                     "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
-                    new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+                    new Delivery("Guy Dayan", "0509889939", "Address Street 1", "Hello There", false));
         }
     }
 
@@ -335,10 +358,11 @@ public class DatabaseHandler {
         List<Complaint> complaintList = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
             String email = "example" + i + "@mail.com";
-            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE,
+                    complaintList);
         }
         for (int i = 1; i <= 20; i++) {
-            registerChainEmployee("Employee"+i, "Employee"+i+"@lilach.co.il", "Employee"+i, "Employee"+i);
+            registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i);
         }
     }
 
@@ -349,11 +373,13 @@ public class DatabaseHandler {
 
         List<Store> stores = initStores();
         saveStores(stores);
-        List<CatalogItem> items = initItems(stores);
+        List<Store> pickupStores = stores.stream().filter((store) -> !store.getName().equals(Constants.WAREHOUSE_NAME)).toList();
+        List<CatalogItem> items = initItems(pickupStores);
         saveItems(items);
 
-        createUsers(stores);
+        createUsers(pickupStores);
         createOrders(stores, items);
+        System.out.println("Finished initializing");
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
@@ -429,7 +455,7 @@ public class DatabaseHandler {
             session.merge(order);
             session.merge(store);
         }
-        //updateDB(session, order);
+        // updateDB(session, order);
         tryFlushSession(session);
     }
 
@@ -455,6 +481,5 @@ public class DatabaseHandler {
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
     }
-
 
 }

@@ -73,7 +73,8 @@ public class RegistrationController {
                 return;
             }
 
-            stores = getStoresTask.getValue().getStores();
+            stores = getStoresTask.getValue().getStores().stream()
+                    .filter((store) -> !store.getName().equals(Constants.WAREHOUSE_NAME)).toList();
             storeSelector.getItems().addAll(stores.stream().map(Store::getName).toList());
             App.hideLoading();
         });
@@ -131,8 +132,7 @@ public class RegistrationController {
             else
                 registredStores = stores;
             return ClientHandler.registerCustomer(fullNameTxtField.getText().strip(),
-                    usernameTxtField.getText().strip(),
-                    emailTxtField.getText().strip(), pwdTxtField.getText().strip(),
+                    usernameTxtField.getText().strip(), emailTxtField.getText().strip(), pwdTxtField.getText().strip(),
                     registredStores, SubscriptionType.values()[subscriptionIndex], complaintList);
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
