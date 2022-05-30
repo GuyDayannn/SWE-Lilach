@@ -67,6 +67,13 @@ public class ClientHandler {
         return (UpdateComplaintResponse) waitForMsgFromServer(updateComplaintRequest.getRequestId());
     }
 
+    public static UpdateOrdersResponse updateOrders(Order order) throws IOException, ConnectException {
+        UpdateOrdersRequest updateOrdersRequest = new UpdateOrdersRequest( order);
+        client.openConnection();
+        client.sendToServer(updateOrdersRequest);
+        return (UpdateOrdersResponse) waitForMsgFromServer(updateOrdersRequest.getRequestId());
+    }
+
     public static LoginResponse loginUser(String username, String password) throws IOException {
         LoginRequest loginRequest = new LoginRequest(username, password);
         client.openConnection();

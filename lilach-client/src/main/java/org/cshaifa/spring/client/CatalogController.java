@@ -48,6 +48,8 @@ public class CatalogController {
     @FXML
     private ToolBar toolbar;
     @FXML
+    private Pane spacer;
+    @FXML
     private ImageView catalogTitle;
     @FXML
     private VBox salesVBox;
@@ -342,6 +344,7 @@ public class CatalogController {
         catalogTitle.setImage((image));
 
         // Load Toolbar
+        toolbar.getItems().remove(spacer);
         toolbar.getItems().remove(shoppingCart);
         Button NewOrderButton = new Button("New Order");
         NewOrderButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -439,6 +442,7 @@ public class CatalogController {
             toolbar.getItems().add(viewProfileButton);
             toolbar.getItems().add(refreshButton);
             toolbar.getItems().add(contactButton);
+            toolbar.getItems().add(spacer);
             toolbar.getItems().add(shoppingCart);
         }
 

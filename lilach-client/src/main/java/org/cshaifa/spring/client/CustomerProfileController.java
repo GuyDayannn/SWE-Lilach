@@ -13,6 +13,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
@@ -23,8 +24,10 @@ import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.responses.AddComplaintResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
 import org.cshaifa.spring.entities.responses.GetOrdersResponse;
+import org.cshaifa.spring.entities.responses.UpdateOrdersResponse;
 import org.cshaifa.spring.utils.Constants;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,9 +37,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class CustomerProfileController {
-
     @FXML
-    private Button closeComplaintButton;
+    public Button refreshBtn;
 
     @FXML
     private TextField compensationAmount;
@@ -125,10 +127,16 @@ public class CustomerProfileController {
 
     private List<Order> customerOrderList = new ArrayList<>();
 
+    private List<Order> ordersList;
+
+    private List<Complaint> customerComplaintList = new ArrayList<>();
+
 
     @FXML
-    void closeComplaint(ActionEvent event) {
-
+    void refreshProfile(ActionEvent event) throws IOException {
+        customerOrderList.clear();
+        customerComplaintList.clear();
+        initialize();
     }
 
     @FXML
@@ -193,46 +201,74 @@ public class CustomerProfileController {
     }
 
 
-    @FXML void cancelOrder(){
-        Order order = orderTable.getSelectionModel().getSelectedItem();
-    }
+//    @FXML void cancelOrder(){
+//        Order order = orderTable.getSelectionModel().getSelectedItem();
+//    }
 
     private void addButtonToTable() {
+
         TableColumn<Order, Void> colBtn = new TableColumn("Cancel Order");
+        if (!orderTable.getColumns().contains(colBtn)) {
+            Callback<TableColumn<Order, Void>, TableCell<Order, Void>> cellFactory = new Callback<TableColumn<Order, Void>, TableCell<Order, Void>>() {
+                @Override
+                public TableCell<Order, Void> call(final TableColumn<Order, Void> param) {
+                    final TableCell<Order, Void> cell = new TableCell<Order, Void>() {
 
-        Callback<TableColumn<Order, Void>, TableCell<Order, Void>> cellFactory = new Callback<TableColumn<Order, Void>, TableCell<Order, Void>>() {
-            @Override
-            public TableCell<Order, Void> call(final TableColumn<Order, Void> param) {
-                final TableCell<Order, Void> cell = new TableCell<Order, Void>() {
+                        private final Button btn = new Button("Cancel");
 
-                    private final Button btn = new Button("Cancel");
+                        {
+                            btn.setOnAction((ActionEvent event) -> {
+                                Order data = getTableView().getItems().get(getIndex());
+                                System.out.println("selectedData: " + data);
 
-                    {
-                        btn.setOnAction((ActionEvent event) -> {
-                            Order data = getTableView().getItems().get(getIndex());
-                            System.out.println("selectedData: " + data);
-                        });
-                    }
+                                Task<UpdateOrdersResponse> removeOrderTask = App.createTimedTask(() -> {
+                                    return ClientHandler.updateOrders(data);
+                                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-                    @Override
-                    public void updateItem(Void item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(btn);
+                                removeOrderTask.setOnSucceeded(e -> {
+                                    UpdateOrdersResponse response = removeOrderTask.getValue();
+                                    ordersList.remove(data);//remove in UI locally
+                                    customerOrderList.remove(data);
+
+                                    //TODO: remove in UI
+                                    if (!response.isSuccessful()) {
+                                        // TODO: maybe log the specific exception somewhere
+                                        App.hideLoading();
+                                        System.err.println("Add complaint failed!");
+                                    }
+                                });
+
+                                removeOrderTask.setOnFailed(e -> {
+                                    // TODO: maybe properly log it somewhere
+                                    System.out.println("Add complaint failed!");
+//                                added_complaint_text.setText(Constants.UPDATED_COMPLAINT_FAILED);
+//                                added_complaint_text.setTextFill(Color.RED);
+                                    removeOrderTask.getException().printStackTrace();
+                                });
+
+                                new Thread(removeOrderTask).start();
+
+                            });
                         }
-                    }
-                };
-                return cell;
-            }
-        };
+                        @Override
+                        public void updateItem(Void item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty) {
+                                setGraphic(null);
+                            } else {
+                                setGraphic(btn);
+                            }
+                        }
+                    };
+                    return cell;
+                }
+            };
 
-        colBtn.setCellFactory(cellFactory);
+            colBtn.setCellFactory(cellFactory);
 
-        orderTable.getColumns().add(colBtn);
+            orderTable.getColumns().add(colBtn);
+        }
     }
-
 
     @FXML
     public void initialize() {
@@ -246,6 +282,17 @@ public class CustomerProfileController {
         added_complaint_text.setText("");
         invalid_customer_text.setText("");
 
+//        Button refreshButton = new Button("Refresh");
+//        refreshButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent mouseEvent) {
+//                try {
+//                    refreshProfile(mouseEvent);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
         Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
             return ClientHandler.getComplaints();
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
@@ -272,7 +319,7 @@ public class CustomerProfileController {
                 invalid_customer_text.setTextFill(Color.RED);
             }
             List<Complaint> complaintList = response.getComplaintList();
-            List<Complaint> customerComplaintList = new ArrayList<>();
+            //List<Complaint> customerComplaintList = new ArrayList<>();
             for (Complaint complaint : complaintList) {
                 if (complaint.getCustomer().getId() == customer.getId()) {
                     customerComplaintList.add(complaint);
@@ -338,9 +385,10 @@ public class CustomerProfileController {
                 invalid_customer_text.setText("failed to get customer ");
                 invalid_customer_text.setTextFill(Color.RED);
             }
-            List<Order> orderList = response.getOrdersList();
+            ordersList = response.getOrdersList();
+            //List<Order> orderList = response.getOrdersList();
             //List<Order> customerOrderList = new ArrayList<>();
-            for (Order order :  orderList) {
+            for (Order order :  ordersList) {
                 if (order.getCustomer().getId() == customer.getId()) {
                     customerOrderList.add(order);
                 }
@@ -359,16 +407,6 @@ public class CustomerProfileController {
 
             isCompletedColumn.setCellValueFactory(cellData ->
                     new SimpleBooleanProperty(cellData.getValue().isCompleted()));
-
-            //TODO: add cancel order button
-
-//            orderTable.requestFocus();
-//            orderTable.getSelectionModel().select(0);
-//            orderTable.getFocusModel().focus(0);
-
-            Order order = orderTable.getSelectionModel().getSelectedItem();
-
-//
 
             data.addAll(customerOrderList);
             orderTable.setItems(data);

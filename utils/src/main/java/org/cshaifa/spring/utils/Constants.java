@@ -15,7 +15,7 @@ public class Constants {
     public static final String UPDATED_COMPLAINT = "You've successfully updated complaint";
     public static final String UPDATED_COMPLAINT_FAILED = "Couldn't update complaint";
 
-    public static final int SERVER_PORT = 8166;
+    public static final int SERVER_PORT = 8130;
     public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
 }

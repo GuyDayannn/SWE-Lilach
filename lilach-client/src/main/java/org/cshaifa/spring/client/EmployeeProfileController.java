@@ -13,10 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.cshaifa.spring.entities.*;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
-import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
-import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
 import java.io.IOException;
@@ -26,88 +23,68 @@ import java.util.concurrent.TimeUnit;
 
 public class EmployeeProfileController {
 
+    //FXML objects
     @FXML
     private Button editCatalogButton;
-
     @FXML
     private Button exitButton;
-
     @FXML
     private Button cancelButton;
-
     @FXML
     private Button catalogButton;
-
     @FXML
     private TableView<CatalogItem> catalogTable;
-
     @FXML
     private Button closeComplaintButton;
-
     @FXML
     private TextField compensationamount;
-
     @FXML
     private ComboBox<Long> complaintComboBox;
-
     @FXML
     private TextField complaintStatus;
-
     @FXML
     private TextArea complaintdescription;
-
     @FXML
     private TextField complaintresponse;
-
     @FXML
     private TextField discountAmount;
-
     @FXML
     private ComboBox<Text> itemComboBox;
-
     @FXML
     private CheckBox selectAllCheckbox;
-
     @FXML
     private TableColumn<CatalogItem, Double> discountColumn;
-
     @FXML
     private TableColumn<CatalogItem, Long> idColumn;
-
     @FXML
     private TableColumn<CatalogItem, String> itemNameColumn;
-
     @FXML
     private TableColumn<CatalogItem, Double> itemPriceColumn;
-
     @FXML
     private TableColumn<CatalogItem, Boolean> onsaleColumn;
-
     @FXML
     private TableColumn<CatalogItem, Boolean> selectColumn;
-
     @FXML
     private Button updateSalesButton;
-
     @FXML
     private Button viewComplaint;
-
     @FXML
     private Text welcomeText;
-
     @FXML
     private Label updated_complaint_text;
-
-    private List<Complaint> complaintList;
-
     @FXML
     private TitledPane paneStoreReport;
-
     @FXML
     private TitledPane paneChainReport;
-
     @FXML
     private TitledPane handleUsersPane;
+    @FXML
+    private ComboBox<String> storeComboBox;
+
+    // Variables
+    private List<Complaint> complaintList;
+    private List<Store> storesList;
+
 
 
     @FXML
@@ -123,6 +100,25 @@ public class EmployeeProfileController {
         long selectedId = Long.parseLong(itemComboBox.getValue().toString());
 
 
+    }
+
+    @FXML
+    void openComplaint(ActionEvent event) { //on view complaint click
+        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
+
+        Complaint complaint = complaintList.get((int) complaintID);
+
+        complaintdescription.setText(complaint.getComplaintDescription());
+        String complaintStatusStr = "";
+        if (complaint.getIsComplaintOpen()) {
+            complaintStatusStr = "Open";
+        } else {
+            complaintStatusStr = "Closed";
+        }
+
+        complaintStatus.setText(complaintStatusStr);
+        compensationamount.setText((Double.toString(complaint.getCompensationAmount())));
+        complaintresponse.setText((complaint.getComplaintResponse()));
     }
 
     @FXML
@@ -180,22 +176,33 @@ public class EmployeeProfileController {
     }
 
     @FXML
-    void openComplaint(ActionEvent event) { //on view complaint click
-        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
+    void selectStore(ActionEvent event) {
 
-            Complaint complaint = complaintList.get((int) complaintID);
+    }
 
-            complaintdescription.setText(complaint.getComplaintDescription());
-            String complaintStatusStr = "";
-            if (complaint.getIsComplaintOpen()) {
-                complaintStatusStr = "Open";
-            } else {
-                complaintStatusStr = "Closed";
-            }
+    @FXML
+    void selectReportType(ActionEvent event) {
 
-            complaintStatus.setText(complaintStatusStr);
-            compensationamount.setText((Double.toString(complaint.getCompensationAmount())));
-            complaintresponse.setText((complaint.getComplaintResponse()));
+    }
+
+    @FXML
+    void setStartDate(ActionEvent event) {
+
+    }
+
+    @FXML
+    void setEndDate(ActionEvent event) {
+
+    }
+
+    @FXML
+    void generateReport(ActionEvent event) {
+
+    }
+
+    @FXML
+    void viewReport(ActionEvent event) {
+
     }
 
     @FXML
@@ -211,11 +218,12 @@ public class EmployeeProfileController {
         StoreManager storeManager = new StoreManager();
         SystemAdmin systemAdmin = new SystemAdmin();
         if (App.getCurrentUser()!=null) {
+            /*
             if(App.getCurrentUser().getClass() == chainEmployee.getClass()){
                 paneStoreReport.setVisible(false);
                 paneChainReport.setVisible(false);
                 handleUsersPane.setVisible(false);
-            }
+            }*/
             if(App.getCurrentUser().getClass() == storeManager.getClass()){
                 paneChainReport.setVisible(false);
                 handleUsersPane.setVisible(false);
@@ -233,14 +241,14 @@ public class EmployeeProfileController {
         getComplaintsTask.setOnSucceeded(e -> {
             if (getComplaintsTask.getValue() == null) {
                 App.hideLoading();
-                System.err.println("Getting catalog failed");
+                System.err.println("Getting complaints failed");
                 return;
             }
             GetComplaintsResponse response = getComplaintsTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
                 App.hideLoading();
-                System.err.println("Getting catalog failed");
+                System.err.println("Getting complaints failed");
                 return;
             }
             complaintList = response.getComplaintList();
@@ -250,7 +258,7 @@ public class EmployeeProfileController {
             //showing customer only his complaints
             if(complaintList.size()>=1){
                 for (int i = 0; i < complaintList.size()-1; i++) {
-                    Long id = (new Long(complaintList.get(i).getId()));
+                    Long id = (complaintList.get(i).getId());
                     complaintListID.add(id);
                 }
             }
@@ -265,7 +273,39 @@ public class EmployeeProfileController {
             getComplaintsTask.getException().printStackTrace();
         });
 
+        // initialize stores below
+        Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
+            return ClientHandler.getStores();
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        getStoresTask.setOnSucceeded(e -> {
+            if (getStoresTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
+            }
+            GetStoresResponse response = getStoresTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
+            }
+            storesList = response.getStores();
+
+            for (Store store : storesList) {
+                System.out.println(store.getName());
+                storeComboBox.getItems().add(store.getName());
+            }
+        });
+
+        getStoresTask.setOnFailed( e -> {
+            // TODO: maybe log somewhere else...
+            getStoresTask.getException().printStackTrace();
+        });
+
         new Thread(getComplaintsTask).start();
+        new Thread(getStoresTask).start();
 
     }
 

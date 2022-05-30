@@ -91,6 +91,8 @@ public class Store implements Serializable {
         return orders;
     }
 
+    public void removeOrder(Order order) {this.orders.remove(order);}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

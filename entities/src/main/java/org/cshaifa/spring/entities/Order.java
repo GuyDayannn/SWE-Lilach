@@ -22,7 +22,7 @@ public class Order implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Customer customer;
 
     private String greeting;
@@ -120,6 +120,8 @@ public class Order implements Serializable {
     public boolean isCompleted() { return completed; }
 
     public void setCompleted(boolean completed) { this.completed = completed; }
+
+    public void deleteCustomer() { this.customer = null; }
 
     public double getTotal() { return total; }
 
