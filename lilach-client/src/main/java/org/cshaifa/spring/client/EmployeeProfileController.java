@@ -351,4 +351,23 @@ public class EmployeeProfileController {
     public void viewAllComplaints(ActionEvent event) {
 
     }
+
+    //methods for handle users below
+    public void selectCustomer(ActionEvent event) {
+    }
+
+    public void editCustomerStatus(ActionEvent event) {
+    }
+
+    public void selectAccpuntStatus(ActionEvent event) {
+    }
+
+    public void selectEmployee(ActionEvent event) {
+    }
+
+    public void selectEmployeeStatus(ActionEvent event) {
+    }
+
+    public void editEmployee(ActionEvent event) {
+    }
 }

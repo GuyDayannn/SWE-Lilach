@@ -206,10 +206,11 @@ public class Report {
 
         //JFreeChart histogram = ChartFactory.createTimeSeriesChart("JFreeChart Histogram", "Time", "Revenue", dataset);
 
-        try { //TODO: how to get each path generally?.getAbsolutePath()
-            reportPath = "E:\\java-proj\\SWE-Lilach\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+        try {
+            //reportPath = "E:\\java-proj\\SWE-Lilach\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+            reportPath = "..\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
             File histFile = new File(reportPath);
-            ChartUtils.saveChartAsPNG(histFile, chart, 500, 270);
+            ChartUtils.saveChartAsPNG(histFile.getAbsoluteFile(), chart, 500, 270);
         } catch (IOException e) {
             System.out.println("Creating histogram image failed.");
             e.printStackTrace();
