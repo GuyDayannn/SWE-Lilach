@@ -16,6 +16,7 @@ import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -89,6 +90,8 @@ public class EmployeeProfileController {
     private DatePicker startDatePicker;
     @FXML
     private DatePicker endDatePicker;
+    @FXML
+    private Button viewReportButton;
 
     // Variables
     private List<Complaint> complaintList;
@@ -98,6 +101,7 @@ public class EmployeeProfileController {
     private LocalDate reportEndDate;
     private ReportType reportType;
     private Store reportStore;
+    private Report report;
 
 
 
@@ -192,7 +196,7 @@ public class EmployeeProfileController {
     void selectStore(ActionEvent event) {
         String storeName = storeComboBox.getValue();
         for(Store store: storesList){
-            if(store.getName()==storeName){
+            if(store.getName().equals(storeName)){
                 reportStore = store;
                 break;
             }
@@ -202,39 +206,37 @@ public class EmployeeProfileController {
     @FXML
     void selectReportType(ActionEvent event) {
         String report = reportTypeComboBox.getValue();
-        if(report == "Orders")
+        if(report.equals("Orders"))
             reportType = ReportType.ORDERS;
-        else if (report == "Revenue")
+        else if (report.equals("Revenue"))
             reportType = ReportType.REVENUE;
-        else if(report == "Complaints")
+        else if(report.equals("Complaints"))
             reportType = ReportType.COMPLAINTS;
-
     }
 
     @FXML
     void setStartDate(ActionEvent event) {
         reportStartDate = startDatePicker.getValue();
-//        Date startDate = (Date) event.getSource();
-//        reportStartDate = LocalDate.ofInstant(startDate.toInstant(), ZoneId.systemDefault());
     }
 
     @FXML
     void setEndDate(ActionEvent event) {
-//        Date endDate =(Date) event.getSource();
-//        reportEndDate = LocalDate.ofInstant(endDate.toInstant(), ZoneId.systemDefault());
         reportEndDate = endDatePicker.getValue();
     }
 
     @FXML
     void generateReport(ActionEvent event) {
-        Report report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
+        report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
         report.generateHistogram();
+        viewReportButton.setDisable(false);
 
     }
 
     @FXML
     void viewReport(ActionEvent event) {
-        //TODO: open popup and open image report
+        String path = report.getReportPath();
+        App.setCurrentReportDisplayed(report);
+        App.popUpLaunch(viewReportButton, "ReportPopUp");
     }
 
     @FXML

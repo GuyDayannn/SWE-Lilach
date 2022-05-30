@@ -35,6 +35,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.cshaifa.spring.entities.Report;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 
@@ -60,6 +61,8 @@ public class App extends Application {
     private static User currentUser = null;
 
     private static Map<CatalogItem, Integer> shoppingCart = new HashMap<>();
+
+    private static Report report;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -203,10 +206,15 @@ public class App extends Application {
         }
     }
 
+
     static void setCurrentItemDisplayed(CatalogItem item, Text itemPrice, Text itemName) {
         currentItemDisplayed = item;
         currentItemPrice = itemPrice;
         currentItemName = itemName;
+    }
+
+    static void setCurrentReportDisplayed(Report report1) {
+       report = report1;
     }
 
     public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
@@ -223,6 +231,10 @@ public class App extends Application {
 
     static CatalogItem getCurrentItemDisplayed() {
         return currentItemDisplayed;
+    }
+
+    static Report getCurrentReportDisplayed() {
+        return report;
     }
 
     static CatalogItem getItemByID(long itemID) {

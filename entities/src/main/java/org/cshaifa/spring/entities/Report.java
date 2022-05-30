@@ -27,6 +27,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -44,6 +45,8 @@ public class Report {
     private LocalDate startDate;
 
     private LocalDate endDate;
+
+    private String reportPath;
 
     Map<LocalDate, Integer> getDailyOrderValues(List<Order> orders) {
         Map<LocalDate, Integer> dailyValues = new HashMap<>();
@@ -102,13 +105,14 @@ public class Report {
         Map<LocalDate, Integer> dailyValues = new HashMap<>();
 
         for (Complaint complaint : complaints) {
-            LocalDate orderDate = complaint.getComplaintTimestamp().toLocalDateTime().toLocalDate();
-            if (orderDate.isAfter(startDate.minusDays(1)) && orderDate.isBefore(endDate)) {
-                if (dailyValues.containsKey(orderDate)) {
-                    Integer val = dailyValues.get(orderDate);
-                    dailyValues.put(orderDate, ++val);
+            LocalDate complaintDate = complaint.getComplaintTimestamp().toLocalDateTime().toLocalDate();
+            System.out.println(complaintDate.toString());
+            if (complaintDate.isAfter(startDate.minusDays(1)) && complaintDate.isBefore(endDate)) {
+                if (dailyValues.containsKey(complaintDate)) {
+                    Integer val = dailyValues.get(complaintDate);
+                    dailyValues.put(complaintDate, ++val);
                 } else {
-                    dailyValues.put(orderDate, 0);
+                    dailyValues.put(complaintDate, 1);
                 }
             }
         }
@@ -153,6 +157,8 @@ public class Report {
     public Report() {
     }
 
+    public String getReportPath(){return reportPath;}
+
     public void generateHistogram() {
         if (store == null) {
             // Generate histogram for entire chain
@@ -161,21 +167,28 @@ public class Report {
             // Generate histogram for store
         }
         XYDataset dataset = null;
-        if(reportType== ReportType.ORDERS){ //numbers of orders per date
-            List<Order> storeOrders = store.getOrders();
-            Map<LocalDate, Integer> dailyValues = getDailyOrderValues(storeOrders);
-            dataset = createDataset(dailyValues);
+        String histTitle="";
+        if(store!=null){
+            if(reportType== ReportType.ORDERS){ //numbers of orders per date
+                List<Order> storeOrders = store.getOrders();
+                Map<LocalDate, Integer> dailyValues = getDailyOrderValues(storeOrders);
+                dataset = createDataset(dailyValues);
+                histTitle = store.getName()+" Orders Histogram";
+            }
+            else if(reportType== ReportType.COMPLAINTS){
+                List<Complaint> complaintList = store.getComplaints();
+                Map<LocalDate, Integer> dailyValues = getDailyComplaints(complaintList);
+                dataset = createDataset(dailyValues);
+                histTitle = store.getName()+"Complaint Histogram";
+            }
+            else if(reportType== ReportType.REVENUE){
+                List<Order> storeOrders = store.getOrders();
+                Map<LocalDate, Integer> dailyValues = getDailyRevenueValues(storeOrders);
+                dataset = createDataset(dailyValues);
+                histTitle = store.getName()+" Revenue Histogram";
+            }
         }
-        else if(reportType== ReportType.COMPLAINTS){
-            List<Complaint> complaintList = store.getComplaints();
-            Map<LocalDate, Integer> dailyValues = getDailyComplaints(complaintList);
-            dataset = createDataset(dailyValues);
-        }
-        else{//reportType== ReportType.REVENUE
-            List<Order> storeOrders = store.getOrders();
-            Map<LocalDate, Integer> dailyValues = getDailyRevenueValues(storeOrders);
-            dataset = createDataset(dailyValues);
-        }
+
 
         //super(title);
 
@@ -186,21 +199,22 @@ public class Report {
 
         final XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
 
-        final JFreeChart chart = new JFreeChart("Time Period Values Demo", plot);
+        final JFreeChart chart = new JFreeChart(histTitle, plot);
         final ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         chartPanel.setMouseZoomable(true, false);
 
         //JFreeChart histogram = ChartFactory.createTimeSeriesChart("JFreeChart Histogram", "Time", "Revenue", dataset);
 
-        try {
-            String histogramImagePath = "images/histograms/" ;
-            File histFile = new File(histogramImagePath+"histogram_"+ startDate.toString() + "_" + endDate.toString() + ".png");
+        try { //TODO: how to get each path generally?.getAbsolutePath()
+            reportPath = "E:\\java-proj\\SWE-Lilach\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+            File histFile = new File(reportPath);
             ChartUtils.saveChartAsPNG(histFile, chart, 500, 270);
         } catch (IOException e) {
             System.out.println("Creating histogram image failed.");
             e.printStackTrace();
         }
+
     }
 
 }

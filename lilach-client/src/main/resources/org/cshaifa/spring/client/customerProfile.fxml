@@ -57,10 +57,12 @@
                               <TableView fx:id="complaintTable" prefHeight="200.0" prefWidth="800.0">
                                 <columns>
                                     <TableColumn fx:id="complaintIdColumn" prefWidth="44.0" text="ID" />
-                                    <TableColumn fx:id="complaintStatusColumn" prefWidth="113.0" text="Complaint Status" />
-                                    <TableColumn fx:id="complaintDescriptionColumn" prefWidth="261.0" text="Complaint description" />
-                                    <TableColumn fx:id="complaintResponseColumn" prefWidth="191.0" text="Complaint Response" />
-                                    <TableColumn fx:id="complaintCompensationAmountColumn" prefWidth="145.0" text="Compensation Amount" />
+                                    <TableColumn fx:id="complaintStatusColumn" prefWidth="113.0" text="Status" />
+                                    <TableColumn fx:id="complaintDescriptionColumn" prefWidth="180.0" text="Complaint description" />
+                                    <TableColumn fx:id="complaintResponseColumn" prefWidth="120.0" text="Response" />
+                                    <TableColumn fx:id="complaintCompensationAmountColumn" minWidth="0.0" prefWidth="135.0" text="Compensation Amount" />
+                                    <TableColumn fx:id="complaintDateColumn" prefWidth="98.0" text="Date" />
+                                    <TableColumn fx:id="complaintStoreColumn" maxWidth="141.0" prefWidth="105.0" text="Store" />
                                 </columns>
                               </TableView>
                            </children>

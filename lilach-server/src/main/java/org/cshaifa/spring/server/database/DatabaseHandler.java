@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -269,7 +270,7 @@ public class DatabaseHandler {
 
     public static List<Store> initStores() {
         List<Store> stores = new ArrayList<>();
-        for (int i = 0; i<10; i++) {
+        for (int i = 1; i<11; i++) {
             stores.add(new Store("Store"+i, "Address"+i));
         }
         stores.add(new Store("Lilach Chain Store", "Everywhere"));
@@ -312,8 +313,8 @@ public class DatabaseHandler {
 
     public static void createOrders(List<Store> stores, List<CatalogItem> items) {
         Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, 3);
+        //Calendar cal = Calendar.getInstance();
+        //cal.add(Calendar.DAY_OF_MONTH, 3);
 
         Random random = new Random();
 
@@ -322,12 +323,18 @@ public class DatabaseHandler {
         //         "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
         //         new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
 
-
+        //Timestamp nowTimestamp = new Timestamp(cal.getTime().getTime());
         for (int i=0; i<100; i++) {
             int item_index = random.nextInt(items.size());
+            Calendar cal = Calendar.getInstance();
+            Calendar cal2 = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_MONTH, i);
+            cal2.add(Calendar.DAY_OF_MONTH,i+3);
+            Timestamp orderTime = new Timestamp(cal.getTime().getTime());
+            Timestamp deliveryTime = new Timestamp(cal2.getTime().getTime());
             createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
                     items.subList(0, item_index).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
-                    "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
+                    "Mazal Tov", orderTime, deliveryTime, true,
                     new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
         }
     }

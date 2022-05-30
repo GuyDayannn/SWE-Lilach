@@ -18,7 +18,7 @@ public class Constants {
     public static final String CANCEL_ORDER_FAILED = "Couldn't delete the order";
 
 
-    public static final int SERVER_PORT = 8154;
+    public static final int SERVER_PORT = 8179;
     public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
 }

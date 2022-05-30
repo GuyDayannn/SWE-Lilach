@@ -94,6 +94,12 @@ public class CustomerProfileController {
     private TableColumn<Complaint, Double> complaintCompensationAmountColumn;
 
     @FXML
+    private TableColumn<Complaint, Long> complaintStoreColumn;
+
+    @FXML
+    private TableColumn<Complaint, Date> complaintDateColumn;
+
+    @FXML
     private TableColumn<Order, Void> colBtn = new TableColumn("Cancel Order");
 
     @FXML
@@ -157,7 +163,7 @@ public class CustomerProfileController {
     void sendComplaint(ActionEvent event) throws ExecutionException, InterruptedException {
         if (customer != null && !complaintDescription.getText().isEmpty()) {
             int storeID = storesComboBox.getValue().intValue();
-            Store store = storeList.get(storeID);
+            Store store = storeList.get(storeID-1);
             Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
                 System.out.printf("customer is: ", customer.getUsername());
                 System.out.printf("%d%n", customer.getId());
@@ -330,6 +336,11 @@ public class CustomerProfileController {
             complaintCompensationAmountColumn.setCellValueFactory(cellData ->
                     new SimpleDoubleProperty(cellData.getValue().getCompensationAmount()).asObject());
 
+            complaintStoreColumn.setCellValueFactory(cellData ->
+                    new SimpleLongProperty(cellData.getValue().getStore().getId()).asObject());
+
+            complaintDateColumn.setCellValueFactory(new PropertyValueFactory<>("complaintTimestamp"));
+
             data.addAll(customerComplaintList);
             complaintTable.setItems(data);
 
@@ -465,7 +476,7 @@ public class CustomerProfileController {
             //showing customer only his complaints
             if(storeList.size()>=1){
                 for (int i = 0; i < storeList.size()-1; i++) {
-                    Long id = (storeList.get(i).getId());
+                    Long id = (storeList.get(i).getId()-1);
                     storesListID.add(id);
                 }
             }
