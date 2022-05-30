@@ -3,6 +3,7 @@ package org.cshaifa.spring.client;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 
 import org.cshaifa.spring.entities.CatalogItem;
 
@@ -56,13 +57,19 @@ public class OrderConfirmationController {
     private Label phoneNumberLabel;
 
     @FXML
+    private Label storeNameLabel;
+
+    @FXML
+    private Label storeAddressLabel;
+
+    @FXML
     private VBox summaryVbox;
 
     @FXML
     private AnchorPane deliveryAnchorPane;
 
     @FXML
-    private GridPane detailsGridPane;
+    private AnchorPane pickupAnchorPane;
 
     private HBox getItemHBox(CatalogItem item, int quantity) {
         HBox hBox = new HBox();
@@ -112,15 +119,20 @@ public class OrderConfirmationController {
         lastNamePaymentLabel.setText("Levi");
 
         if (!App.isOrderDelivery()) {
-            // TODO: view pickup details (name of store)
-            detailsGridPane.getChildren().remove(0);
+            // TODO: change to actual store name
+            storeNameLabel.setText("Temp Store");
+            storeAddressLabel.setText("Tel Aviv");
             return;
+        } else {
+            pickupAnchorPane.setVisible(false);
+            deliveryAnchorPane.setVisible(true);
         }
 
         firstNameDeliveryLabel.setText(App.getRecipientFirstName());
         lastNameDeliveryLabel.setText(App.getRecipientLastName());
         messageLabel.setText(App.getMessage());
         phoneNumberLabel.setText(App.getCustomerPhoneNumber());
+        deliveryTimeLabel.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(App.getSupplyDate()));
     }
 
     @FXML

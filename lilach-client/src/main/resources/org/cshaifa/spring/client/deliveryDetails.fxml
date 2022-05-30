@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.DeliveryDetailsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.DeliveryDetailsController">
    <children>
       <ComboBox fx:id="supplyMethodSelector" layoutX="444.0" layoutY="104.0" onAction="#selectSupplyMethod" prefWidth="150.0" />
       <VBox fx:id="deliveryDetailsVBox" alignment="CENTER" layoutX="315.0" layoutY="191.0" maxWidth="408.0" prefHeight="338.0" prefWidth="408.0" spacing="20.0">
@@ -28,8 +28,14 @@
             <ComboBox fx:id="deliveryTimeSelector" prefWidth="150.0" />
          </children>
       </VBox>
-      <Button layoutX="14.0" layoutY="681.0" mnemonicParsing="false" onAction="#goBack" text="Back to Order Details" />
-      <Button layoutX="889.0" layoutY="681.0" mnemonicParsing="false" onAction="#proceed" text="Proceed to Payment" />
+      <Button layoutX="14.0" layoutY="678.0" mnemonicParsing="false" onAction="#goBack" text="Back to Order Details">
+         <font>
+            <Font size="15.0" />
+         </font></Button>
+      <Button layoutX="869.0" layoutY="678.0" mnemonicParsing="false" onAction="#proceed" text="Proceed to Payment">
+         <font>
+            <Font size="15.0" />
+         </font></Button>
       <Label fx:id="notificationLabel" alignment="BASELINE_CENTER" layoutX="384.0" layoutY="567.0" prefHeight="18.0" prefWidth="272.0" />
    </children>
 </AnchorPane>

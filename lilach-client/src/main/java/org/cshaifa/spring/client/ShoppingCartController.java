@@ -164,6 +164,7 @@ public class ShoppingCartController {
                         App.setWindowTitle("Order Summary");
                         App.setContent("orderSummary");
                     } catch(IOException e) {
+                        e.printStackTrace();
                         System.out.println("Opening Order Summary Failed");
                     }
                 }

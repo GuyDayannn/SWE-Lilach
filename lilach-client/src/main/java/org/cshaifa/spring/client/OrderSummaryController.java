@@ -1,5 +1,14 @@
 package org.cshaifa.spring.client;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Map;
+
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.SubscriptionType;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -10,26 +19,8 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.SubscriptionType;
-
-import javax.swing.text.Position;
-import javax.xml.catalog.Catalog;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
-import java.util.Map;
 
 public class OrderSummaryController {
 
@@ -43,7 +34,22 @@ public class OrderSummaryController {
     private HBox titleHbox;
 
     @FXML
-    private VBox summaryVbox;
+    private VBox summaryVBox;
+
+    @FXML
+    private Label orderTotalLabel;
+
+    @FXML
+    private Label discountLabel;
+
+    @FXML
+    private Label newTotalLabel;
+
+    @FXML
+    private HBox discountHBox;
+
+    @FXML
+    private HBox newTotalHBox;
 
     Map<CatalogItem, Integer> shoppingCart;
 
@@ -63,37 +69,34 @@ public class OrderSummaryController {
             }
         }
 
-        Label itemName = new Label(item.getName()+"\t\t");
+        Label itemName = new Label(item.getName() + "\t\t");
         double price = item.getPrice();
         if (item.isOnSale()) {
             price = new BigDecimal((price * 0.01 * (100 - item.getDiscount()))).setScale(2, RoundingMode.HALF_UP)
                     .doubleValue();
         }
         double finalPrice = price * shoppingCart.get(item);
-        Label itemPrice = new Label(String.format("%.2f", price)+"\t");
-        Label itemFinalPrice = new Label(String.format("%.2f", finalPrice)+"\t");
+        Label itemPrice = new Label(String.format("%.2f", price) + "\t");
+        Label itemFinalPrice = new Label(String.format("%.2f", finalPrice) + "\t");
         Label itemQuantity = new Label(Integer.toString(shoppingCart.get(item)));
         Button decAmount = new Button("-");
         decAmount.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (shoppingCart.get(item)>1) {
+                if (shoppingCart.get(item) > 1) {
                     Integer quantity = shoppingCart.get(item);
                     App.getCart().put(item, --quantity);
                     itemQuantity.setText(Integer.toString(shoppingCart.get(item)));
                     double price = item.getPrice();
                     if (item.isOnSale()) {
-                        price = new BigDecimal((price * 0.01 * (100 - item.getDiscount()))).setScale(2, RoundingMode.HALF_UP)
-                                .doubleValue();
+                        price = new BigDecimal((price * 0.01 * (100 - item.getDiscount())))
+                                .setScale(2, RoundingMode.HALF_UP).doubleValue();
                     }
                     itemFinalPrice.setText(Double.toString(price * shoppingCart.get(item)));
-                    summaryVbox.getChildren().clear();
                     displayTotal();
-                }
-                else if(shoppingCart.get(item) == 1) {
+                } else if (shoppingCart.get(item) == 1) {
                     shoppingCart.remove(item);
                     itemsVbox.getChildren().clear();
-                    summaryVbox.getChildren().clear();
                     loadItems();
                     displayTotal();
                 }
@@ -103,17 +106,16 @@ public class OrderSummaryController {
         incAmount.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                //need to add support for case where quantity>stock
+                // need to add support for case where quantity>stock
                 Integer quantity = shoppingCart.get(item);
                 App.getCart().put(item, ++quantity);
                 itemQuantity.setText(Integer.toString(shoppingCart.get(item)));
                 double price = item.getPrice();
                 if (item.isOnSale()) {
-                    price = new BigDecimal((price * 0.01 * (100 - item.getDiscount()))).setScale(2, RoundingMode.HALF_UP)
-                            .doubleValue();
+                    price = new BigDecimal((price * 0.01 * (100 - item.getDiscount())))
+                            .setScale(2, RoundingMode.HALF_UP).doubleValue();
                 }
                 itemFinalPrice.setText(Double.toString(price * shoppingCart.get(item)));
-                summaryVbox.getChildren().clear();
                 displayTotal();
             }
         });
@@ -123,20 +125,20 @@ public class OrderSummaryController {
             public void handle(ActionEvent event) {
                 shoppingCart.remove(item);
                 itemsVbox.getChildren().clear();
-                summaryVbox.getChildren().clear();
                 loadItems();
                 displayTotal();
             }
         });
 
-        HBox.setMargin(removeButton, new Insets(0,120,0,0));
-        HBox.setMargin(itemName, new Insets(0,0,0,0));
-        HBox.setMargin(itemPrice, new Insets(0,60,0,60));
-        HBox.setMargin(decAmount, new Insets(0,0,0,60));
-        HBox.setMargin(itemQuantity, new Insets(0,0,0,0));
-        HBox.setMargin(incAmount, new Insets(0,100,0,0));
-        HBox.setMargin(itemFinalPrice, new Insets(0,0,0,0));
-        hBox.getChildren().addAll(removeButton, iv, itemName, itemPrice, decAmount, itemQuantity, incAmount, itemFinalPrice);
+        HBox.setMargin(removeButton, new Insets(0, 120, 0, 0));
+        HBox.setMargin(itemName, new Insets(0, 0, 0, 0));
+        HBox.setMargin(itemPrice, new Insets(0, 60, 0, 60));
+        HBox.setMargin(decAmount, new Insets(0, 0, 0, 60));
+        HBox.setMargin(itemQuantity, new Insets(0, 0, 0, 0));
+        HBox.setMargin(incAmount, new Insets(0, 100, 0, 0));
+        HBox.setMargin(itemFinalPrice, new Insets(0, 0, 0, 0));
+        hBox.getChildren().addAll(removeButton, iv, itemName, itemPrice, decAmount, itemQuantity, incAmount,
+                itemFinalPrice);
         hBox.setPrefSize(100, 500);
         hBox.setSpacing(5);
         hBox.getStyleClass().add("item");
@@ -157,55 +159,40 @@ public class OrderSummaryController {
 
     @FXML
     void displayTotal() {
-        if (shoppingCart!=null) {
-            double total = shoppingCart.entrySet().stream().mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
-            summaryVbox.getChildren().add(new Text("Order Total:\t\t" + Double.toString(total)));
-            Customer currentCustomer = (Customer)App.getCurrentUser();
+        if (shoppingCart != null) {
+            double total = shoppingCart.entrySet().stream()
+                    .mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
+            orderTotalLabel.setText(Double.toString(total));
+            Customer currentCustomer = (Customer) App.getCurrentUser();
             if (currentCustomer.getSubscriptionType() == SubscriptionType.YEARLY) {
-                summaryVbox.getChildren().add(new Text("10% Discount:\t\t" + Double.toString(total*0.1)));
-                summaryVbox.getChildren().add(new Text("New Total:\t\t" + Double.toString(total*0.9)));
+                discountHBox.setVisible(true);
+                newTotalHBox.setVisible(true);
+
+                discountLabel.setText(Double.toString(total * 0.1));
+                newTotalLabel.setText(Double.toString(total * 0.9));
+            } else {
+                summaryVBox.getChildren().remove(discountHBox);
+                summaryVBox.getChildren().remove(newTotalHBox);
             }
-            summaryVbox.getChildren().add(new Text("\n\n"));
-            HBox buttonsBox = new HBox();
-            buttonsBox.setAlignment(Pos.BOTTOM_RIGHT);
-            buttonsBox.setPrefWidth(400);
+        }
+    }
 
-            Button backButton = new Button("Go Back");
-            backButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    try{
-                        App.setWindowTitle("Catalog");
-                        App.setContent("catalog");
-                    } catch(IOException e) {
-                        System.out.println("Opening Catalog failed");
-                    }
-                }
-            });
+    @FXML
+    private void goBack(ActionEvent event) {
+        try {
+            App.setWindowTitle("Catalog");
+            App.setContent("catalog");
+        } catch (IOException e) {
+            System.out.println("Opening Catalog failed");
+        }
+    }
 
-            Button clearButton = new Button("Clear Cart");
-            clearButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    shoppingCart.clear();
-                    itemsVbox.getChildren().clear();
-                    itemsVbox.getChildren().add(new Text("Shopping cart is empty"));
-                    summaryVbox.getChildren().clear();
-                }
-            });
-            Button finishButton = new Button("Continue");
-            finishButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    try {
-                        App.setContent("deliveryDetails");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            buttonsBox.getChildren().addAll(backButton, finishButton);
-            summaryVbox.getChildren().add(buttonsBox);
+    @FXML
+    private void continueOrder(ActionEvent event) {
+        try {
+            App.setContent("deliveryDetails");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -217,10 +204,9 @@ public class OrderSummaryController {
         cartImage.setFitHeight(40);
         shoppingCart = App.getCart();
 
-        if (shoppingCart.size()==0) {
+        if (shoppingCart.size() == 0) {
             itemsVbox.getChildren().add(new Text("Shopping cart is empty"));
-        }
-        else {
+        } else {
             loadItems();
             displayTotal();
         }

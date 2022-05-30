@@ -42,7 +42,7 @@
                   <VBox fx:id="summaryVbox" prefHeight="173.0" prefWidth="518.0" styleClass="summaryVbox" />
                </children>
             </VBox>
-            <GridPane fx:id="detailsGridPane" gridLinesVisible="true" prefHeight="585.0" prefWidth="457.0" GridPane.columnIndex="1">
+            <GridPane gridLinesVisible="true" prefHeight="585.0" prefWidth="457.0" GridPane.columnIndex="1">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
@@ -51,7 +51,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <AnchorPane fx:id="deliveryAnchorPane" prefHeight="200.0" prefWidth="200.0">
+                  <AnchorPane fx:id="deliveryAnchorPane" prefHeight="200.0" prefWidth="200.0" visible="false">
                      <children>
                         <VBox layoutX="14.0" layoutY="40.0" prefHeight="186.0" prefWidth="428.0" spacing="20.0">
                            <children>
@@ -148,6 +148,47 @@
                         </VBox>
                      </children>
                   </AnchorPane>
+                  <AnchorPane fx:id="pickupAnchorPane" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <VBox layoutX="14.0" layoutY="40.0" prefHeight="186.0" prefWidth="428.0" spacing="20.0">
+                           <children>
+                              <Label text="Self Pickup">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Label>
+                              <HBox prefWidth="429.0" spacing="10.0">
+                                 <children>
+                                    <Label text="Store Name" textAlignment="CENTER">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="storeNameLabel" alignment="TOP_LEFT" textAlignment="CENTER">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox prefWidth="429.0" spacing="10.0">
+                                 <children>
+                                    <Label text="Store Address" textAlignment="CENTER">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="storeAddressLabel" alignment="TOP_LEFT" textAlignment="CENTER">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                      <children>
                         <VBox layoutX="14.0" layoutY="40.0" prefHeight="186.0" prefWidth="428.0" spacing="20.0">
@@ -215,8 +256,14 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <Button layoutX="412.0" layoutY="288.0" mnemonicParsing="false" onAction="#placeOrder" text="Place Order" />
-                        <Button layoutX="5.0" layoutY="288.0" mnemonicParsing="false" onAction="#goBack" text="Go Back" />
+                        <Button layoutX="401.0" layoutY="288.0" mnemonicParsing="false" onAction="#placeOrder" text="Place Order">
+                           <font>
+                              <Font size="15.0" />
+                           </font></Button>
+                        <Button layoutX="14.0" layoutY="288.0" mnemonicParsing="false" onAction="#goBack" text="Go Back">
+                           <font>
+                              <Font size="15.0" />
+                           </font></Button>
                      </children>
                   </AnchorPane>
                </children>
