@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -257,12 +258,13 @@ public class DatabaseHandler {
         return order;
     }
 
-    public static Complaint addComplaint(String complaintDescription, Customer customer) throws HibernateException {
+    public static Complaint addComplaint(String complaintDescription, Customer customer, Store store) throws HibernateException {
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer);
+        Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer, store, nowTimestamp);
         session.save(complaint);
 
         customer.addComplaint(complaint);
@@ -352,8 +354,8 @@ public class DatabaseHandler {
 
     public static void createOrders(List<Store> stores, List<CatalogItem> items) {
         Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, 3);
+        //Calendar cal = Calendar.getInstance();
+        //cal.add(Calendar.DAY_OF_MONTH, 3);
 
         Random random = new Random();
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -12,8 +14,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 <AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
    <children>
       <Text fx:id="welcomeText" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, ___________" wrappingWidth="203.48004150390625">
@@ -40,12 +40,12 @@
                               <Font size="14.0" />
                            </font>
                         </Text>
-                        <ComboBox fx:id="reportTypeComboBox" layoutX="28.0" layoutY="122.0" onAction="#selectReportType" prefWidth="202.0" >
+                        <ComboBox fx:id="reportTypeComboBox" layoutX="28.0" layoutY="122.0" onAction="#selectReportType" prefWidth="202.0">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
-                                    <String fx:value="Orders"/>
-                                    <String fx:value="Revenue"/>
-                                    <String fx:value="Complaints"/>
+                                    <String fx:value="Orders" />
+                                    <String fx:value="Revenue" />
+                                    <String fx:value="Complaints" />
                                 </FXCollections>
                             </items>
                         </ComboBox>
@@ -100,15 +100,28 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <ComboBox fx:id="complaintComboBox1" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
-                        <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select User" />
-                        <Button fx:id="viewComplaint1" layoutX="175.0" layoutY="29.0" mnemonicParsing="false" onAction="#openComplaint" text="View" />
-                        <Button fx:id="closeComplaintButton1" layoutX="457.0" layoutY="218.0" mnemonicParsing="false" onAction="#closeComplaint" text="Edit User" />
-                        <Text layoutX="298.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User Status" />
-                        <TextField fx:id="complaintStatus1" layoutX="298.0" layoutY="29.0" text="" />
+                        <ComboBox fx:id="customerComboBox" layoutX="14.0" layoutY="29.0" onAction="#selectCustomer" prefWidth="150.0" />
+                        <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Customer" />
+                        <Button fx:id="editCustomerBtn" layoutX="475.0" layoutY="81.0" mnemonicParsing="false" onAction="#editCustomerStatus" text="Edit Customer" />
+                        <Text layoutX="277.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Account  Status" />
+                        <TextField fx:id="customerAccountText" layoutX="277.0" layoutY="29.0" text="" />
                         <Label fx:id="updated_complaint_text1" layoutX="383.0" layoutY="259.0" text="" />
+                        <Text layoutX="21.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Customer Account Status:" />
+                        <ComboBox fx:id="accountStatusComboBox" layoutX="277.0" layoutY="81.0" onAction="#selectAccpuntStatus" prefWidth="150.0" />
+                        <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee" />
+                        <ComboBox fx:id="employeesComboBox" layoutX="25.0" layoutY="165.0" onAction="#selectEmployee" prefWidth="150.0" />
+                        <Text layoutX="277.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Employee Status" />
+                        <TextField fx:id="employeeStatusText" layoutX="277.0" layoutY="165.0" />
+                        <Text layoutX="25.0" layoutY="234.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status: " />
+                        <ComboBox fx:id="employeeStatusComboBox" layoutX="277.0" layoutY="217.0" onAction="#selectEmployeeStatus" prefWidth="150.0" />
+                        <Button fx:id="editEmployeeBtn" layoutX="475.0" layoutY="217.0" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
                      </children>
                   </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane prefHeight="200.0" prefWidth="200.0" text="View Two Reports">
+               <content>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" />
                </content>
             </TitledPane>
         </panes>

@@ -1,6 +1,7 @@
 package org.cshaifa.spring.entities;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -26,6 +27,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -44,6 +46,8 @@ public class Report {
 
     private LocalDate endDate;
 
+    private String reportPath;
+
     Map<LocalDate, Integer> getDailyOrderValues(List<Order> orders) {
         Map<LocalDate, Integer> dailyValues = new HashMap<>();
 
@@ -56,6 +60,59 @@ public class Report {
                     dailyValues.put(orderDate, ++val);
                 } else {
                     dailyValues.put(orderDate, 1);
+                }
+            }
+        }
+
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1))
+        {
+            if (!dailyValues.containsKey(date)) {
+                dailyValues.put(date, 0);
+            }
+        }
+
+        return dailyValues;
+    }
+
+
+    Map<LocalDate, Integer> getDailyRevenueValues(List<Order> orders) {
+        Map<LocalDate, Integer> dailyValues = new HashMap<>();
+
+        for (Order order : orders) {
+            LocalDate orderDate = order.getOrderDate().toLocalDateTime().toLocalDate();
+            int dailyRevenue = (int) order.getTotal();
+            if (orderDate.isAfter(startDate.minusDays(1)) && orderDate.isBefore(endDate)) {
+                if (dailyValues.containsKey(orderDate)) {
+                    int val = dailyValues.get(orderDate);
+                    dailyValues.put(orderDate, val+dailyRevenue);
+                } else {
+                    dailyValues.put(orderDate, dailyRevenue);
+                }
+            }
+        }
+
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1))
+        {
+            if (!dailyValues.containsKey(date)) {
+                dailyValues.put(date, 0);
+            }
+        }
+
+        return dailyValues;
+    }
+
+    Map<LocalDate, Integer> getDailyComplaints(List<Complaint> complaints) {
+        Map<LocalDate, Integer> dailyValues = new HashMap<>();
+
+        for (Complaint complaint : complaints) {
+            LocalDate complaintDate = complaint.getComplaintTimestamp().toLocalDateTime().toLocalDate();
+            System.out.println(complaintDate.toString());
+            if (complaintDate.isAfter(startDate.minusDays(1)) && complaintDate.isBefore(endDate)) {
+                if (dailyValues.containsKey(complaintDate)) {
+                    Integer val = dailyValues.get(complaintDate);
+                    dailyValues.put(complaintDate, ++val);
+                } else {
+                    dailyValues.put(complaintDate, 1);
                 }
             }
         }
@@ -100,6 +157,8 @@ public class Report {
     public Report() {
     }
 
+    public String getReportPath(){return reportPath;}
+
     public void generateHistogram() {
         if (store == null) {
             // Generate histogram for entire chain
@@ -107,12 +166,29 @@ public class Report {
         else {
             // Generate histogram for store
         }
+        XYDataset dataset = null;
+        String histTitle="";
+        if(store!=null){
+            if(reportType== ReportType.ORDERS){ //numbers of orders per date
+                List<Order> storeOrders = store.getOrders();
+                Map<LocalDate, Integer> dailyValues = getDailyOrderValues(storeOrders);
+                dataset = createDataset(dailyValues);
+                histTitle = store.getName()+" Orders Histogram";
+            }
+            else if(reportType== ReportType.COMPLAINTS){
+                List<Complaint> complaintList = store.getComplaints();
+                Map<LocalDate, Integer> dailyValues = getDailyComplaints(complaintList);
+                dataset = createDataset(dailyValues);
+                histTitle = store.getName()+"Complaint Histogram";
+            }
+            else if(reportType== ReportType.REVENUE){
+                List<Order> storeOrders = store.getOrders();
+                Map<LocalDate, Integer> dailyValues = getDailyRevenueValues(storeOrders);
+                dataset = createDataset(dailyValues);
+                histTitle = store.getName()+" Revenue Histogram";
+            }
+        }
 
-        List<Order> storeOrders = store.getOrders();
-
-        Map<LocalDate, Integer> dailyValues = getDailyOrderValues(storeOrders);
-
-        XYDataset dataset = createDataset(dailyValues);
 
         //super(title);
 
@@ -123,7 +199,7 @@ public class Report {
 
         final XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
 
-        final JFreeChart chart = new JFreeChart("Time Period Values Demo", plot);
+        final JFreeChart chart = new JFreeChart(histTitle, plot);
         final ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         chartPanel.setMouseZoomable(true, false);
@@ -131,12 +207,15 @@ public class Report {
         //JFreeChart histogram = ChartFactory.createTimeSeriesChart("JFreeChart Histogram", "Time", "Revenue", dataset);
 
         try {
-            String histogramImagePath = "images/histograms/histogram_" + startDate.toString() + "_" + endDate.toString() + ".png";
-            ChartUtils.saveChartAsPNG(new File(histogramImagePath), chart, 500, 270);
+            //reportPath = "E:\\java-proj\\SWE-Lilach\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+            reportPath = "..\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+            File histFile = new File(reportPath);
+            ChartUtils.saveChartAsPNG(histFile.getAbsoluteFile(), chart, 500, 270);
         } catch (IOException e) {
             System.out.println("Creating histogram image failed.");
             e.printStackTrace();
         }
+
     }
 
 }

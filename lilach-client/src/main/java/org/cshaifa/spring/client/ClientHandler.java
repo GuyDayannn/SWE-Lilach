@@ -192,8 +192,8 @@ public class ClientHandler {
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());
     }
 
-    public static AddComplaintResponse addComplaint(String complaintDescription, Customer customer) throws IOException, InterruptedException {
-        AddComplaintRequest addComplaintRequest = new AddComplaintRequest(complaintDescription, customer);
+    public static AddComplaintResponse addComplaint(String complaintDescription, Customer customer, Store store) throws IOException, InterruptedException {
+        AddComplaintRequest addComplaintRequest = new AddComplaintRequest(complaintDescription,customer, store);
         client.openConnection();
         client.sendToServer(addComplaintRequest);
         return (AddComplaintResponse) waitForMsgFromServer(addComplaintRequest.getRequestId());

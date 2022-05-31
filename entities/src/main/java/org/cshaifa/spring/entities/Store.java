@@ -34,11 +34,16 @@ public class Store implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Order> orders;
 
+    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<Complaint> complaints;
+
     public Store() {
         this.name = "";
         this.address = "";
         this.customers = new ArrayList<>();
         this.orders = new ArrayList<>();
+        this.complaints = new ArrayList<>();
     }
 
     public Store(String name, String address) {
@@ -46,6 +51,7 @@ public class Store implements Serializable {
         this.address = address;
         this.customers = new ArrayList<>();
         this.orders = new ArrayList<>();
+        this.complaints = new ArrayList<>();
     }
 
     public Store(String name, String address, List<Customer> customers) {
@@ -53,13 +59,15 @@ public class Store implements Serializable {
         this.address = address;
         this.customers = customers;
         this.orders = new ArrayList<>();
+        this.complaints = new ArrayList<>();
     }
 
-    public Store(String name, String address, List<Customer> customers, List<Order> orders) {
+    public Store(String name, String address, List<Customer> customers, List<Order> orders,List<Complaint> complaints) {
         this.name = name;
         this.address = address;
         this.customers = customers;
         this.orders = orders;
+        this.complaints = complaints;
     }
 
 
@@ -87,8 +95,18 @@ public class Store implements Serializable {
 
     public void addOrder(Order order) {orders.add(order);}
 
+    public void addComplaint(Complaint complaint) {complaints.add(complaint);}
+
     public List<Order> getOrders() {
         return orders;
+    }
+
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public List<Complaint> getComplaints() {
+        return complaints;
     }
 
     public void removeOrder(Order order) {this.orders.remove(order);}
