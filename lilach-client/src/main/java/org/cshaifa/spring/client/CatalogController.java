@@ -205,7 +205,7 @@ public class CatalogController {
         ivRemove.setFitHeight(15);
         ivRemove.setFitWidth(15);
         removeItemButton.setGraphic(ivRemove);
-        addCartButton.setOnAction(new EventHandler<ActionEvent>() {
+        removeItemButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 // TODO: Handle item removal
