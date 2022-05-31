@@ -28,6 +28,7 @@ import org.cshaifa.spring.entities.responses.GetStoresResponse;
 import org.cshaifa.spring.entities.responses.IsAliveResponse;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.entities.responses.LogoutResponse;
+import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.entities.responses.RegisterResponse;
 import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
@@ -73,6 +74,7 @@ public class LilachServer extends AbstractServer {
                     try {
                         DatabaseHandler.updateItem(updatedItem);
                         client.sendToClient(new UpdateItemResponse(requestId, updatedItem));
+                        sendToAllClients(new NotifyUpdateResponse(updatedItem));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
