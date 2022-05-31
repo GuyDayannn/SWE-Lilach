@@ -97,16 +97,18 @@ public class App extends Application {
         stage.setScene(scene);
         appStage = stage;
         // TODO: logout without any loading for now, maybe change, maybe don't
-        appStage.setOnCloseRequest(e -> logoutUser());
+        appStage.setOnCloseRequest(e -> {
+            logoutUser();
+            scheduler.shutdown();
+        });
         appStage.show();
     }
 
     public static void logoutUser() {
         final User toLogout = currentUser;
         new Thread(
-                createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT,
-                        TimeUnit.SECONDS))
-                .start();
+                createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS))
+                        .start();
         currentUser = null;
     }
 
@@ -235,7 +237,6 @@ public class App extends Application {
         }
     }
 
-
     static void setCurrentItemDisplayed(CatalogItem item, Text itemPrice, Text itemName) {
         currentItemDisplayed = item;
         currentItemPrice = itemPrice;
@@ -243,15 +244,14 @@ public class App extends Application {
     }
 
     static void setCurrentReportDisplayed(Report report1) {
-       report = report1;
+        report = report1;
     }
 
     public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
-        if(updatedItem.getDiscount()!=0){
-            double price = updatedItem.getPrice()*(1-updatedItem.getDiscount()/100);
+        if (updatedItem.getDiscount() != 0) {
+            double price = updatedItem.getPrice() * (1 - updatedItem.getDiscount() / 100);
             currentItemPrice.setText(String.format("%.2f", price));
-        }
-        else{
+        } else {
             currentItemPrice.setText(Double.toString(updatedItem.getPrice()));
         }
 
@@ -286,29 +286,53 @@ public class App extends Application {
         shoppingCart.put(item, quantity);
     }
 
-    public static String getRecipientFirstName() { return recipientFirstName; }
+    public static String getRecipientFirstName() {
+        return recipientFirstName;
+    }
 
-    public static void setRecipientFirstName(String firstName) { App.recipientFirstName = firstName; }
+    public static void setRecipientFirstName(String firstName) {
+        App.recipientFirstName = firstName;
+    }
 
-    public static String getRecipientLastName() { return recipientLastName; }
+    public static String getRecipientLastName() {
+        return recipientLastName;
+    }
 
-    public static void setRecipientLastName(String lastName) { App.recipientLastName = lastName; }
+    public static void setRecipientLastName(String lastName) {
+        App.recipientLastName = lastName;
+    }
 
-    public static String getRecipientAddress() { return recipientAddress; }
+    public static String getRecipientAddress() {
+        return recipientAddress;
+    }
 
-    public static void setRecipientAddress(String address) { App.recipientAddress = address; }
+    public static void setRecipientAddress(String address) {
+        App.recipientAddress = address;
+    }
 
-    public static String getMessage() { return message; }
+    public static String getMessage() {
+        return message;
+    }
 
-    public static void setMessage(String message) { App.message = message; }
+    public static void setMessage(String message) {
+        App.message = message;
+    }
 
-    public static String getCustomerPhoneNumber() { return customerPhoneNumber; }
+    public static String getCustomerPhoneNumber() {
+        return customerPhoneNumber;
+    }
 
-    public static void setCustomerPhoneNumber(String phoneNumber) { App.customerPhoneNumber = phoneNumber; }
+    public static void setCustomerPhoneNumber(String phoneNumber) {
+        App.customerPhoneNumber = phoneNumber;
+    }
 
-    public static Timestamp getSupplyDate() { return supplyDate; }
+    public static Timestamp getSupplyDate() {
+        return supplyDate;
+    }
 
-    public static void setSupplyDate(Timestamp supplyDate) { App.supplyDate = supplyDate; }
+    public static void setSupplyDate(Timestamp supplyDate) {
+        App.supplyDate = supplyDate;
+    }
 
     public static boolean isOrderDelivery() {
         return orderDelivery;
@@ -346,9 +370,15 @@ public class App extends Application {
         return enteredSupplyDetails;
     }
 
-    public static void setEnteredSupplyDetails(boolean enteredSupplyDetails) { App.enteredSupplyDetails = enteredSupplyDetails; }
+    public static void setEnteredSupplyDetails(boolean enteredSupplyDetails) {
+        App.enteredSupplyDetails = enteredSupplyDetails;
+    }
 
-    public static Store getPickupStore() { return pickupStore; }
+    public static Store getPickupStore() {
+        return pickupStore;
+    }
 
-    public static void setPickupStore(Store pickupStore) { App.pickupStore = pickupStore; }
+    public static void setPickupStore(Store pickupStore) {
+        App.pickupStore = pickupStore;
+    }
 }

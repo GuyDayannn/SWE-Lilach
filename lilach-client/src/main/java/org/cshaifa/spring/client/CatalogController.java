@@ -17,6 +17,7 @@ import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -507,8 +508,7 @@ public class CatalogController {
             toolbar.getItems().add(contactButton);
             toolbar.getItems().add(spacer);
             toolbar.getItems().add(shoppingCart);
-        }
-        else {
+        } else {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
             toolbar.getItems().add(viewProfileButton);
             toolbar.getItems().add(refreshButton);
@@ -554,26 +554,31 @@ public class CatalogController {
             listDisplay();
 
             App.scheduler.scheduleAtFixedRate(() -> {
-                try{
+                try {
                     Object gotObject = ClientHandler.waitForUpdateFromServer();
                     if (gotObject == null)
                         return;
 
-                    NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) ClientHandler.waitForUpdateFromServer();
-                    if(notifyUpdateResponse != null) {
-                        catalogItems.set(catalogItems.indexOf(catalogItems.stream().filter(catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId()).findFirst().get()), notifyUpdateResponse.getToUpdate());
-                        refreshList();
-                        System.out.println("playing");
-                        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
-                        updateNotification.setVisible(true);
-                        fadeTransition.setFromValue(0.0);
-                        fadeTransition.setToValue(1.0);
-                        fadeTransition.setCycleCount(3);
-                        fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
-                        fadeTransition.play();
+                    NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) gotObject;
+                    if (notifyUpdateResponse != null) {
+                        int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
+                                catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
+                                .findFirst().get());
+                        catalogItems.set(itemIndex, notifyUpdateResponse.getToUpdate());
+                        itemCells.set(itemIndex, getItemHBox(catalogItems.get(itemIndex)));
+                        Platform.runLater(() -> {
+                            refreshList();
+                            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
+                            updateNotification.setVisible(true);
+                            fadeTransition.setFromValue(0.0);
+                            fadeTransition.setToValue(1.0);
+                            fadeTransition.setCycleCount(3);
+                            fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
+                            fadeTransition.play();
+                        });
                     }
 
-                } catch (InterruptedException error) {
+                } catch (Exception error) {
                     error.printStackTrace();
                     return;
                 }
