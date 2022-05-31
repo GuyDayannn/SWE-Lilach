@@ -9,4 +9,4 @@
 **/.project
 **/bin/*
 dependency-reduced-pom.xml
-hibernate.properties
+*.properties
