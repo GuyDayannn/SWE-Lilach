@@ -5,10 +5,10 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -21,7 +21,15 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.*;
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.ChainEmployee;
+import org.cshaifa.spring.entities.Complaint;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Delivery;
+import org.cshaifa.spring.entities.Order;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.SubscriptionType;
+import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -99,7 +107,7 @@ public class DatabaseHandler {
             else
                 user.logout();
             session.beginTransaction();
-            session.merge(user);
+            updateDB(session, user);
             tryFlushSession(session);
         } else
             session.close();
@@ -139,7 +147,7 @@ public class DatabaseHandler {
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
-                session.merge(store);
+                updateDB(session, store);
             }
 
         } catch (Exception e) {
@@ -194,15 +202,15 @@ public class DatabaseHandler {
         session.save(order);
 
         store.addOrder(order);
-        session.merge(store);
+        updateDB(session, store);
 
         customer.addOrder(order);
-        session.merge(customer);
+        updateDB(session, customer);
 
         // Update stock
         items.forEach((item, amount) -> {
             item.reduceQuantity(store, amount);
-            session.merge(item);
+            updateDB(session, item);
         });
 
         tryFlushSession(session);
@@ -210,16 +218,17 @@ public class DatabaseHandler {
         return order;
     }
 
-    public static Complaint addComplaint(String complaintDescription, Customer customer) throws HibernateException {
+    public static Complaint addComplaint(String complaintDescription, Customer customer, Store store) throws HibernateException {
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer);
+        Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        Complaint complaint = new Complaint(complaintDescription, "", 0.0, true, customer, store, nowTimestamp);
         session.save(complaint);
 
         customer.addComplaint(complaint);
-        session.merge(customer);
+        updateDB(session, customer);
 
         tryFlushSession(session);
 
@@ -241,20 +250,34 @@ public class DatabaseHandler {
         return imagesLists;
     }
 
-    public static void initializeDatabaseIfEmpty() throws Exception {
-        // Assume that we initialize only if the catalog is empty
-        if (!getAllEntities(CatalogItem.class).isEmpty())
-            return;
-
+    public static void saveStores(List<Store> stores) {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
-
-        Store store = new Store("Example Store", "Example Address");
-        Store chainStore = new Store("Chain Store", "Everywhere");
-        session.save(store);
-        session.save(chainStore);
+        for (Store store : stores) {
+            session.save(store);
+        }
         tryFlushSession(session);
+    }
 
+    public static void saveItems(List<CatalogItem> items) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        for (CatalogItem item : items) {
+            session.save(item);
+        }
+        tryFlushSession(session);
+    }
+
+    public static List<Store> initStores() {
+        List<Store> stores = new ArrayList<>();
+        for (int i = 1; i<11; i++) {
+            stores.add(new Store("Store"+i, "Address"+i));
+        }
+        stores.add(new Store("Lilach Chain Store", "Everywhere"));
+        return stores;
+    }
+
+    public static List<CatalogItem> initItems(List<Store> stores) {
         List<List<Path>> imageLists = getRandomOrderedImages();
         Random random = new Random();
         List<CatalogItem> randomItems = new ArrayList<>();
@@ -267,9 +290,7 @@ public class DatabaseHandler {
                 for (Path imagePath : imageList) {
                     int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
-                    int randomQuantity = random.nextInt(500);
-                    Map<Store, Integer> stock = new HashMap<>();
-                    stock.put(store, randomQuantity);
+                    Map<Store, Integer> stock = stores.stream().collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
                     randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
                             false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
@@ -278,42 +299,69 @@ public class DatabaseHandler {
         }
 
         // On Sale Items
-        randomItems.remove(0);
-        randomItems.add(0, new CatalogItem("Sale flower",
-        imageLists.get(0).get(0).toUri().toString(), 249.99,
-        new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
-        randomItems.remove(1);
-        randomItems.add(1, new CatalogItem("Sale flower",
-        imageLists.get(0).get(1).toUri().toString(), 149.99,
-        new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
+        //randomItems.remove(0);
+        //randomItems.add(0, new CatalogItem("Sale flower",
+        //imageLists.get(0).get(0).toUri().toString(), 249.99,
+        //new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
+        //randomItems.remove(1);
+        //randomItems.add(1, new CatalogItem("Sale flower",
+        //imageLists.get(0).get(1).toUri().toString(), 149.99,
+        //new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
 
-        session = DatabaseConnector.getSessionFactory().openSession();
-        session.beginTransaction();
+        return randomItems;
+    }
 
-        for (CatalogItem item : randomItems) {
-            session.save(item);
+    public static void createOrders(List<Store> stores, List<CatalogItem> items) {
+        Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+        //Calendar cal = Calendar.getInstance();
+        //cal.add(Calendar.DAY_OF_MONTH, 3);
+
+        Random random = new Random();
+
+        // createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+        //         items.subList(0, random.nextInt(1, items.size())).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+        //         "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
+        //         new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+
+        //Timestamp nowTimestamp = new Timestamp(cal.getTime().getTime());
+        for (int i=0; i<100; i++) {
+            int item_index = random.nextInt(items.size());
+            Calendar cal = Calendar.getInstance();
+            Calendar cal2 = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_MONTH, i);
+            cal2.add(Calendar.DAY_OF_MONTH,i+3);
+            Timestamp orderTime = new Timestamp(cal.getTime().getTime());
+            Timestamp deliveryTime = new Timestamp(cal2.getTime().getTime());
+            createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+                    items.subList(0, item_index).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+                    "Mazal Tov", orderTime, deliveryTime, true,
+                    new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
         }
+    }
 
-        tryFlushSession(session);
-
-        List<Store> stores = new ArrayList<>();
+    public static void createUsers(List<Store> stores) throws Exception {
         List<Complaint> complaintList = new ArrayList<>();
-        stores.add(store);
-        stores.add(chainStore);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 1; i <= 20; i++) {
             String email = "example" + i + "@mail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
         }
+        for (int i = 1; i <= 20; i++) {
+            registerChainEmployee("Employee"+i, "Employee"+i+"@lilach.co.il", "Employee"+i, "Employee"+i);
+        }
+    }
 
-        registerChainEmployee("Employee", "Employee", "Employee123", "Employee123");
-        Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, 3);
+    public static void initializeDatabaseIfEmpty() throws Exception {
+        // Assume that we initialize only if the catalog is empty
+        if (!getAllEntities(CatalogItem.class).isEmpty())
+            return;
 
-        createOrder(store, (Customer) getUserByUsername("cust1"),
-                randomItems.subList(0, 3).stream().collect(
-                        Collectors.toMap(Function.identity(), item -> 2)),
-                "greeting", nowTimestamp, new Timestamp(cal.getTime().getTime()), true, new Delivery("Guy Dayan", "0509889939","address", "Hello There", false));
+        List<Store> stores = initStores();
+        saveStores(stores);
+        List<CatalogItem> items = initItems(stores);
+        saveItems(items);
+
+        createUsers(stores);
+        createOrders(stores, items);
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
@@ -358,15 +406,48 @@ public class DatabaseHandler {
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
-        session.merge(newItem);
+        updateDB(session, newItem);
         tryFlushSession(session);
     }
 
     public static void updateComplaint(Complaint newComplaint) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
-        session.merge(newComplaint);
+        updateDB(session, newComplaint);
         tryFlushSession(session);
+    }
+
+    public static void updateOrders(Order order) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        Customer customer = order.getCustomer();
+        customer.removeOrder(order);
+        order.deleteCustomer();
+        Store store = order.getStore();
+        store.removeOrder(order);
+
+        try {
+            session.update(customer);
+            session.update(order);
+            session.update(store);
+            session.delete(order);
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.merge(customer);
+            session.merge(order);
+            session.merge(store);
+        }
+        //updateDB(session, order);
+        tryFlushSession(session);
+    }
+
+    private static <T> void updateDB(Session session, T toUpdate) {
+        try {
+            session.update(toUpdate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.merge(toUpdate);
+        }
     }
 
     public static void tryFlushSession(Session session) throws HibernateException {
@@ -382,4 +463,6 @@ public class DatabaseHandler {
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
     }
+
+
 }

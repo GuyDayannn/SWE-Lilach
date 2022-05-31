@@ -67,6 +67,13 @@ public class ClientHandler {
         return (UpdateComplaintResponse) waitForMsgFromServer(updateComplaintRequest.getRequestId());
     }
 
+    public static UpdateOrdersResponse updateOrders(Order order) throws IOException, ConnectException {
+        UpdateOrdersRequest updateOrdersRequest = new UpdateOrdersRequest( order);
+        client.openConnection();
+        client.sendToServer(updateOrdersRequest);
+        return (UpdateOrdersResponse) waitForMsgFromServer(updateOrdersRequest.getRequestId());
+    }
+
     public static LoginResponse loginUser(String username, String password) throws IOException {
         LoginRequest loginRequest = new LoginRequest(username, password);
         client.openConnection();
@@ -141,8 +148,8 @@ public class ClientHandler {
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());
     }
 
-    public static AddComplaintResponse addComplaint(String complaintDescription, Customer customer) throws IOException {
-        AddComplaintRequest addComplaintRequest = new AddComplaintRequest(complaintDescription,customer);
+    public static AddComplaintResponse addComplaint(String complaintDescription, Customer customer, Store store) throws IOException {
+        AddComplaintRequest addComplaintRequest = new AddComplaintRequest(complaintDescription,customer, store);
         client.openConnection();
         client.sendToServer(addComplaintRequest);
         return (AddComplaintResponse) waitForMsgFromServer(addComplaintRequest.getRequestId());

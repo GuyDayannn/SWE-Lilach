@@ -8,5 +8,6 @@
 **/.classpath
 **/.project
 **/bin/*
+entities/src/main/images/histograms/*
 dependency-reduced-pom.xml
 hibernate.properties

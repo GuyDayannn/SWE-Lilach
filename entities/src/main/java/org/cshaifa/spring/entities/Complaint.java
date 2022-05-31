@@ -5,6 +5,9 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -18,12 +21,14 @@ public class Complaint implements Serializable {
     private String complaintResponse;
     private double compensationAmount;
     private boolean isComplaintOpen;
+    private Timestamp complaintTimestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;
     //@LazyCollection(LazyCollectionOption.FALSE)
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Store store;
 
     public Complaint(){
         super();
@@ -32,6 +37,8 @@ public class Complaint implements Serializable {
         this.isComplaintOpen = true;
         this.compensationAmount = 0.0;
         this.customer = new Customer();
+        this.store = new Store();
+        this.complaintTimestamp = null;
     }
 
     public Complaint(
@@ -39,13 +46,17 @@ public class Complaint implements Serializable {
         String complaintResponse,
         double compensationAmount,
         boolean isComplaintOpen,
-        Customer customer){
+        Customer customer,
+        Store store,
+        Timestamp complaintTimestamp){
         super();
         this.complaintDescription = complaintDescription;
         this.complaintResponse = complaintResponse;
         this.compensationAmount = compensationAmount;
         this.isComplaintOpen = isComplaintOpen;
         this.customer = customer;
+        this.store = store;
+        this.complaintTimestamp = complaintTimestamp;
     }
 
     public long getId() {
@@ -56,6 +67,8 @@ public class Complaint implements Serializable {
     public String getComplaintResponse() {return complaintResponse;}
     public boolean getIsComplaintOpen() {return isComplaintOpen;}
     public Customer getCustomer() {return customer;}
+    public Store getStore() {return store;}
+    public Timestamp getComplaintTimestamp() {return complaintTimestamp;}
 
     public void setCompensationAmount(double compensationAmount){
         this.compensationAmount = compensationAmount;
@@ -64,6 +77,7 @@ public class Complaint implements Serializable {
     public void setComplaintResponse(String complaintResponse) {this.complaintResponse = complaintResponse;}
     public void setComplaintOpen(boolean isComplaintOpen) {this.isComplaintOpen = isComplaintOpen;}
     public void setCustomer(Customer customer) {this.customer = customer;}
-
+    public void setStore(Store store) {this.store = store;}
+    public void setComplaintTimestamp(Timestamp timestamp) {this.complaintTimestamp = timestamp;}
 
 }
