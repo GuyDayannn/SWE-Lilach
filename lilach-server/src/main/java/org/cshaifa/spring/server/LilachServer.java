@@ -186,9 +186,9 @@ public class LilachServer extends AbstractServer {
                 } else if (request instanceof GetComplaintsRequest) {
                     try {
                         List<Complaint> complaintsList = DatabaseHandler.getComplaints();
-                        sendToAllClients(new GetComplaintsResponse(requestId, complaintsList));
+                        client.sendToClient(new GetComplaintsResponse(requestId, complaintsList));
                     } catch (HibernateException e) {
-                        sendToAllClients(new GetComplaintsResponse(requestId, false));
+                        client.sendToClient(new GetComplaintsResponse(requestId, false));
                     }
                 }
             } else {

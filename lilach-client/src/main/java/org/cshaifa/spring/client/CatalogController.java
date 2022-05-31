@@ -487,8 +487,15 @@ public class CatalogController {
 
             App.scheduler.scheduleAtFixedRate(() -> {
                 try{
+                    Object gotObject = ClientHandler.waitForUpdateFromServer();
+                    if (gotObject == null)
+                        return;
+
                     NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) ClientHandler.waitForUpdateFromServer();
                     if(notifyUpdateResponse != null) {
+                        catalogItems.set(catalogItems.indexOf(catalogItems.stream().filter(catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId()).findFirst().get()), notifyUpdateResponse.getToUpdate());
+                        refreshList();
+                        System.out.println("playing");
                         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
                         updateNotification.setVisible(true);
                         fadeTransition.setFromValue(0.0);
@@ -497,10 +504,9 @@ public class CatalogController {
                         fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
                         fadeTransition.play();
                     }
-                    catalogItems.set(catalogItems.indexOf(catalogItems.stream().filter(catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId()).findFirst().get()), notifyUpdateResponse.getToUpdate());
-                    refreshList();
 
                 } catch (InterruptedException error) {
+                    error.printStackTrace();
                     return;
                 }
             }, 0, Constants.UPDATE_INTERVAL, TimeUnit.SECONDS);
