@@ -40,10 +40,10 @@
             <TextField fx:id="deliveryAddressField" prefHeight="26.0" prefWidth="259.0" promptText="Delivery Address" />
             <TextField fx:id="messageField" promptText="Message (Optional)" />
             <TextField fx:id="phoneNumberField" maxWidth="150.0" promptText="Phone Number" />
-            <DatePicker fx:id="deliveryDatePicker" />
+            <DatePicker fx:id="deliveryDatePicker" editable="false" onAction="#selectDate" promptText="Delivery Date" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                <children>
-                  <ComboBox fx:id="deliveryTimeSelector" prefWidth="150.0" stylesheets="@stylesheets/shoppingcart.css" />
+                  <ComboBox fx:id="deliveryTimeSelector" disable="true" prefWidth="150.0" stylesheets="@stylesheets/shoppingcart.css" />
                   <CheckBox fx:id="immediateCheckbox" alignment="CENTER" mnemonicParsing="false" onAction="#changeImmediate" text="ASAP" />
                </children>
                <padding>

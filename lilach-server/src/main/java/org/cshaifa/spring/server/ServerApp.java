@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.cshaifa.spring.server.database.DatabaseHandler;
 import org.cshaifa.spring.utils.Constants;
-import org.cshaifa.spring.utils.SendEmailUtil;
 
 public class ServerApp {
     private static final LilachServer server = new LilachServer(Constants.SERVER_PORT);

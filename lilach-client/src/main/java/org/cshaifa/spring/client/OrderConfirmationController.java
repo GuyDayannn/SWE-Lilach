@@ -171,13 +171,14 @@ public class OrderConfirmationController {
     @FXML
     private void placeOrder(ActionEvent event) {
         // TODO: add store
-        Task<CreateOrderResponse> createOrderTask = App.createTimedTask(
-                () -> ClientHandler.createOrder(App.isOrderDelivery() ? null : App.getPickupStore(),
-                        (Customer) App.getCurrentUser(), App.getCart(), "Mazal Tov",
-                        new Timestamp(Calendar.getInstance().getTime().getTime()), App.getSupplyDate(),
-                        App.isOrderDelivery(),
-                        new Delivery(App.getRecipientFirstName() + " " + App.getRecipientLastName(),
-                                App.getCustomerPhoneNumber(), App.getRecipientAddress(), App.getMessage(), false)),
+        Task<CreateOrderResponse> createOrderTask = App.createTimedTask(() -> ClientHandler.createOrder(
+                App.isOrderDelivery() ? null : App.getPickupStore(), (Customer) App.getCurrentUser(), App.getCart(),
+                "Mazal Tov", new Timestamp(Calendar.getInstance().getTime().getTime()),
+                App.isOrderDelivery() ? App.getSupplyDate() : null, App.isOrderDelivery(),
+                App.isOrderDelivery()
+                        ? new Delivery(App.getRecipientFirstName() + " " + App.getRecipientLastName(),
+                                App.getCustomerPhoneNumber(), App.getRecipientAddress(), App.getMessage(), false)
+                        : null),
                 Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
         createOrderTask.setOnSucceeded(e -> {

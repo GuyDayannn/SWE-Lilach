@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -93,6 +94,7 @@ public class DeliveryDetailsController {
         phoneNumberField.setText(App.getCustomerPhoneNumber());
         deliveryDatePicker.setValue(App.getSupplyDate().toLocalDateTime().toLocalDate());
         deliveryTimeSelector.setValue(new SimpleDateFormat("HH:mm").format(App.getSupplyDate()));
+        deliveryTimeSelector.setDisable(false);
     }
 
     @FXML
@@ -110,18 +112,6 @@ public class DeliveryDetailsController {
         stores = ((Customer) App.getCurrentUser()).getStores();
         storeSelector.getItems().addAll(stores.stream().map(Store::getName).toList());
 
-        DateFormat df = new SimpleDateFormat("HH:mm");
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.add(Calendar.HOUR_OF_DAY, 3);
-        int startDate = calendar.get(Calendar.DATE);
-        List<String> times = new ArrayList<>();
-        while (calendar.get(Calendar.DATE) == startDate) {
-            times.add(df.format(calendar.getTime()));
-            calendar.add(Calendar.MINUTE, 30);
-        }
-
-        deliveryTimeSelector.setItems(FXCollections.observableArrayList(times));
         phoneNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d{0,10}"))
                 phoneNumberField.setText(oldValue);
@@ -136,6 +126,43 @@ public class DeliveryDetailsController {
         storeSelector.setVisible(supplyMethodSelector.getSelectionModel().getSelectedIndex() == 0);
     }
 
+    private void initializeTimes() {
+        DateFormat df = new SimpleDateFormat("HH:mm");
+        List<String> times = new ArrayList<>();
+        Calendar current = Calendar.getInstance();
+
+        LocalDate pickedDate = deliveryDatePicker.getValue();
+
+        boolean sameDate = pickedDate.getDayOfYear() == current.get(Calendar.DAY_OF_YEAR)
+                && pickedDate.getYear() == current.get(Calendar.YEAR);
+
+        if (sameDate)
+            current.add(Calendar.HOUR_OF_DAY, 3);
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(pickedDate.getYear(), pickedDate.getMonthValue() - 1, pickedDate.getDayOfMonth());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+
+        int startDate = cal.get(Calendar.DATE);
+
+        while (cal.get(Calendar.DATE) == startDate) {
+            if (cal.after(current) || cal.equals(current) || !sameDate)
+                times.add(df.format(cal.getTime()));
+            cal.add(Calendar.MINUTE, 30);
+        }
+
+        deliveryTimeSelector.setItems(FXCollections.observableArrayList(times));
+        deliveryTimeSelector.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    private void selectDate(ActionEvent event) {
+        deliveryTimeSelector.setDisable(false);
+        initializeTimes();
+    }
+
     @FXML
     private void selectStore(ActionEvent event) {
 
@@ -144,8 +171,15 @@ public class DeliveryDetailsController {
     @FXML
     private void changeImmediate(ActionEvent event) {
         deliveryTimeSelector.setDisable(immediateCheckbox.isSelected());
-        if(immediateCheckbox.isSelected()) {
+        if (immediateCheckbox.isSelected()) {
+            deliveryDatePicker.setValue(LocalDate.now());
+            initializeTimes();
             deliveryTimeSelector.setValue(deliveryTimeSelector.getItems().get(0));
+            deliveryDatePicker.setDisable(true);
+            deliveryTimeSelector.setDisable(true);
+        } else {
+            deliveryDatePicker.setDisable(false);
+            deliveryTimeSelector.setDisable(false);
         }
     }
 
@@ -179,7 +213,8 @@ public class DeliveryDetailsController {
             App.setMessage(messageField.getText().strip());
             App.setCustomerPhoneNumber(phoneNumberField.getText().strip());
             // TODO: add times of delivery
-            String chosenTime = immediateCheckbox.isSelected() ? deliveryTimeSelector.getItems().get(0) : deliveryTimeSelector.getValue();
+            String chosenTime = immediateCheckbox.isSelected() ? deliveryTimeSelector.getItems().get(0)
+                    : deliveryTimeSelector.getValue();
             App.setSupplyDate(Timestamp.valueOf(deliveryDatePicker.getValue()
                     .atTime(LocalTime.parse(chosenTime, DateTimeFormatter.ofPattern("HH:mm")))));
         } else {

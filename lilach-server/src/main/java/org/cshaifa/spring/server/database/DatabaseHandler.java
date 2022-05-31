@@ -232,7 +232,8 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        session.save(deliveryDetails);
+        if (deliveryDetails != null)
+            session.save(deliveryDetails);
 
         Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery, deliveryDetails);
         session.save(order);
