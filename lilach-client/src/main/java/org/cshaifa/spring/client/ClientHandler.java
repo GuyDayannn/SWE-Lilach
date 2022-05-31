@@ -52,6 +52,7 @@ import org.cshaifa.spring.utils.Constants;
 public class ClientHandler {
     private static LilachClient client = new LilachClient("localhost", Constants.SERVER_PORT);
     public static BlockingQueue<Object> msgQueue = new LinkedBlockingDeque<>();
+    public static BlockingQueue<Object> updateQueue = new LinkedBlockingDeque<>();
     public static volatile boolean connectionClosed = false;
 
     private static Object waitForMsgFromServer(int requestId) throws InterruptedException {
@@ -60,6 +61,13 @@ public class ClientHandler {
             Thread.onSpinWait();
 
         return msgQueue.take();
+    }
+
+    private static Object waitForUpdateFromServer() throws InterruptedException {
+        while (updateQueue.isEmpty())
+            Thread.onSpinWait();
+
+        return updateQueue.take();
     }
 
     public static GetCatalogResponse getCatalog() throws IOException, ConnectException, InterruptedException {
