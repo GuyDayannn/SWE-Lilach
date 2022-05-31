@@ -27,7 +27,7 @@
             <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, Customer" />
             <Pane fx:id="spacer" HBox.hgrow="ALWAYS">
                <children>
-                  <Label fx:id="updateNotification" layoutX="332.0" layoutY="6.0" prefHeight="26.0" prefWidth="141.0" text="Product Updated" textFill="RED">
+                  <Label fx:id="updateNotification" layoutX="332.0" layoutY="6.0" prefHeight="26.0" prefWidth="141.0" text="Product Updated" textFill="RED" visible="false">
                      <font>
                         <Font name="System Bold Italic" size="17.0" />
                      </font>
