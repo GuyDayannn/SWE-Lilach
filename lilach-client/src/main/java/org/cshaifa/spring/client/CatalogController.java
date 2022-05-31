@@ -72,6 +72,16 @@ public class CatalogController {
     @FXML
     private Button addItemButton;
     @FXML
+    private Button signInButton;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Button refreshButton;
+    @FXML
+    private Button contactButton;
+    @FXML
+    private Button viewProfileButton;
+    @FXML
     private ComboBox<String> selectedTypeComboBox;
     @FXML
     private ComboBox<String> selectedColorComboBox;
@@ -133,12 +143,35 @@ public class CatalogController {
     }
 
     @FXML
-    void refreshCatalog(MouseEvent event) throws IOException {
+    private void refreshCatalog(ActionEvent event) {
         clearFilters();
-        toolbar.getItems().clear();
-        toolbar.getItems().add(welcomeText);
         salesVBox.getChildren().clear();
         initialize();
+    }
+
+    @FXML
+    private void contact(ActionEvent event) {
+        // TODO: do something here?
+    }
+
+    @FXML
+    private void viewProfile(ActionEvent event) {
+        if (App.getCurrentUser() instanceof Customer) {
+
+            App.setWindowTitle("Customer Profile");
+            try {
+                App.setContent("customerProfile");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            App.setWindowTitle("Employee Profile");
+            try {
+                App.setContent("employeeProfile");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -260,6 +293,31 @@ public class CatalogController {
             return false;
         }
         return true;
+    }
+
+    @FXML
+    private void signIn(ActionEvent event) {
+        App.setWindowTitle("login");
+        try {
+            App.setContent("customerLogin");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void register(ActionEvent event) {
+        App.setWindowTitle("register");
+        try {
+            App.setContent("customerRegister");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void refresh(ActionEvent event) {
+
     }
 
     @FXML
@@ -401,132 +459,23 @@ public class CatalogController {
     }
 
     @FXML
-    void initialize() throws IOException {
-        // Load Lilach Logo
-        Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
-        catalogTitle.setImage((image));
-
-        // Load Toolbar
-        toolbar.getItems().remove(spacer);
-        toolbar.getItems().remove(shoppingCart);
-        toolbar.getItems().remove(addItemButton);
-        Button NewOrderButton = new Button("New Order");
-        NewOrderButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-
-            }
-        });
-        Button signInButton = new Button("Sign In");
-        signInButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                App.setWindowTitle("login");
-                try {
-                    App.setContent("customerLogin");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        Button registerButton = new Button("Register");
-        registerButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                App.setWindowTitle("register");
-                try {
-                    App.setContent("customerRegister");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        Button refreshButton = new Button("Refresh");
-        refreshButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                try {
-                    refreshCatalog(mouseEvent);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        Button contactButton = new Button("Contact");
-        contactButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-
-            }
-        });
-        Button viewProfileButton = new Button("View Profile");
-        viewProfileButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if (App.getCurrentUser().getClass().equals(Customer.class)) {
-
-                    App.setWindowTitle("Customer Profile");
-                    try {
-                        App.setContent("customerProfile");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    App.setWindowTitle("Employee Profile");
-                    try {
-                        App.setContent("employeeProfile");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
+    void initialize() {
         if (App.getCurrentUser() == null) {
-            NewOrderButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    App.setWindowTitle("login");
-                    try {
-                        App.setContent("customerLogin");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
             welcomeText.setText("");
-            toolbar.getItems().add(NewOrderButton);
-            toolbar.getItems().add(signInButton);
-            toolbar.getItems().add(registerButton);
-            toolbar.getItems().add(refreshButton);
-            toolbar.getItems().add(contactButton);
+            toolbar.getItems().remove(viewProfileButton);
+            toolbar.getItems().remove(shoppingCart);
+            toolbar.getItems().remove(addItemButton);
         } else if (App.getCurrentUser() instanceof Customer) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
-            toolbar.getItems().add(NewOrderButton);
-            toolbar.getItems().add(viewProfileButton);
-            toolbar.getItems().add(refreshButton);
-            toolbar.getItems().add(contactButton);
-            toolbar.getItems().add(spacer);
-            toolbar.getItems().add(shoppingCart);
+            toolbar.getItems().remove(signInButton);
+            toolbar.getItems().remove(registerButton);
+            toolbar.getItems().remove(addItemButton);
         } else {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
-            toolbar.getItems().add(viewProfileButton);
-            toolbar.getItems().add(refreshButton);
-            toolbar.getItems().add(contactButton);
-            toolbar.getItems().add(spacer);
-            Image plusImage = new Image(getClass().getResource("images/plus.png").toString());
-            ImageView ivPlus = new ImageView(plusImage);
-            ivPlus.setFitHeight(20);
-            ivPlus.setFitWidth(20);
-            addItemButton.setGraphic(ivPlus);
-            toolbar.getItems().add(addItemButton);
+            toolbar.getItems().remove(shoppingCart);
+            toolbar.getItems().remove(signInButton);
+            toolbar.getItems().remove(registerButton);
         }
-
-        Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
-        ImageView ivCart = new ImageView(cartImage);
-        ivCart.setFitHeight(20);
-        ivCart.setFitWidth(20);
-        shoppingCart.setGraphic(ivCart);
 
         Task<GetCatalogResponse> getCatalogTask = App.createTimedTask(() -> {
             return ClientHandler.getCatalog();
