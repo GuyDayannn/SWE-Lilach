@@ -182,6 +182,27 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
+    public static String freezeCustomer(Customer customer, boolean toFreeze) {
+        if(customer.isFrozen() && toFreeze)
+            return "Account Already Frozen";
+        else if(!customer.isFrozen() && !toFreeze)
+            return "An Already Unfrozen";
+
+        if(toFreeze)
+            customer.freeze();
+        else
+            customer.unfreeze();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        updateDB(session, customer);
+        tryFlushSession(session);
+
+        if(toFreeze)
+            return "Account has been frozen";
+        else
+            return "Account has be unfrozen";
+    }
+
     public static Store getWarehouseStore() {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();

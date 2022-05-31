@@ -154,4 +154,11 @@ public class ClientHandler {
         client.sendToServer(addComplaintRequest);
         return (AddComplaintResponse) waitForMsgFromServer(addComplaintRequest.getRequestId());
     }
+
+    public static FreezeCustomerResponse freezeCustomer(Customer customer, boolean toFreeze) throws IOException {
+        FreezeCustomerRequest freezeCustomerRequest = new FreezeCustomerRequest(customer, toFreeze);
+        client.openConnection();
+        client.sendToServer(freezeCustomerRequest);
+        return (FreezeCustomerResponse) waitForMsgFromServer(freezeCustomerRequest.getRequestId());
+    }
 }

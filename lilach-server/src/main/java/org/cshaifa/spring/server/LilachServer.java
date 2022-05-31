@@ -3,11 +3,7 @@ package org.cshaifa.spring.server;
 import java.io.IOException;
 import java.util.List;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Complaint;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.requests.AddComplaintRequest;
 import org.cshaifa.spring.entities.requests.CreateOrderRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
@@ -103,6 +99,10 @@ public class LilachServer extends AbstractServer {
                     User user = DatabaseHandler.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
                     if (user != null && user.isLoggedIn()) {
                         client.sendToClient(new LoginResponse(requestId, false, Constants.ALREADY_LOGGED_IN));
+                        return;
+                    }
+                    if(user instanceof Customer && ((Customer)user).isFrozen()) {
+                        client.sendToClient(new LoginResponse(requestId, false, Constants.CUSTOMER_FROZEN_MSG));
                         return;
                     }
                     if (user != null) {
