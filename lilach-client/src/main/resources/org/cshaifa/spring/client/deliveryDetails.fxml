@@ -7,13 +7,25 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.DeliveryDetailsController">
    <children>
+      <HBox fx:id="titleHbox" prefHeight="53.0" prefWidth="1040.0" styleClass="titleHBox" stylesheets="@stylesheets/shoppingcart.css">
+         <children>
+            <ImageView fx:id="deliveryImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="10.0" translateY="5.0" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleText" text="Delivery" translateX="20.0" translateY="10.0">
+               <font>
+                  <Font name="Trebuchet MS" size="24.0" />
+               </font>
+            </Text>
+         </children>
+      </HBox>
       <ComboBox fx:id="supplyMethodSelector" layoutX="444.0" layoutY="104.0" onAction="#selectSupplyMethod" prefWidth="150.0" />
       <ComboBox fx:id="storeSelector" layoutX="445.0" layoutY="154.0" onAction="#selectStore" prefWidth="150.0" />
       <VBox fx:id="deliveryDetailsVBox" alignment="CENTER" layoutX="315.0" layoutY="191.0" maxWidth="408.0" prefHeight="338.0" prefWidth="408.0" spacing="20.0">
@@ -31,7 +43,7 @@
             <DatePicker fx:id="deliveryDatePicker" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                <children>
-                  <ComboBox fx:id="deliveryTimeSelector" prefWidth="150.0" />
+                  <ComboBox fx:id="deliveryTimeSelector" prefWidth="150.0" stylesheets="@stylesheets/shoppingcart.css" />
                   <CheckBox fx:id="immediateCheckbox" alignment="CENTER" mnemonicParsing="false" onAction="#changeImmediate" text="ASAP" />
                </children>
                <padding>
@@ -40,11 +52,11 @@
             </HBox>
          </children>
       </VBox>
-      <Button layoutX="14.0" layoutY="678.0" mnemonicParsing="false" onAction="#goBack" text="Back to Order Details">
+      <Button layoutX="14.0" layoutY="678.0" mnemonicParsing="false" onAction="#goBack" stylesheets="@stylesheets/shoppingcart.css" text="Back to Order Details">
          <font>
             <Font size="15.0" />
          </font></Button>
-      <Button layoutX="869.0" layoutY="678.0" mnemonicParsing="false" onAction="#proceed" text="Proceed to Payment">
+      <Button layoutX="869.0" layoutY="678.0" mnemonicParsing="false" onAction="#proceed" stylesheets="@stylesheets/shoppingcart.css" text="Proceed to Payment">
          <font>
             <Font size="15.0" />
          </font></Button>

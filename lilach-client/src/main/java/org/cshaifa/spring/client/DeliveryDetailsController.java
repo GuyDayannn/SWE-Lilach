@@ -16,6 +16,8 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -64,6 +66,9 @@ public class DeliveryDetailsController {
     @FXML
     private AnchorPane anchorPane;
 
+    @FXML
+    private ImageView deliveryImage;
+
     private List<Store> stores = null;
 
     private void recoverSavedData() {
@@ -92,6 +97,10 @@ public class DeliveryDetailsController {
 
     @FXML
     void initialize() {
+        Image cart = new Image(getClass().getResource("images/delivery.png").toString());
+        deliveryImage.setImage(cart);
+        deliveryImage.setFitWidth(40);
+        deliveryImage.setFitHeight(40);
         supplyMethodSelector.setItems(FXCollections.observableArrayList("Self Pickup - 0$", "Delivery - 30$"));
         supplyMethodSelector.getSelectionModel().selectFirst();
         deliveryDetailsVBox.setVisible(false);
