@@ -11,4 +11,7 @@ public class NotifyUpdateResponse extends Response {
         this.toUpdate = toUpdate;
     }
 
+    public CatalogItem getToUpdate() {
+        return toUpdate;
+    }
 }

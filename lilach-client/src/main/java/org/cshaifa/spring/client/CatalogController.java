@@ -22,6 +22,7 @@ import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
 
 import javafx.application.Platform;
@@ -485,13 +486,23 @@ public class CatalogController {
             listDisplay();
 
             App.scheduler.scheduleAtFixedRate(() -> {
-                FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
-                updateNotification.setVisible(true);
-                fadeTransition.setFromValue(0.0);
-                fadeTransition.setToValue(1.0);
-                fadeTransition.setCycleCount(3);
-                fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
-                fadeTransition.play();
+                try{
+                    NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) ClientHandler.waitForUpdateFromServer();
+                    if(notifyUpdateResponse != null) {
+                        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
+                        updateNotification.setVisible(true);
+                        fadeTransition.setFromValue(0.0);
+                        fadeTransition.setToValue(1.0);
+                        fadeTransition.setCycleCount(3);
+                        fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
+                        fadeTransition.play();
+                    }
+                    catalogItems.set(catalogItems.indexOf(catalogItems.stream().filter(catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId()).findFirst().get()), notifyUpdateResponse.getToUpdate());
+                    refreshList();
+
+                } catch (InterruptedException error) {
+                    return;
+                }
             }, 0, Constants.UPDATE_INTERVAL, TimeUnit.SECONDS);
 
             App.hideLoading();
