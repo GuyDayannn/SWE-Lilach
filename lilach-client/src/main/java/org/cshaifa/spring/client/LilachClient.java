@@ -10,7 +10,11 @@ public class LilachClient extends AbstractClient {
 
     @Override
     protected void handleMessageFromServer(Object msg) {
-        ClientHandler.msgFromServer = msg;
+        try {
+          ClientHandler.msgQueue.put(msg);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
     }
 
     @Override

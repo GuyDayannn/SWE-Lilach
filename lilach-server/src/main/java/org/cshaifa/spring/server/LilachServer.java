@@ -2,6 +2,7 @@ package org.cshaifa.spring.server;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.requests.AddComplaintRequest;
