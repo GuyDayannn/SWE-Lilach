@@ -11,8 +11,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Order;
@@ -72,6 +76,8 @@ public class CatalogController {
     private Slider hiPrice;
     @FXML
     private TilePane tilePane;
+    @FXML
+    private Label updateNotification;
 
     // Variables
     List<CatalogItem> catalogItems = null;
@@ -479,7 +485,13 @@ public class CatalogController {
             listDisplay();
 
             App.scheduler.scheduleAtFixedRate(() -> {
-
+                FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
+                updateNotification.setVisible(true);
+                fadeTransition.setFromValue(0.0);
+                fadeTransition.setToValue(1.0);
+                fadeTransition.setCycleCount(3);
+                fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
+                fadeTransition.play();
             }, 0, Constants.UPDATE_INTERVAL, TimeUnit.SECONDS);
 
             App.hideLoading();
