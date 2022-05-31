@@ -6,6 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.requests.AddComplaintRequest;
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Complaint;
+import org.cshaifa.spring.entities.Order;
+import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.requests.AddComplaintRequest;
+import org.cshaifa.spring.entities.requests.CreateItemRequest;
 import org.cshaifa.spring.entities.requests.CreateOrderRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetComplaintsRequest;
@@ -20,6 +26,8 @@ import org.cshaifa.spring.entities.requests.UpdateComplaintRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.requests.UpdateOrdersRequest;
 import org.cshaifa.spring.entities.responses.AddComplaintResponse;
+import org.cshaifa.spring.entities.responses.AddComplaintResponse;
+import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.CreateOrderResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
@@ -33,6 +41,9 @@ import org.cshaifa.spring.entities.responses.RegisterResponse;
 import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.entities.responses.UpdateOrdersResponse;
+import org.cshaifa.spring.entities.responses.RegisterResponse;
+import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
+import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.server.database.DatabaseHandler;
 import org.cshaifa.spring.server.ocsf.AbstractServer;
 import org.cshaifa.spring.server.ocsf.ConnectionToClient;
@@ -146,8 +157,21 @@ public class LilachServer extends AbstractServer {
                         client.sendToClient(new LogoutResponse(requestId, false));
                         return;
                     }
-
                     client.sendToClient(new LogoutResponse(requestId, true));
+
+                } else if (request instanceof CreateItemRequest createItemRequest) {
+                    try {
+                        CatalogItem item = DatabaseHandler.createItem(createItemRequest.getName(),
+                                createItemRequest.getPrice(), createItemRequest.getQuantities(),
+                                createItemRequest.isOnSale(), createItemRequest.getDiscountPercent(),
+                                createItemRequest.getSize(), createItemRequest.getItemType(),
+                                createItemRequest.getItemColor(), createItemRequest.isDefault(),
+                                createItemRequest.getImage());
+                        client.sendToClient(new CreateItemResponse(requestId, item != null, item));
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
+                        client.sendToClient(new CreateItemResponse(requestId, false));
+                    }
                 } else if (request instanceof GetStoresRequest) {
                     client.sendToClient(new GetStoresResponse(requestId, DatabaseHandler.getStores()));
                 } else if (request instanceof CreateOrderRequest createOrderRequest) {

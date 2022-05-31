@@ -17,6 +17,7 @@ import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.requests.AddComplaintRequest;
+import org.cshaifa.spring.entities.requests.CreateItemRequest;
 import org.cshaifa.spring.entities.requests.CreateOrderRequest;
 import org.cshaifa.spring.entities.requests.FreezeCustomerRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
@@ -31,6 +32,7 @@ import org.cshaifa.spring.entities.requests.UpdateComplaintRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.requests.UpdateOrdersRequest;
 import org.cshaifa.spring.entities.responses.AddComplaintResponse;
+import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.CreateOrderResponse;
 import org.cshaifa.spring.entities.responses.FreezeCustomerResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
@@ -95,7 +97,8 @@ public class ClientHandler {
      * CatalogItem item = (CatalogItem) waitForMsgFromServer(); return item; }
      */
 
-    public static UpdateItemResponse updateItem(CatalogItem updatedItem) throws IOException, ConnectException, InterruptedException {
+    public static UpdateItemResponse updateItem(CatalogItem updatedItem)
+            throws IOException, ConnectException, InterruptedException {
         UpdateItemRequest updateItemRequest = new UpdateItemRequest(updatedItem);
         client.openConnection();
         client.sendToServer(updateItemRequest);
@@ -110,7 +113,18 @@ public class ClientHandler {
         return (UpdateComplaintResponse) waitForMsgFromServer(updateComplaintRequest.getRequestId());
     }
 
-    public static UpdateOrdersResponse updateOrders(Order order) throws IOException, ConnectException, InterruptedException {
+    public static CreateItemResponse createItem(String name, double price, Map<Store, Integer> quantities,
+            boolean onSale, double discountPercent, String size, String itemType, String itemColor, boolean isDefault,
+            byte[] image) throws IOException, InterruptedException {
+        CreateItemRequest createItemRequest = new CreateItemRequest(name, price, quantities, onSale, discountPercent,
+                size, itemType, itemColor, isDefault, image);
+        client.openConnection();
+        client.sendToServer(createItemRequest);
+        return (CreateItemResponse) waitForMsgFromServer(createItemRequest.getRequestId());
+    }
+
+    public static UpdateOrdersResponse updateOrders(Order order)
+            throws IOException, ConnectException, InterruptedException {
         UpdateOrdersRequest updateOrdersRequest = new UpdateOrdersRequest(order);
         client.openConnection();
         client.sendToServer(updateOrdersRequest);
@@ -126,7 +140,8 @@ public class ClientHandler {
     }
 
     public static RegisterResponse registerCustomer(String fullName, String username, String email, String password,
-            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) throws IOException, InterruptedException {
+            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList)
+            throws IOException, InterruptedException {
         RegisterRequest registerRequest = new RegisterRequest(fullName, username, email, password, stores,
                 subscriptionType, complaintList);
         client.openConnection();
@@ -170,7 +185,8 @@ public class ClientHandler {
         client.setPort(port);
     }
 
-    public static IsAliveResponse changeServerDetailsAndCheckAlive(String hostname, int port) throws IOException, InterruptedException {
+    public static IsAliveResponse changeServerDetailsAndCheckAlive(String hostname, int port)
+            throws IOException, InterruptedException {
         if (client.isConnected()) {
             client.closeConnection();
             while (!connectionClosed)
@@ -192,14 +208,16 @@ public class ClientHandler {
         return (CreateOrderResponse) waitForMsgFromServer(createOrderRequest.getRequestId());
     }
 
-    public static AddComplaintResponse addComplaint(String complaintDescription, Customer customer, Store store) throws IOException, InterruptedException {
-        AddComplaintRequest addComplaintRequest = new AddComplaintRequest(complaintDescription,customer, store);
+    public static AddComplaintResponse addComplaint(String complaintDescription, Customer customer, Store store)
+            throws IOException, InterruptedException {
+        AddComplaintRequest addComplaintRequest = new AddComplaintRequest(complaintDescription, customer, store);
         client.openConnection();
         client.sendToServer(addComplaintRequest);
         return (AddComplaintResponse) waitForMsgFromServer(addComplaintRequest.getRequestId());
     }
 
-    public static FreezeCustomerResponse freezeCustomer(Customer customer, boolean toFreeze) throws IOException, InterruptedException {
+    public static FreezeCustomerResponse freezeCustomer(Customer customer, boolean toFreeze)
+            throws IOException, InterruptedException {
         FreezeCustomerRequest freezeCustomerRequest = new FreezeCustomerRequest(customer, toFreeze);
         client.openConnection();
         client.sendToServer(freezeCustomerRequest);

@@ -1,7 +1,10 @@
 package org.cshaifa.spring.server.database;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -441,6 +444,44 @@ public class DatabaseHandler {
             }
         }
         return catalogItems;
+    }
+
+    public static CatalogItem createItem(String name, double price, Map<Store, Integer> quantities, boolean onSale, double discountPercent, String size,
+            String itemType, String itemColor, boolean isDefault, byte[] image) throws HibernateException {
+        CatalogItem catalogItem = new CatalogItem(name, "", price, quantities, onSale, discountPercent, size, itemType,
+                itemColor, isDefault);
+        catalogItem.setImage(image);
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.save(catalogItem);
+
+        Path imagesPath = Paths.get(System.getProperty("user.home")).resolve("server-images");
+        if (!Files.exists(imagesPath))
+            try {
+                Files.createDirectory(imagesPath);
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                session.delete(catalogItem);
+                tryFlushSession(session);
+                return null;
+            }
+
+        try {
+            catalogItem.setImagePath(
+                    ImageUtils.saveImage(image, Paths.get(System.getProperty("user.home")).resolve("server-images"),
+                            catalogItem.getId() + ".jpg").toUri().toString());
+        } catch (IOException e) {
+            // Couldn't create image
+            e.printStackTrace();
+            session.delete(catalogItem);
+            tryFlushSession(session);
+            return null;
+        }
+
+        tryFlushSession(session);
+
+        return catalogItem;
     }
 
     public static List<Complaint> getComplaints() {

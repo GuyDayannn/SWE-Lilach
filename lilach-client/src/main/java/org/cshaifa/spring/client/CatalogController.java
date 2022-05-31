@@ -1,48 +1,51 @@
 package org.cshaifa.spring.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import javafx.animation.Animation;
-import javafx.animation.FadeTransition;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.util.Duration;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.SubscriptionType;
+import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
+import org.cshaifa.spring.utils.ImageUtils;
 
-import javafx.application.Platform;
+import javafx.animation.FadeTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.Slider;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Duration;
 
 public class CatalogController {
 
@@ -66,6 +69,8 @@ public class CatalogController {
     @FXML
     private Button shoppingCart;
     @FXML
+    private Button addItemButton;
+    @FXML
     private ComboBox<String> selectedTypeComboBox;
     @FXML
     private ComboBox<String> selectedColorComboBox;
@@ -83,7 +88,7 @@ public class CatalogController {
     // Variables
     List<CatalogItem> catalogItems = null;
     private boolean filter_applied = false;
-    private FilteredList<HBox> itemCells = null;
+    private ObservableList<HBox> itemCells = null;
 
     @FXML
     void displayType(MouseEvent event) {
@@ -96,14 +101,13 @@ public class CatalogController {
     }
 
     void refreshList() {
-        itemCells.setPredicate(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.getSource().indexOf(s))));
-        tilePane.getChildren().setAll(itemCells);
+        tilePane.getChildren()
+                .setAll(itemCells.filtered(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.indexOf(s)))));
     }
 
     void listDisplay() {
-        itemCells = new FilteredList<HBox>(FXCollections.observableArrayList(catalogItems.stream()
-                .filter(item -> !filter_applied || isInFilter(item)).map(item -> getItemHBox(item)).toList()));
-        tilePane.getChildren().setAll(itemCells);
+        itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item -> getItemHBox(item)).toList());
+        refreshList();
     }
 
     @FXML
@@ -167,6 +171,7 @@ public class CatalogController {
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.CENTER_LEFT);
         Button viewButton = new Button("View");
+        viewButton.getStyleClass().add("catalog-item-buttons");
         viewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -175,7 +180,6 @@ public class CatalogController {
             }
         });
         Button addCartButton = new Button();
-        viewButton.getStyleClass().add("catalog-item-buttons");
         addCartButton.getStyleClass().add("catalog-item-buttons");
         Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
         ImageView ivCart = new ImageView(cartImage);
@@ -193,12 +197,25 @@ public class CatalogController {
                 }
             }
         });
+        Button removeItemButton = new Button();
+        removeItemButton.getStyleClass().add("catalog-item-buttons");
+        Image removeImage = new Image(getClass().getResource("images/remove.png").toString());
+        ImageView ivRemove = new ImageView(removeImage);
+        ivRemove.setFitHeight(15);
+        ivRemove.setFitWidth(15);
+        removeItemButton.setGraphic(ivRemove);
+        addCartButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // TODO: Handle item removal
+            }
+        });
         if (App.getCurrentUser() == null) {
             buttonBox.getChildren().add(viewButton);
         } else if (App.getCurrentUser() instanceof Customer) {
             buttonBox.getChildren().addAll(viewButton, addCartButton);
         } else {
-            buttonBox.getChildren().add(viewButton);
+            buttonBox.getChildren().addAll(viewButton, removeItemButton);
         }
 
         vBox.getChildren().add(buttonBox);
@@ -242,6 +259,43 @@ public class CatalogController {
             return false;
         }
         return true;
+    }
+
+    @FXML
+    void addItem(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        ExtensionFilter filter = new ExtensionFilter("JPG files (*.jpg)", "*.jpeg", "*.jpg", "*.JPG");
+        chooser.getExtensionFilters().add(filter);
+        File selectedFile = chooser.showOpenDialog(null);
+        if (selectedFile == null)
+            return;
+
+        Task<CreateItemResponse> createItemTask = App.createTimedTask(
+                () -> ClientHandler.createItem("Example", 400, new HashMap<>(), false, 0, "large", "flower", "white",
+                        true, ImageUtils.getByteArrayFromURI(selectedFile.toURI())),
+                Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        createItemTask.setOnSucceeded(e -> {
+            if (createItemTask.getValue() == null || !createItemTask.getValue().isSuccessful()) {
+                App.hideLoading();
+                return;
+            }
+
+            CreateItemResponse response = createItemTask.getValue();
+            catalogItems.add(response.getItem());
+
+            itemCells.add(getItemHBox(response.getItem()));
+            refreshList();
+            App.hideLoading();
+        });
+
+        createItemTask.setOnFailed(e -> {
+            createItemTask.getException().printStackTrace();
+            App.hideLoading();
+        });
+
+        App.showLoading(rootVBox, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+        new Thread(createItemTask).start();
     }
 
     @FXML
@@ -354,6 +408,7 @@ public class CatalogController {
         // Load Toolbar
         toolbar.getItems().remove(spacer);
         toolbar.getItems().remove(shoppingCart);
+        toolbar.getItems().remove(addItemButton);
         Button NewOrderButton = new Button("New Order");
         NewOrderButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -444,7 +499,7 @@ public class CatalogController {
             toolbar.getItems().add(registerButton);
             toolbar.getItems().add(refreshButton);
             toolbar.getItems().add(contactButton);
-        } else {
+        } else if (App.getCurrentUser() instanceof Customer) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
             toolbar.getItems().add(NewOrderButton);
             toolbar.getItems().add(viewProfileButton);
@@ -452,6 +507,19 @@ public class CatalogController {
             toolbar.getItems().add(contactButton);
             toolbar.getItems().add(spacer);
             toolbar.getItems().add(shoppingCart);
+        }
+        else {
+            welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
+            toolbar.getItems().add(viewProfileButton);
+            toolbar.getItems().add(refreshButton);
+            toolbar.getItems().add(contactButton);
+            toolbar.getItems().add(spacer);
+            Image plusImage = new Image(getClass().getResource("images/plus.png").toString());
+            ImageView ivPlus = new ImageView(plusImage);
+            ivPlus.setFitHeight(20);
+            ivPlus.setFitWidth(20);
+            addItemButton.setGraphic(ivPlus);
+            toolbar.getItems().add(addItemButton);
         }
 
         Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
