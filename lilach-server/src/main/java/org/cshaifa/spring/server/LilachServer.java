@@ -104,7 +104,7 @@ public class LilachServer extends AbstractServer {
                         client.sendToClient(new LoginResponse(requestId, false, Constants.ALREADY_LOGGED_IN));
                         return;
                     }
-                    if(user instanceof Customer && ((Customer)user).isFrozen()) {
+                    if (user instanceof Customer && ((Customer) user).isFrozen()) {
                         client.sendToClient(new LoginResponse(requestId, false, Constants.CUSTOMER_FROZEN_MSG));
                         return;
                     }
@@ -169,11 +169,18 @@ public class LilachServer extends AbstractServer {
                         client.sendToClient(new CreateOrderResponse(requestId, false, Constants.FAIL_MSG));
                     }
                 } else if (request instanceof AddComplaintRequest addComplaintRequest) {
-                try {
-                    Complaint complaint = DatabaseHandler.addComplaint(addComplaintRequest.getComplaintDescription(), addComplaintRequest.getCustomer(), addComplaintRequest.getStore());
-                    if (complaint != null) {
-                        client.sendToClient(new AddComplaintResponse(requestId, true, complaint, Constants.SUCCESS_MSG));
-                    } else {
+                    try {
+                        Complaint complaint = DatabaseHandler.addComplaint(
+                                addComplaintRequest.getComplaintDescription(), addComplaintRequest.getCustomer(),
+                                addComplaintRequest.getStore());
+                        if (complaint != null) {
+                            client.sendToClient(
+                                    new AddComplaintResponse(requestId, true, complaint, Constants.SUCCESS_MSG));
+                        } else {
+                            client.sendToClient(new AddComplaintResponse(requestId, false, Constants.FAIL_MSG));
+                        }
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
                         client.sendToClient(new AddComplaintResponse(requestId, false, Constants.FAIL_MSG));
                     }
                 } else if (request instanceof GetComplaintsRequest) {
