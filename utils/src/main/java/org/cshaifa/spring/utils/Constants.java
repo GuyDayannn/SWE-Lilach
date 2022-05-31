@@ -19,4 +19,5 @@ public class Constants {
     public static final int SERVER_PORT = 8130;
     public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
+    public static final long UPDATE_INTERVAL = 5;
 }

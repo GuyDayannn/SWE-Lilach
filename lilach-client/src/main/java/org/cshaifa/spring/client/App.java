@@ -55,6 +55,7 @@ public class App extends Application {
     private static Node loadingRootNode;
     private static ScheduledFuture<Void> scheduledCancelButtonShow;
     private static ScheduledExecutorService cancelButtonExecutorService;
+    public static ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private static Text currentItemPrice;
     private static Text currentItemName;
@@ -125,6 +126,9 @@ public class App extends Application {
     }
 
     static void setContent(String pageName) throws IOException {
+        scheduler.shutdown();
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         if (pageName == "catalog") {

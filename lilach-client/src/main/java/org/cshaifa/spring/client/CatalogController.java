@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -18,6 +20,7 @@ import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.utils.Constants;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -178,8 +181,7 @@ public class CatalogController {
                 if (App.getCart().containsKey(item)) {
                     Integer quantity = App.getCart().get(item);
                     App.getCart().put(item, ++quantity);
-                }
-                else {
+                } else {
                     App.getCart().put(item, 1);
                 }
             }
@@ -305,8 +307,7 @@ public class CatalogController {
                             if (App.getCart().containsKey(item)) {
                                 Integer quantity = App.getCart().get(item);
                                 App.getCart().put(item, ++quantity);
-                            }
-                            else {
+                            } else {
                                 App.getCart().put(item, 1);
                             }
                         }
@@ -399,7 +400,7 @@ public class CatalogController {
         viewProfileButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if(App.getCurrentUser().getClass().equals(Customer.class)){
+                if (App.getCurrentUser().getClass().equals(Customer.class)) {
 
                     App.setWindowTitle("Customer Profile");
                     try {
@@ -477,7 +478,12 @@ public class CatalogController {
             // catalogDisplay();
             listDisplay();
 
+            App.scheduler.scheduleAtFixedRate(() -> {
+
+            }, 0, Constants.UPDATE_INTERVAL, TimeUnit.SECONDS);
+
             App.hideLoading();
+
         });
 
         getCatalogTask.setOnFailed(e -> {
@@ -496,10 +502,9 @@ public class CatalogController {
         selectedTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
             filter();
 
-            if (t1=="Chocolate" || t1=="Set") {
+            if (t1 == "Chocolate" || t1 == "Set") {
                 selectedColorComboBox.setDisable(true);
-            }
-            else {
+            } else {
                 selectedColorComboBox.setDisable(false);
             }
         });
@@ -513,7 +518,6 @@ public class CatalogController {
                 }
             }
         });
-
 
         ObservableList<String> colorOptions = FXCollections.observableArrayList("Red", "Orange", "Yellow", "Green",
                 "Blue", "Purple", "Pink", "White", "Black");

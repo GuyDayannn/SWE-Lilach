@@ -5,9 +5,7 @@ import java.net.ConnectException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.cshaifa.spring.entities.CatalogItem;
@@ -63,9 +61,9 @@ public class ClientHandler {
         return msgQueue.take();
     }
 
-    private static Object waitForUpdateFromServer() throws InterruptedException {
-        while (updateQueue.isEmpty())
-            Thread.onSpinWait();
+    public static Object waitForUpdateFromServer() throws InterruptedException {
+        if (updateQueue.isEmpty())
+            return null;
 
         return updateQueue.take();
     }
