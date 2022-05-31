@@ -23,13 +23,23 @@ public class PaymentDetailsController {
     @FXML
     void initialize() {
         expMonthField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.isEmpty() && !newValue.matches("^(0[1-9]|1[0-2])$") && !newValue.matches("^[0-1]$"))
+            if (!newValue.isEmpty() && !newValue.matches("0[1-9]|1[0-2]") && !newValue.matches("[0-1]"))
                 expMonthField.setText(oldValue);
         });
 
         expYearField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.isEmpty() && !newValue.matches("^([2-5][0-9])$") && !newValue.matches("^[2-5]$"))
+            if (!newValue.isEmpty() && !newValue.matches("[2-5][0-9]") && !newValue.matches("[2-5]"))
                 expYearField.setText(oldValue);
+        });
+
+        cardNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*"))
+                cardNumberField.setText(oldValue);
+        });
+
+        cvvField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d{0,3}"))
+                cvvField.setText(oldValue);
         });
     }
 
@@ -44,6 +54,21 @@ public class PaymentDetailsController {
 
     @FXML
     private void proceed(ActionEvent event) {
-        // TODO: save details and proceed to final order summary screen
+        if (!cardNumberField.getText().matches("\\d{4,}") || !expYearField.getText().matches("[2-5][0-9]")
+                || !expMonthField.getText().matches("0[1-9]|1[0-2]") || !cvvField.getText().matches("\\d{3}")) {
+            System.out.println("Not all fields are valid");
+            // TODO: flash error msg
+            return;
+        }
+
+        App.setCardNumber(cardNumberField.getText());
+        App.setCardExpDate(expMonthField.getText() + "/" + expYearField.getText());
+        App.setCardCvv(cvvField.getText());
+
+        try {
+            App.setContent("orderConfirmation");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -27,7 +27,7 @@ public class CreateOrderRequest extends Request {
     private Delivery deliveryDetails;
 
     public CreateOrderRequest(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting, Timestamp orderDate,
-            Timestamp supplyDate, boolean deilvery, Delivery deliveryDetails) {
+            Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) {
         this.store = store;
         this.customer = customer;
         this.items = items;

@@ -1,7 +1,10 @@
 package org.cshaifa.spring.server.database;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -183,20 +186,58 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
+    public static String freezeCustomer(Customer customer, boolean toFreeze) {
+        if (customer.isFrozen() && toFreeze)
+            return "Account Already Frozen";
+        else if (!customer.isFrozen() && !toFreeze)
+            return "An Already Unfrozen";
+
+        if (toFreeze)
+            customer.freeze();
+        else
+            customer.unfreeze();
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        updateDB(session, customer);
+        tryFlushSession(session);
+
+        if (toFreeze)
+            return "Account has been frozen";
+        else
+            return "Account has be unfrozen";
+    }
+
+    public static Store getWarehouseStore() {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Store> query = builder.createQuery(Store.class);
+        Root<Store> root = query.from(Store.class);
+
+        query.select(root).where(builder.equal(root.get("name"), Constants.WAREHOUSE_NAME));
+
+        Store store = session.createQuery(query).uniqueResult();
+        session.close();
+        return store;
+    }
+
     public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
-            Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) throws HibernateException {
-        // Check stock
-        if (!items.entrySet().stream().allMatch(entry -> {
-            return entry.getKey().getStock().containsKey(store)
-                    && entry.getValue() <= entry.getKey().getStock().get(store);
-        })) {
-            return null;
+            Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails)
+            throws HibernateException {
+        if (!delivery) {
+            // Check stock
+            if (!items.entrySet().stream().allMatch(entry -> {
+                return entry.getKey().getStock().containsKey(store)
+                        && entry.getValue() <= entry.getKey().getStock().get(store);
+            })) {
+                return null;
+            }
         }
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        session.save(deliveryDetails);
+        if (deliveryDetails != null)
+            session.save(deliveryDetails);
 
         Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery, deliveryDetails);
         session.save(order);
@@ -207,18 +248,21 @@ public class DatabaseHandler {
         customer.addOrder(order);
         updateDB(session, customer);
 
-        // Update stock
-        items.forEach((item, amount) -> {
-            item.reduceQuantity(store, amount);
-            updateDB(session, item);
-        });
+        if (!delivery) {
+            // Update stock
+            items.forEach((item, amount) -> {
+                item.reduceQuantity(store, amount);
+                updateDB(session, item);
+            });
+        }
 
         tryFlushSession(session);
 
         return order;
     }
 
-    public static Complaint addComplaint(String complaintDescription, Customer customer, Store store) throws HibernateException {
+    public static Complaint addComplaint(String complaintDescription, Customer customer, Store store)
+            throws HibernateException {
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
@@ -234,8 +278,6 @@ public class DatabaseHandler {
 
         return complaint;
     }
-
-
 
     private static List<List<Path>> getRandomOrderedImages() {
         List<List<Path>> imagesLists = new ArrayList<>();
@@ -270,10 +312,10 @@ public class DatabaseHandler {
 
     public static List<Store> initStores() {
         List<Store> stores = new ArrayList<>();
-        for (int i = 1; i<11; i++) {
-            stores.add(new Store("Store"+i, "Address"+i));
+        for (int i = 0; i < 10; i++) {
+            stores.add(new Store("Store" + i, "Address" + i));
         }
-        stores.add(new Store("Lilach Chain Store", "Everywhere"));
+        stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere"));
         return stores;
     }
 
@@ -290,7 +332,8 @@ public class DatabaseHandler {
                 for (Path imagePath : imageList) {
                     int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
-                    Map<Store, Integer> stock = stores.stream().collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
+                    Map<Store, Integer> stock = stores.stream()
+                            .collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
                     randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
                             false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
@@ -299,43 +342,49 @@ public class DatabaseHandler {
         }
 
         // On Sale Items
-        //randomItems.remove(0);
-        //randomItems.add(0, new CatalogItem("Sale flower",
-        //imageLists.get(0).get(0).toUri().toString(), 249.99,
-        //new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white", true));
-        //randomItems.remove(1);
-        //randomItems.add(1, new CatalogItem("Sale flower",
-        //imageLists.get(0).get(1).toUri().toString(), 149.99,
-        //new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow", true));
+        // randomItems.remove(0);
+        // randomItems.add(0, new CatalogItem("Sale flower",
+        // imageLists.get(0).get(0).toUri().toString(), 249.99,
+        // new HashMap<>(Map.of(store, 10)), true, 50.0, "large", "flower", "white",
+        // true));
+        // randomItems.remove(1);
+        // randomItems.add(1, new CatalogItem("Sale flower",
+        // imageLists.get(0).get(1).toUri().toString(), 149.99,
+        // new HashMap<>(Map.of(store, 10)), true, 50.0, "medium", "flower", "yellow",
+        // true));
 
         return randomItems;
     }
 
     public static void createOrders(List<Store> stores, List<CatalogItem> items) {
         Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        //Calendar cal = Calendar.getInstance();
-        //cal.add(Calendar.DAY_OF_MONTH, 3);
+        // Calendar cal = Calendar.getInstance();
+        // cal.add(Calendar.DAY_OF_MONTH, 3);
 
         Random random = new Random();
 
-        // createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
-        //         items.subList(0, random.nextInt(1, items.size())).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
-        //         "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
-        //         new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+        // createOrder(stores.get(random.nextInt(stores.size())),
+        // (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
+        // items.subList(0, random.nextInt(1,
+        // items.size())).stream().collect(Collectors.toMap(Function.identity(), item ->
+        // random.nextInt(1,4))),
+        // "Mazal Tov", nowTimestamp, new Timestamp(cal.getTime().getTime()), true,
+        // new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There",
+        // false));
 
-        //Timestamp nowTimestamp = new Timestamp(cal.getTime().getTime());
-        for (int i=0; i<100; i++) {
+        for (int i = 0; i < 20; i++) {
             int item_index = random.nextInt(items.size());
             Calendar cal = Calendar.getInstance();
             Calendar cal2 = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_MONTH, i);
-            cal2.add(Calendar.DAY_OF_MONTH,i+3);
+            cal2.add(Calendar.DAY_OF_MONTH, i + 3);
             Timestamp orderTime = new Timestamp(cal.getTime().getTime());
             Timestamp deliveryTime = new Timestamp(cal2.getTime().getTime());
-            createOrder(stores.get(random.nextInt(stores.size())), (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
-                    items.subList(0, item_index).stream().collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1,4))),
+            createOrder(stores.get(stores.size() - 1), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)),
+                    items.subList(0, item_index).stream()
+                            .collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1, 4))),
                     "Mazal Tov", orderTime, deliveryTime, true,
-                    new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There", false));
+                    new Delivery("Guy Dayan", "0509889939", "Address Street 1", "Hello There", false));
         }
     }
 
@@ -343,10 +392,11 @@ public class DatabaseHandler {
         List<Complaint> complaintList = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
             String email = "example" + i + "@mail.com";
-            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE, complaintList);
+            registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE,
+                    complaintList);
         }
         for (int i = 1; i <= 20; i++) {
-            registerChainEmployee("Employee"+i, "Employee"+i+"@lilach.co.il", "Employee"+i, "Employee"+i);
+            registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i);
         }
     }
 
@@ -357,11 +407,14 @@ public class DatabaseHandler {
 
         List<Store> stores = initStores();
         saveStores(stores);
-        List<CatalogItem> items = initItems(stores);
+        List<Store> pickupStores = stores.stream().filter((store) -> !store.getName().equals(Constants.WAREHOUSE_NAME))
+                .toList();
+        List<CatalogItem> items = initItems(pickupStores);
         saveItems(items);
 
-        createUsers(stores);
+        createUsers(pickupStores);
         createOrders(stores, items);
+        System.out.println("Finished initializing");
     }
 
     private static <T> List<T> getAllEntities(Class<T> c) {
@@ -391,6 +444,44 @@ public class DatabaseHandler {
             }
         }
         return catalogItems;
+    }
+
+    public static CatalogItem createItem(String name, double price, Map<Store, Integer> quantities, boolean onSale, double discountPercent, String size,
+            String itemType, String itemColor, boolean isDefault, byte[] image) throws HibernateException {
+        CatalogItem catalogItem = new CatalogItem(name, "", price, quantities, onSale, discountPercent, size, itemType,
+                itemColor, isDefault);
+        catalogItem.setImage(image);
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        session.save(catalogItem);
+
+        Path imagesPath = Paths.get(System.getProperty("user.home")).resolve("server-images");
+        if (!Files.exists(imagesPath))
+            try {
+                Files.createDirectory(imagesPath);
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                session.delete(catalogItem);
+                tryFlushSession(session);
+                return null;
+            }
+
+        try {
+            catalogItem.setImagePath(
+                    ImageUtils.saveImage(image, Paths.get(System.getProperty("user.home")).resolve("server-images"),
+                            catalogItem.getId() + ".jpg").toUri().toString());
+        } catch (IOException e) {
+            // Couldn't create image
+            e.printStackTrace();
+            session.delete(catalogItem);
+            tryFlushSession(session);
+            return null;
+        }
+
+        tryFlushSession(session);
+
+        return catalogItem;
     }
 
     public static List<Complaint> getComplaints() {
@@ -437,7 +528,7 @@ public class DatabaseHandler {
             session.merge(order);
             session.merge(store);
         }
-        //updateDB(session, order);
+        // updateDB(session, order);
         tryFlushSession(session);
     }
 
@@ -463,6 +554,5 @@ public class DatabaseHandler {
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
     }
-
 
 }

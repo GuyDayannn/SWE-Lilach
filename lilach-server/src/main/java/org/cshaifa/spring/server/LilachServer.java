@@ -1,15 +1,49 @@
 package org.cshaifa.spring.server;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.cshaifa.spring.entities.*;
+import org.cshaifa.spring.entities.requests.AddComplaintRequest;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.User;
-import org.cshaifa.spring.entities.requests.*;
-import org.cshaifa.spring.entities.responses.*;
+import org.cshaifa.spring.entities.requests.AddComplaintRequest;
+import org.cshaifa.spring.entities.requests.CreateItemRequest;
+import org.cshaifa.spring.entities.requests.CreateOrderRequest;
+import org.cshaifa.spring.entities.requests.GetCatalogRequest;
+import org.cshaifa.spring.entities.requests.GetComplaintsRequest;
+import org.cshaifa.spring.entities.requests.GetOrdersRequest;
+import org.cshaifa.spring.entities.requests.GetStoresRequest;
+import org.cshaifa.spring.entities.requests.IsAliveRequest;
+import org.cshaifa.spring.entities.requests.LoginRequest;
+import org.cshaifa.spring.entities.requests.LogoutRequest;
+import org.cshaifa.spring.entities.requests.RegisterRequest;
+import org.cshaifa.spring.entities.requests.Request;
+import org.cshaifa.spring.entities.requests.UpdateComplaintRequest;
+import org.cshaifa.spring.entities.requests.UpdateItemRequest;
+import org.cshaifa.spring.entities.requests.UpdateOrdersRequest;
+import org.cshaifa.spring.entities.responses.AddComplaintResponse;
+import org.cshaifa.spring.entities.responses.AddComplaintResponse;
+import org.cshaifa.spring.entities.responses.CreateItemResponse;
+import org.cshaifa.spring.entities.responses.CreateOrderResponse;
+import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
+import org.cshaifa.spring.entities.responses.GetOrdersResponse;
+import org.cshaifa.spring.entities.responses.GetStoresResponse;
+import org.cshaifa.spring.entities.responses.IsAliveResponse;
+import org.cshaifa.spring.entities.responses.LoginResponse;
+import org.cshaifa.spring.entities.responses.LogoutResponse;
+import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
+import org.cshaifa.spring.entities.responses.RegisterResponse;
+import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
+import org.cshaifa.spring.entities.responses.UpdateItemResponse;
+import org.cshaifa.spring.entities.responses.UpdateOrdersResponse;
+import org.cshaifa.spring.entities.responses.RegisterResponse;
+import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
+import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.server.database.DatabaseHandler;
 import org.cshaifa.spring.server.ocsf.AbstractServer;
 import org.cshaifa.spring.server.ocsf.ConnectionToClient;
@@ -39,18 +73,19 @@ public class LilachServer extends AbstractServer {
                         client.sendToClient(new GetCatalogResponse(requestId, false));
                     }
                 } else if (request instanceof GetOrdersRequest) {
-                        try {
-                            List<Order> orderList = DatabaseHandler.getOrders();
-                            client.sendToClient(new GetOrdersResponse(requestId, orderList));
-                        } catch (HibernateException e) {
-                            e.printStackTrace();
-                            client.sendToClient(new GetOrdersResponse(requestId, false));
-                        }
+                    try {
+                        List<Order> orderList = DatabaseHandler.getOrders();
+                        client.sendToClient(new GetOrdersResponse(requestId, orderList));
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
+                        client.sendToClient(new GetOrdersResponse(requestId, false));
+                    }
                 } else if (request instanceof UpdateItemRequest updateItemRequest) {
                     CatalogItem updatedItem = updateItemRequest.getUpdatedItem();
                     try {
                         DatabaseHandler.updateItem(updatedItem);
                         client.sendToClient(new UpdateItemResponse(requestId, updatedItem));
+                        sendToAllClients(new NotifyUpdateResponse(updatedItem));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
@@ -64,7 +99,7 @@ public class LilachServer extends AbstractServer {
                         e.printStackTrace();
                         client.sendToClient(new UpdateComplaintResponse(requestId, false));
                     }
-                }else if (request instanceof UpdateOrdersRequest updateOrdersRequest) {
+                } else if (request instanceof UpdateOrdersRequest updateOrdersRequest) {
                     Order order = updateOrdersRequest.getUpdatedOrders();
                     try {
                         DatabaseHandler.updateOrders(order);
@@ -78,6 +113,10 @@ public class LilachServer extends AbstractServer {
                     User user = DatabaseHandler.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
                     if (user != null && user.isLoggedIn()) {
                         client.sendToClient(new LoginResponse(requestId, false, Constants.ALREADY_LOGGED_IN));
+                        return;
+                    }
+                    if (user instanceof Customer && ((Customer) user).isFrozen()) {
+                        client.sendToClient(new LoginResponse(requestId, false, Constants.CUSTOMER_FROZEN_MSG));
                         return;
                     }
                     if (user != null) {
@@ -118,16 +157,32 @@ public class LilachServer extends AbstractServer {
                         client.sendToClient(new LogoutResponse(requestId, false));
                         return;
                     }
-
                     client.sendToClient(new LogoutResponse(requestId, true));
+
+                } else if (request instanceof CreateItemRequest createItemRequest) {
+                    try {
+                        CatalogItem item = DatabaseHandler.createItem(createItemRequest.getName(),
+                                createItemRequest.getPrice(), createItemRequest.getQuantities(),
+                                createItemRequest.isOnSale(), createItemRequest.getDiscountPercent(),
+                                createItemRequest.getSize(), createItemRequest.getItemType(),
+                                createItemRequest.getItemColor(), createItemRequest.isDefault(),
+                                createItemRequest.getImage());
+                        client.sendToClient(new CreateItemResponse(requestId, item != null, item));
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
+                        client.sendToClient(new CreateItemResponse(requestId, false));
+                    }
                 } else if (request instanceof GetStoresRequest) {
                     client.sendToClient(new GetStoresResponse(requestId, DatabaseHandler.getStores()));
                 } else if (request instanceof CreateOrderRequest createOrderRequest) {
                     try {
-                        Order order = DatabaseHandler.createOrder(createOrderRequest.getStore(),
-                                createOrderRequest.getCustomer(), createOrderRequest.getItems(),
-                                createOrderRequest.getGreeting(), createOrderRequest.getOrderDate(),
-                                createOrderRequest.getSupplyDate(), createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
+                        Store store = createOrderRequest.getStore();
+                        if (store == null)
+                            store = DatabaseHandler.getWarehouseStore();
+                        Order order = DatabaseHandler.createOrder(store, createOrderRequest.getCustomer(),
+                                createOrderRequest.getItems(), createOrderRequest.getGreeting(),
+                                createOrderRequest.getOrderDate(), createOrderRequest.getSupplyDate(),
+                                createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
                             client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
                         } else {
@@ -138,25 +193,28 @@ public class LilachServer extends AbstractServer {
                         client.sendToClient(new CreateOrderResponse(requestId, false, Constants.FAIL_MSG));
                     }
                 } else if (request instanceof AddComplaintRequest addComplaintRequest) {
-                try {
-                    Complaint complaint = DatabaseHandler.addComplaint(addComplaintRequest.getComplaintDescription(), addComplaintRequest.getCustomer(), addComplaintRequest.getStore());
-                    if (complaint != null) {
-                        client.sendToClient(new AddComplaintResponse(requestId, true, complaint, Constants.SUCCESS_MSG));
-                    } else {
+                    try {
+                        Complaint complaint = DatabaseHandler.addComplaint(
+                                addComplaintRequest.getComplaintDescription(), addComplaintRequest.getCustomer(),
+                                addComplaintRequest.getStore());
+                        if (complaint != null) {
+                            client.sendToClient(
+                                    new AddComplaintResponse(requestId, true, complaint, Constants.SUCCESS_MSG));
+                        } else {
+                            client.sendToClient(new AddComplaintResponse(requestId, false, Constants.FAIL_MSG));
+                        }
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
                         client.sendToClient(new AddComplaintResponse(requestId, false, Constants.FAIL_MSG));
                     }
-                } catch (HibernateException e) {
-                    e.printStackTrace();
-                    client.sendToClient(new AddComplaintResponse(requestId, false, Constants.FAIL_MSG));
+                } else if (request instanceof GetComplaintsRequest) {
+                    try {
+                        List<Complaint> complaintsList = DatabaseHandler.getComplaints();
+                        client.sendToClient(new GetComplaintsResponse(requestId, complaintsList));
+                    } catch (HibernateException e) {
+                        client.sendToClient(new GetComplaintsResponse(requestId, false));
+                    }
                 }
-            }else if (request instanceof GetComplaintsRequest){
-                try {
-                    List<Complaint> complaintsList = DatabaseHandler.getComplaints();
-                    sendToAllClients(new GetComplaintsResponse(requestId, complaintsList ));
-                } catch (HibernateException e) {
-                    sendToAllClients(new GetComplaintsResponse(requestId, false));
-                }
-            }
             } else {
                 // TODO: Return a general error message to the client
             }

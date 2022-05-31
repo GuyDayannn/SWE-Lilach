@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -35,6 +36,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.Report;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
@@ -54,6 +56,7 @@ public class App extends Application {
     private static Node loadingRootNode;
     private static ScheduledFuture<Void> scheduledCancelButtonShow;
     private static ScheduledExecutorService cancelButtonExecutorService;
+    public static ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     private static Text currentItemPrice;
     private static Text currentItemName;
@@ -62,6 +65,29 @@ public class App extends Application {
 
     private static Map<CatalogItem, Integer> shoppingCart = new HashMap<>();
 
+    private static String recipientFirstName = null;
+
+    private static String recipientLastName = null;
+
+    private static String recipientAddress = null;
+
+    private static String message = null;
+
+    private static String customerPhoneNumber = null;
+
+    private static Timestamp supplyDate = null;
+
+    private static Store pickupStore = null;
+
+    private static boolean orderDelivery;
+
+    private static String cardNumber;
+
+    private static String cardCvv;
+
+    private static String cardExpDate;
+
+    private static boolean enteredSupplyDetails = false;
     private static Report report;
 
     @Override
@@ -71,16 +97,18 @@ public class App extends Application {
         stage.setScene(scene);
         appStage = stage;
         // TODO: logout without any loading for now, maybe change, maybe don't
-        appStage.setOnCloseRequest(e -> logoutUser());
+        appStage.setOnCloseRequest(e -> {
+            logoutUser();
+            scheduler.shutdown();
+        });
         appStage.show();
     }
 
     public static void logoutUser() {
         final User toLogout = currentUser;
         new Thread(
-                createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT,
-                        TimeUnit.SECONDS))
-                .start();
+                createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS))
+                        .start();
         currentUser = null;
     }
 
@@ -102,6 +130,9 @@ public class App extends Application {
     }
 
     static void setContent(String pageName) throws IOException {
+        scheduler.shutdown();
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         if (pageName == "catalog") {
@@ -206,7 +237,6 @@ public class App extends Application {
         }
     }
 
-
     static void setCurrentItemDisplayed(CatalogItem item, Text itemPrice, Text itemName) {
         currentItemDisplayed = item;
         currentItemPrice = itemPrice;
@@ -214,15 +244,14 @@ public class App extends Application {
     }
 
     static void setCurrentReportDisplayed(Report report1) {
-       report = report1;
+        report = report1;
     }
 
     public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
-        if(updatedItem.getDiscount()!=0){
-            double price = updatedItem.getPrice()*(1-updatedItem.getDiscount()/100);
+        if (updatedItem.getDiscount() != 0) {
+            double price = updatedItem.getPrice() * (1 - updatedItem.getDiscount() / 100);
             currentItemPrice.setText(String.format("%.2f", price));
-        }
-        else{
+        } else {
             currentItemPrice.setText(Double.toString(updatedItem.getPrice()));
         }
 
@@ -255,5 +284,101 @@ public class App extends Application {
 
     public static void addToCart(CatalogItem item, int quantity) {
         shoppingCart.put(item, quantity);
+    }
+
+    public static String getRecipientFirstName() {
+        return recipientFirstName;
+    }
+
+    public static void setRecipientFirstName(String firstName) {
+        App.recipientFirstName = firstName;
+    }
+
+    public static String getRecipientLastName() {
+        return recipientLastName;
+    }
+
+    public static void setRecipientLastName(String lastName) {
+        App.recipientLastName = lastName;
+    }
+
+    public static String getRecipientAddress() {
+        return recipientAddress;
+    }
+
+    public static void setRecipientAddress(String address) {
+        App.recipientAddress = address;
+    }
+
+    public static String getMessage() {
+        return message;
+    }
+
+    public static void setMessage(String message) {
+        App.message = message;
+    }
+
+    public static String getCustomerPhoneNumber() {
+        return customerPhoneNumber;
+    }
+
+    public static void setCustomerPhoneNumber(String phoneNumber) {
+        App.customerPhoneNumber = phoneNumber;
+    }
+
+    public static Timestamp getSupplyDate() {
+        return supplyDate;
+    }
+
+    public static void setSupplyDate(Timestamp supplyDate) {
+        App.supplyDate = supplyDate;
+    }
+
+    public static boolean isOrderDelivery() {
+        return orderDelivery;
+    }
+
+    public static void setOrderDelivery(boolean orderDelivery) {
+        App.orderDelivery = orderDelivery;
+    }
+
+    public static String getCardNumber() {
+        return cardNumber;
+    }
+
+    public static void setCardNumber(String cardNumber) {
+        App.cardNumber = cardNumber;
+    }
+
+    public static String getCardCvv() {
+        return cardCvv;
+    }
+
+    public static void setCardCvv(String cardCvv) {
+        App.cardCvv = cardCvv;
+    }
+
+    public static String getCardExpDate() {
+        return cardExpDate;
+    }
+
+    public static void setCardExpDate(String cardExpDate) {
+        App.cardExpDate = cardExpDate;
+    }
+
+    public static boolean isEnteredSupplyDetails() {
+        return enteredSupplyDetails;
+    }
+
+    public static void setEnteredSupplyDetails(boolean enteredSupplyDetails) {
+        App.enteredSupplyDetails = enteredSupplyDetails;
+    }
+
+    public static Store getPickupStore() {
+        return pickupStore;
+    }
+
+    public static void setPickupStore(Store pickupStore) {
+        App.pickupStore = pickupStore;
     }
 }

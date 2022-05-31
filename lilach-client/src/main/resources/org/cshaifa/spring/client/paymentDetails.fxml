@@ -41,7 +41,13 @@
             </VBox>
          </children>
       </VBox>
-      <Button layoutX="825.0" layoutY="681.0" mnemonicParsing="false" onAction="#proceed" text="Proceed to Order Confirmation" />
-      <Button layoutX="14.0" layoutY="681.0" mnemonicParsing="false" onAction="#goBack" text="Back to Supply Options" />
+      <Button layoutX="795.0" layoutY="678.0" mnemonicParsing="false" onAction="#proceed" text="Proceed to Order Confirmation">
+         <font>
+            <Font size="15.0" />
+         </font></Button>
+      <Button layoutX="14.0" layoutY="678.0" mnemonicParsing="false" onAction="#goBack" text="Back to Supply Options">
+         <font>
+            <Font size="15.0" />
+         </font></Button>
    </children>
 </AnchorPane>
