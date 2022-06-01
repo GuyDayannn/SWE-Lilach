@@ -121,8 +121,13 @@ public class EmployeeProfileController {
 
     @FXML
     void openComplaint(ActionEvent event) { //on view complaint click
-        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
+        //first clearning screens
+        complaintdescription.clear();
+        complaintStatus.clear();
+        compensationamount.clear();
+        complaintresponse.clear();
 
+        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
         Complaint complaint = complaintList.get((int) complaintID);
 
         complaintdescription.setText(complaint.getComplaintDescription());
@@ -239,6 +244,110 @@ public class EmployeeProfileController {
         App.popUpLaunch(viewReportButton, "ReportPopUp");
     }
 
+    void initComplaints(){
+        //initialize complaints below:
+        Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
+            return ClientHandler.getComplaints();
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        getComplaintsTask.setOnSucceeded(e -> {
+            if (getComplaintsTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting complaints failed");
+                return;
+            }
+            GetComplaintsResponse response = getComplaintsTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
+                System.err.println("Getting complaints failed");
+                return;
+            }
+            complaintList = response.getComplaintList();
+
+            List<Long> complaintListID = new ArrayList<Long>();
+            ObservableList<Long> data = FXCollections.observableArrayList();
+            //showing customer only his complaints
+            if (complaintList.size() >= 1) {
+                for (int i = 0; i < complaintList.size()-1; i++) {
+                    Long id = (complaintList.get(i).getId()); //id 1 shows complaint 2
+                    if(id!=0.0) {
+                        complaintListID.add(id);
+                    } //TODO: fix index id jumps in 1
+                }
+            }
+
+            data.addAll(complaintListID); //adding to dropdown combo
+            complaintComboBox.setItems(data);
+            //new Thread(getComplaintsTask).start();
+
+        });
+
+        getComplaintsTask.setOnFailed(e -> {
+            // TODO: maybe log somewhere else...
+            getComplaintsTask.getException().printStackTrace();
+        });
+
+        try {
+//            Thread t1 = new Thread(getComplaintsTask);
+//            t1.start();
+//            t1.join();
+            Thread t2 = new Thread(getComplaintsTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+
+        }
+    }
+
+
+    void initStores(){
+        // initialize stores below
+        Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
+            return ClientHandler.getStores();
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        getStoresTask.setOnSucceeded(e -> {
+            if (getStoresTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
+            }
+            GetStoresResponse response = getStoresTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
+            }
+            storesList = response.getStores();
+
+            for (Store store : storesList) {
+                System.out.println(store.getName());
+                storeComboBox.getItems().add(store.getName());
+            }
+
+            //new Thread(getStoresTask).start();
+        });
+
+        getStoresTask.setOnFailed(e -> {
+            // TODO: maybe log somewhere else...
+            getStoresTask.getException().printStackTrace();
+        });
+        try {
+//            Thread t1 = new Thread(getComplaintsTask);
+//            t1.start();
+//            t1.join();
+            Thread t2 = new Thread(getStoresTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+
+        }
+    }
+
     @FXML
     public void initialize() {
         if (App.getCurrentUser() != null) {
@@ -266,87 +375,8 @@ public class EmployeeProfileController {
             }
         }
 
-        //initialize complaints below:
-        Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
-            return ClientHandler.getComplaints();
-        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        getComplaintsTask.setOnSucceeded(e -> {
-            if (getComplaintsTask.getValue() == null) {
-                App.hideLoading();
-                System.err.println("Getting complaints failed");
-                return;
-            }
-            GetComplaintsResponse response = getComplaintsTask.getValue();
-            if (!response.isSuccessful()) {
-                // TODO: maybe log the specific exception somewhere
-                App.hideLoading();
-                System.err.println("Getting complaints failed");
-                return;
-            }
-            complaintList = response.getComplaintList();
-
-            List<Long> complaintListID = new ArrayList<Long>();
-            ObservableList<Long> data = FXCollections.observableArrayList();
-            //showing customer only his complaints
-            if (complaintList.size() >= 1) {
-                for (int i = 0; i < complaintList.size() - 1; i++) {
-                    Long id = (complaintList.get(i).getId());
-                    complaintListID.add(id);
-                }
-            }
-
-            data.addAll(complaintListID); //adding to dropdown combo
-            complaintComboBox.setItems(data);
-
-        });
-
-        getComplaintsTask.setOnFailed(e -> {
-            // TODO: maybe log somewhere else...
-            getComplaintsTask.getException().printStackTrace();
-        });
-
-        // initialize stores below
-        Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
-            return ClientHandler.getStores();
-        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        getStoresTask.setOnSucceeded(e -> {
-            if (getStoresTask.getValue() == null) {
-                App.hideLoading();
-                System.err.println("Getting stores failed");
-                return;
-            }
-            GetStoresResponse response = getStoresTask.getValue();
-            if (!response.isSuccessful()) {
-                // TODO: maybe log the specific exception somewhere
-                App.hideLoading();
-                System.err.println("Getting stores failed");
-                return;
-            }
-            storesList = response.getStores();
-
-            for (Store store : storesList) {
-                System.out.println(store.getName());
-                storeComboBox.getItems().add(store.getName());
-            }
-        });
-
-        getStoresTask.setOnFailed(e -> {
-            // TODO: maybe log somewhere else...
-            getStoresTask.getException().printStackTrace();
-        });
-        try {
-            Thread t1 = new Thread(getComplaintsTask);
-            t1.start();
-            t1.join();
-            Thread t2 = new Thread(getStoresTask);
-            t2.start();
-            t2.join();
-        } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-
-        }
+        initComplaints();
+        initStores();
     }
     public void viewAllComplaints(ActionEvent event) {
 

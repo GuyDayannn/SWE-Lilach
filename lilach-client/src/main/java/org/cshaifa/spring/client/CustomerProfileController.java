@@ -167,13 +167,6 @@ public class CustomerProfileController {
             Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
                 System.out.printf("customer is: ", customer.getUsername());
                 System.out.printf("%d%n", customer.getId());
-//                    Complaint complaint = new Complaint();
-//                    complaint.setCustomer(customer);
-//                    complaint.setComplaintOpen(true);
-//                    complaint.setComplaintDescription(complaintDescription.getText().strip());
-//                    complaint.setComplaintResponse("");
-                //customer.addComplaint(complaint);
-                //complaintList.getItems().add(complaint); //adding new complaint in UI
                 return ClientHandler.addComplaint(complaintDescription.getText().strip(), customer, store);
             }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
@@ -199,6 +192,9 @@ public class CustomerProfileController {
                 Thread t = new Thread(addComplaintTask);
                 t.start();
                 t.join();
+                customerComplaintList.clear();
+                complaintTable.getItems().clear();
+                getComplaints(); //adding new complaint to UI
             } catch (InterruptedException interruptedException) {
                 interruptedException.printStackTrace();
             }
@@ -263,7 +259,16 @@ public class CustomerProfileController {
                                 removeOrderTask.getException().printStackTrace();
                             });
 
-                            new Thread(removeOrderTask).start();
+                            try{
+                                Thread t = new Thread(removeOrderTask);
+                                t.start();
+                                t.join();
+                                customerOrderList.clear();
+                                complaintTable.getItems().clear();
+                                getOrders(); //removing order from UI
+                            } catch (InterruptedException interruptedException) {
+                                interruptedException.printStackTrace();
+                            }
 
                         });
 
@@ -448,19 +453,6 @@ public class CustomerProfileController {
         added_complaint_text.setText("");
         invalid_customer_text.setText("");
 
-//        Button refreshButton = new Button("Refresh");
-//        refreshButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent mouseEvent) {
-//                try {
-//                    refreshProfile(mouseEvent);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-
-
         if (App.getCurrentUser()!=null) {
             if (App.getCurrentUser() instanceof Customer)
                 customer = (Customer) App.getCurrentUser();
@@ -475,9 +467,12 @@ public class CustomerProfileController {
             ObservableList<Long> data = FXCollections.observableArrayList();
             //showing customer only his complaints
             if(storeList.size()>=1){
-                for (int i = 0; i < storeList.size()-1; i++) {
+                for (int i = 0; i < storeList.size(); i++) {
                     Long id = (storeList.get(i).getId()-1);
-                    storesListID.add(id);
+                    if(id!=0.0){
+                        storesListID.add(id);
+                    }
+
                 }
             }
 
