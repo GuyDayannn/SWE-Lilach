@@ -19,14 +19,17 @@ public class Delivery implements Serializable {
 
     private String message;
 
+    private boolean immediate;
+
     private boolean deliveryCompleted;
 
 
-    public Delivery(String recipientName, String phoneNumber, String address, String message, boolean deliveryCompleted) {
+    public Delivery(String recipientName, String phoneNumber, String address, String message, boolean immediate, boolean deliveryCompleted) {
         this.recipientName = recipientName;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.message = message;
+        this.immediate = immediate;
         this.deliveryCompleted = deliveryCompleted;
     }
 

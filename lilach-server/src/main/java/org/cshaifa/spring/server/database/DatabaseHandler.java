@@ -384,7 +384,7 @@ public class DatabaseHandler {
                     items.subList(0, item_index).stream()
                             .collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1, 4))),
                     "Mazal Tov", orderTime, deliveryTime, true,
-                    new Delivery("Guy Dayan", "0509889939", "Address Street 1", "Hello There", false));
+                    new Delivery("Guy Dayan", "0509889939", "Address Street 1", "Hello There", false, false));
         }
     }
 

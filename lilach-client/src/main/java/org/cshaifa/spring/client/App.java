@@ -77,6 +77,8 @@ public class App extends Application {
 
     private static Timestamp supplyDate = null;
 
+    private static boolean immediate = false;
+
     private static Store pickupStore = null;
 
     private static boolean orderDelivery;
@@ -381,4 +383,8 @@ public class App extends Application {
     public static void setPickupStore(Store pickupStore) {
         App.pickupStore = pickupStore;
     }
+
+    public static boolean isImmediate() { return immediate; }
+
+    public static void setImmediate(boolean immediate) { App.immediate = immediate; }
 }

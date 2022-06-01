@@ -177,7 +177,7 @@ public class OrderConfirmationController {
                 App.isOrderDelivery() ? App.getSupplyDate() : null, App.isOrderDelivery(),
                 App.isOrderDelivery()
                         ? new Delivery(App.getRecipientFirstName() + " " + App.getRecipientLastName(),
-                                App.getCustomerPhoneNumber(), App.getRecipientAddress(), App.getMessage(), false)
+                                App.getCustomerPhoneNumber(), App.getRecipientAddress(), App.getMessage(), App.isImmediate(), false)
                         : null),
                 Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
