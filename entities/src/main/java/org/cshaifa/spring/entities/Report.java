@@ -77,7 +77,6 @@ public class Report {
 
     Map<LocalDate, Integer> getDailyRevenueValues(List<Order> orders) {
         Map<LocalDate, Integer> dailyValues = new HashMap<>();
-
         for (Order order : orders) {
             LocalDate orderDate = order.getOrderDate().toLocalDateTime().toLocalDate();
             int dailyRevenue = (int) order.getTotal();
@@ -90,35 +89,29 @@ public class Report {
                 }
             }
         }
-
         for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1))
         {
             if (!dailyValues.containsKey(date)) {
                 dailyValues.put(date, 0);
             }
         }
-
         return dailyValues;
     }
 
     Map<LocalDate, Integer> getDailyComplaints(List<Complaint> complaints) {
         Map<LocalDate, Integer> dailyValues = new HashMap<>();
-
         for (Complaint complaint : complaints) {
             LocalDate complaintDate = complaint.getComplaintTimestamp().toLocalDateTime().toLocalDate();
-            System.out.println(complaintDate.toString());
             if (complaintDate.isAfter(startDate.minusDays(1)) && complaintDate.isBefore(endDate)) {
                 if (dailyValues.containsKey(complaintDate)) {
-                    Integer val = dailyValues.get(complaintDate);
+                    int val = dailyValues.get(complaintDate);
                     dailyValues.put(complaintDate, ++val);
                 } else {
                     dailyValues.put(complaintDate, 1);
                 }
             }
         }
-
-        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1))
-        {
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
             if (!dailyValues.containsKey(date)) {
                 dailyValues.put(date, 0);
             }
@@ -126,6 +119,7 @@ public class Report {
 
         return dailyValues;
     }
+
 
     public XYDataset createDataset(Map<LocalDate, Integer> dailyValues) {
 
@@ -179,7 +173,7 @@ public class Report {
                 List<Complaint> complaintList = store.getComplaints();
                 Map<LocalDate, Integer> dailyValues = getDailyComplaints(complaintList);
                 dataset = createDataset(dailyValues);
-                histTitle = store.getName()+"Complaint Histogram";
+                histTitle = store.getName()+" Complaint Histogram";
             }
             else if(reportType== ReportType.REVENUE){
                 List<Order> storeOrders = store.getOrders();

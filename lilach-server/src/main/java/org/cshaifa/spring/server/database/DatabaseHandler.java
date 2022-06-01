@@ -225,6 +225,7 @@ public class DatabaseHandler {
             throws HibernateException {
         if (!delivery) {
             // Check stock
+            supplyDate = orderDate;
             if (!items.entrySet().stream().allMatch(entry -> {
                 return entry.getKey().getStock().containsKey(store)
                         && entry.getValue() <= entry.getKey().getStock().get(store);
@@ -273,6 +274,8 @@ public class DatabaseHandler {
 
         customer.addComplaint(complaint);
         updateDB(session, customer);
+        store.addComplaint(complaint);
+        updateDB(session, store);
 
         tryFlushSession(session);
 
@@ -492,6 +495,11 @@ public class DatabaseHandler {
     public static List<Order> getOrders() {
         List<Order> orderList = getAllEntities(Order.class);
         return orderList;
+    }
+
+    public static List<User> getUsers() {
+        List<User> userList = getAllEntities(User.class);
+        return userList;
     }
 
     public static void updateItem(CatalogItem newItem) throws HibernateException {

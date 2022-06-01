@@ -19,7 +19,7 @@ public class Order implements Serializable {
     @Column(name = "quantity")
     private Map<CatalogItem, Integer> items;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Store store;
 
     @ManyToOne(fetch = FetchType.EAGER)

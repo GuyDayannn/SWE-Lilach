@@ -16,37 +16,8 @@ import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
 import org.cshaifa.spring.entities.User;
-import org.cshaifa.spring.entities.requests.AddComplaintRequest;
-import org.cshaifa.spring.entities.requests.CreateItemRequest;
-import org.cshaifa.spring.entities.requests.CreateOrderRequest;
-import org.cshaifa.spring.entities.requests.FreezeCustomerRequest;
-import org.cshaifa.spring.entities.requests.GetCatalogRequest;
-import org.cshaifa.spring.entities.requests.GetComplaintsRequest;
-import org.cshaifa.spring.entities.requests.GetOrdersRequest;
-import org.cshaifa.spring.entities.requests.GetStoresRequest;
-import org.cshaifa.spring.entities.requests.IsAliveRequest;
-import org.cshaifa.spring.entities.requests.LoginRequest;
-import org.cshaifa.spring.entities.requests.LogoutRequest;
-import org.cshaifa.spring.entities.requests.RegisterRequest;
-import org.cshaifa.spring.entities.requests.UpdateComplaintRequest;
-import org.cshaifa.spring.entities.requests.UpdateItemRequest;
-import org.cshaifa.spring.entities.requests.UpdateOrdersRequest;
-import org.cshaifa.spring.entities.responses.AddComplaintResponse;
-import org.cshaifa.spring.entities.responses.CreateItemResponse;
-import org.cshaifa.spring.entities.responses.CreateOrderResponse;
-import org.cshaifa.spring.entities.responses.FreezeCustomerResponse;
-import org.cshaifa.spring.entities.responses.GetCatalogResponse;
-import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
-import org.cshaifa.spring.entities.responses.GetOrdersResponse;
-import org.cshaifa.spring.entities.responses.GetStoresResponse;
-import org.cshaifa.spring.entities.responses.IsAliveResponse;
-import org.cshaifa.spring.entities.responses.LoginResponse;
-import org.cshaifa.spring.entities.responses.LogoutResponse;
-import org.cshaifa.spring.entities.responses.RegisterResponse;
-import org.cshaifa.spring.entities.responses.Response;
-import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
-import org.cshaifa.spring.entities.responses.UpdateOrdersResponse;
+import org.cshaifa.spring.entities.requests.*;
+import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
 public class ClientHandler {
@@ -89,6 +60,13 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(getOrdersRequest);
         return (GetOrdersResponse) waitForMsgFromServer(getOrdersRequest.getRequestId());
+    }
+
+    public static GetUsersResponse getUsers() throws IOException, ConnectException, InterruptedException {
+        GetUsersRequest getUsersRequest = new GetUsersRequest();
+        client.openConnection();
+        client.sendToServer(getUsersRequest);
+        return (GetUsersResponse) waitForMsgFromServer(getUsersRequest.getRequestId());
     }
 
     /*

@@ -26,8 +26,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class EmployeeProfileController {
-
     //FXML objects
+    @FXML
+    private TextField customerAccountText;
+    @FXML
+    private ComboBox customerComboBox;
+    @FXML
+    private ComboBox employeesComboBox;
     @FXML
     private Button editCatalogButton;
     @FXML
@@ -96,6 +101,9 @@ public class EmployeeProfileController {
     // Variables
     private List<Complaint> complaintList;
     private List<Store> storesList;
+    private List<User> userList;
+    private List<Customer> customerList = new ArrayList<>();
+    private List<Employee> employeeList= new ArrayList<>();
 
     private LocalDate reportStartDate;
     private LocalDate reportEndDate;
@@ -324,7 +332,7 @@ public class EmployeeProfileController {
             storesList = response.getStores();
 
             for (Store store : storesList) {
-                System.out.println(store.getName());
+                //System.out.println(store.getName());
                 storeComboBox.getItems().add(store.getName());
             }
 
@@ -340,6 +348,73 @@ public class EmployeeProfileController {
 //            t1.start();
 //            t1.join();
             Thread t2 = new Thread(getStoresTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+
+        }
+    }
+
+    void initUsers(){
+        // initialize stores below
+
+        Task<GetUsersResponse> getUsersTask = App.createTimedTask(() -> {
+            return ClientHandler.getUsers();
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        getUsersTask.setOnSucceeded(e -> {
+            if (getUsersTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
+            }
+            GetUsersResponse response = getUsersTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
+            }
+            userList = response.getUsersList();
+            ChainEmployee chainEmployee = new ChainEmployee();
+            StoreManager storeManager = new StoreManager();
+            SystemAdmin systemAdmin = new SystemAdmin();
+            CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee();
+            for(User user: userList){
+//                        == ChainEmployee.class || user.getClass() ==CustomerServiceEmployee.class
+//                 || user.getClass() ==SystemAdmin.class)
+                if(user.getClass().isAssignableFrom(Employee.class)){
+                    employeeList.add((Employee) user);
+                    System.out.println("added employee");
+
+                }
+                if(user.getClass().isAssignableFrom(Customer.class)){
+                    customerList.add((Customer) user);
+                    System.out.println("added customer");
+                }
+                else{
+                    System.out.println("Couldn't classify user");
+                }
+            }
+
+            for (Customer customer : customerList) {
+                System.out.println(customer.getUsername());
+                customerComboBox.getItems().add(customer.getUsername());
+            }
+
+            for (Employee employee : employeeList) {
+                System.out.println(employee.getUsername());
+                employeesComboBox.getItems().add(employee.getUsername());
+            }
+        });
+
+        getUsersTask.setOnFailed(e -> {
+            // TODO: maybe log somewhere else...
+            getUsersTask.getException().printStackTrace();
+        });
+        try {
+            Thread t2 = new Thread(getUsersTask);
             t2.start();
             t2.join();
         } catch (InterruptedException interruptedException) {
@@ -374,9 +449,10 @@ public class EmployeeProfileController {
                 //else it's system admin and he can see all options
             }
         }
-
+        //calling db server tasks to get data
         initComplaints();
         initStores();
+        initUsers();
     }
     public void viewAllComplaints(ActionEvent event) {
 
@@ -384,6 +460,19 @@ public class EmployeeProfileController {
 
     //methods for handle users below
     public void selectCustomer(ActionEvent event) {
+//        String custUsername = customerComboBox.getItems().
+//        Customer selectedCustomer;
+//        for(Customer customer: customerList){
+//            if(customer.getUsername().equals(custUsername)){
+//                selectedCustomer = customer;
+//                break;
+//            }
+//        }
+//        boolean isFrozen = selectedCustomer.isFrozen();
+//        if(isFrozen)
+//            customerAccountText.setText("Frozen");
+//        else
+//            customerAccountText.setText("Active");
     }
 
     public void editCustomerStatus(ActionEvent event) {
