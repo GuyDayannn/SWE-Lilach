@@ -10,4 +10,11 @@ public class FreezeCustomerRequest extends Request{
         this.customer = customer;
         this.toFreeze = toFreeze;
     }
+
+    public Customer getUpdatedCustomer() {
+        return customer;
+    }
+    public Boolean getIfToFreeze() {
+        return toFreeze;
+    }
 }

@@ -1,14 +1,14 @@
 package org.cshaifa.spring.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "chain_employees")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class ChainEmployee extends Employee {
+
+    @OneToOne(cascade = CascadeType.ALL )
+    private Store store;
 
     public ChainEmployee(String fullName, String username, String email, String password, String passwordSalt) {
         super(fullName, username, email, password, passwordSalt);
@@ -17,4 +17,6 @@ public class ChainEmployee extends Employee {
     public ChainEmployee() {
     }
 
+    public Store getStore() {return store;}
+    public void setStore(Store store) {this.store = store;}
 }

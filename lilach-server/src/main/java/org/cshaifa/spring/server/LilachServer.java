@@ -85,8 +85,20 @@ public class LilachServer extends AbstractServer {
                         e.printStackTrace();
                         client.sendToClient(new UpdateOrdersResponse(requestId, false));
                     }
+                }else if (request instanceof FreezeCustomerRequest freezeCustomerRequest) {
+                        Customer customer = freezeCustomerRequest.getUpdatedCustomer();
+                        boolean toFreeze = freezeCustomerRequest.getIfToFreeze();
+                        try {
+                            String msgFreeze = DatabaseHandler.freezeCustomer(customer, toFreeze);
+                            client.sendToClient(new FreezeCustomerResponse(requestId, true, msgFreeze));
+                        } catch (HibernateException e) {
+                            e.printStackTrace();
+                            String errorMsg = e.getMessage();
+                            client.sendToClient(new FreezeCustomerResponse(requestId, errorMsg));
+                        }
 
-                } else if (request instanceof LoginRequest loginRequest) {
+
+                    } else if (request instanceof LoginRequest loginRequest) {
                     User user = DatabaseHandler.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
                     if (user != null && user.isLoggedIn()) {
                         client.sendToClient(new LoginResponse(requestId, false, Constants.ALREADY_LOGGED_IN));

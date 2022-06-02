@@ -24,15 +24,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.ChainEmployee;
-import org.cshaifa.spring.entities.Complaint;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Delivery;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.SubscriptionType;
-import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -186,6 +178,28 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
+    public static String registerStoreManager(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        try {
+            String hexSalt = generateHexSalt();
+            session.save(
+                    new StoreManager(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return Constants.SUCCESS_MSG;
+    }
+
     public static String freezeCustomer(Customer customer, boolean toFreeze) {
         if (customer.isFrozen() && toFreeze)
             return "Account Already Frozen";
@@ -225,7 +239,7 @@ public class DatabaseHandler {
             throws HibernateException {
         if (!delivery) {
             // Check stock
-            supplyDate = orderDate;
+            //supplyDate = orderDate;
             if (!items.entrySet().stream().allMatch(entry -> {
                 return entry.getKey().getStock().containsKey(store)
                         && entry.getValue() <= entry.getKey().getStock().get(store);
@@ -313,12 +327,15 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
-    public static List<Store> initStores() {
+    public static List<Store> initStores(List<StoreManager> managers, List<ChainEmployee> employees) {
         List<Store> stores = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            stores.add(new Store("Store" + i, "Address" + i));
+            List<ChainEmployee> storeEmployees = new ArrayList<>();
+            storeEmployees.add(employees.get(2*i));
+            storeEmployees.add(employees.get((2*i)+1));
+            stores.add(new Store("Store" + i, "Address" + i, managers.get(i), storeEmployees));
         }
-        stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere"));
+        stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere", managers.get(10), new ArrayList<>()));
         return stores;
     }
 
@@ -366,6 +383,7 @@ public class DatabaseHandler {
 
         Random random = new Random();
 
+
         // createOrder(stores.get(random.nextInt(stores.size())),
         // (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
         // items.subList(0, random.nextInt(1,
@@ -375,7 +393,7 @@ public class DatabaseHandler {
         // new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There",
         // false));
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             int item_index = random.nextInt(items.size());
             Calendar cal = Calendar.getInstance();
             Calendar cal2 = Calendar.getInstance();
@@ -383,7 +401,7 @@ public class DatabaseHandler {
             cal2.add(Calendar.DAY_OF_MONTH, i + 3);
             Timestamp orderTime = new Timestamp(cal.getTime().getTime());
             Timestamp deliveryTime = new Timestamp(cal2.getTime().getTime());
-            createOrder(stores.get(stores.size() - 1), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)),
+            createOrder(stores.get(random.nextInt(11)), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)),
                     items.subList(0, item_index).stream()
                             .collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1, 4))),
                     "Mazal Tov", orderTime, deliveryTime, true,
@@ -391,15 +409,23 @@ public class DatabaseHandler {
         }
     }
 
-    public static void createUsers(List<Store> stores) throws Exception {
+    public static void createCustomers(List<Store> stores) throws Exception {
         List<Complaint> complaintList = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
             String email = "example" + i + "@mail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE,
                     complaintList);
         }
+
+    }
+
+    public static void createEmployees() throws Exception{
         for (int i = 1; i <= 20; i++) {
             registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i);
+        }
+
+        for (int i = 1; i <= 11; i++) {
+            registerStoreManager("Manager" + i, "Manager" + i + "@lilach.co.il", "Manager" + i, "Manager" + i);
         }
     }
 
@@ -407,15 +433,26 @@ public class DatabaseHandler {
         // Assume that we initialize only if the catalog is empty
         if (!getAllEntities(CatalogItem.class).isEmpty())
             return;
-
-        List<Store> stores = initStores();
+        createEmployees();
+        List<User> users = getUsers();
+        List<StoreManager> managers = new ArrayList<>();
+        List<ChainEmployee> employees = new ArrayList<>();
+        for (User user : users) {
+            if (user.getClass() == StoreManager.class) {
+                managers.add((StoreManager)user);
+            }
+            if(user.getClass() == ChainEmployee.class) {
+                employees.add((ChainEmployee)user);
+            }
+        }
+        List<Store> stores = initStores(managers, employees);
         saveStores(stores);
         List<Store> pickupStores = stores.stream().filter((store) -> !store.getName().equals(Constants.WAREHOUSE_NAME))
                 .toList();
         List<CatalogItem> items = initItems(pickupStores);
         saveItems(items);
 
-        createUsers(pickupStores);
+        createCustomers(pickupStores);
         createOrders(stores, items);
         System.out.println("Finished initializing");
     }

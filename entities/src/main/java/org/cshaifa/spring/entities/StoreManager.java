@@ -18,6 +18,13 @@ public class StoreManager extends ChainEmployee{
         this.store = store;
     }
 
+    public StoreManager(String fullName, String username, String email, String password, String passwordSalt) {
+        super(fullName, username, email, password, passwordSalt);
+    }
+
     public StoreManager() {
     }
+
+    public Store getStore() {return store;}
+    public void setStore(Store store) {this.store = store;}
 }

@@ -201,4 +201,5 @@ public class ClientHandler {
         client.sendToServer(freezeCustomerRequest);
         return (FreezeCustomerResponse) waitForMsgFromServer(freezeCustomerRequest.getRequestId());
     }
+
 }

@@ -23,11 +23,11 @@
       </Text>
       <Button fx:id="exitButton" layoutX="548.0" layoutY="6.0" mnemonicParsing="false" onAction="#exitProfile" prefHeight="27.0" prefWidth="51.0" text="Exit" />
       <Button fx:id="catalogButton" layoutX="437.0" layoutY="6.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="110.0" text="Edit Catalog" />
-      <Accordion layoutY="32.0" prefHeight="368.0" prefWidth="600.0">
+      <Accordion layoutY="32.0" prefHeight="500.0" prefWidth="600.0">
         <panes>
           <TitledPane fx:id="paneStoreReport" animated="false" text="View Store Report" visible="true">
             <content>
-              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" visible="true">
+              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="265.0" prefWidth="598.0" visible="true">
                      <children>
                         <Text layoutX="28.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:">
                            <font>
@@ -98,23 +98,44 @@
           </TitledPane>
             <TitledPane fx:id="handleUsersPane" animated="false" text="View/Handle Users">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="590.0">
                      <children>
                         <ComboBox fx:id="customerComboBox" layoutX="14.0" layoutY="29.0" onAction="#selectCustomer" prefWidth="150.0" />
+
+
+
                         <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Customer" />
-                        <Button fx:id="editCustomerBtn" layoutX="475.0" layoutY="81.0" mnemonicParsing="false" onAction="#editCustomerStatus" text="Edit Customer" />
+                        <Button fx:id="editCustomerBtn" layoutX="476.0" layoutY="89.0" mnemonicParsing="false" onAction="#editCustomerStatus" text="Edit Customer" AnchorPane.bottomAnchor="260.0" />
                         <Text layoutX="277.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Account  Status" />
                         <TextField fx:id="customerAccountText" layoutX="277.0" layoutY="29.0" text="" />
                         <Label fx:id="updated_complaint_text1" layoutX="383.0" layoutY="259.0" text="" />
                         <Text layoutX="21.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Customer Account Status:" />
-                        <ComboBox fx:id="accountStatusComboBox" layoutX="277.0" layoutY="81.0" onAction="#selectAccpuntStatus" prefWidth="150.0" />
-                        <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee" />
-                        <ComboBox fx:id="employeesComboBox" layoutX="25.0" layoutY="165.0" onAction="#selectEmployee" prefWidth="150.0" />
-                        <Text layoutX="277.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Employee Status" />
-                        <TextField fx:id="employeeStatusText" layoutX="277.0" layoutY="165.0" />
-                        <Text layoutX="25.0" layoutY="234.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status: " />
-                        <ComboBox fx:id="employeeStatusComboBox" layoutX="277.0" layoutY="217.0" onAction="#selectEmployeeStatus" prefWidth="150.0" />
-                        <Button fx:id="editEmployeeBtn" layoutX="475.0" layoutY="217.0" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
+                        <ComboBox fx:id="customerStatusComboBox" layoutX="277.0" layoutY="81.0" onAction="#selectAccountStatus" prefWidth="150.0">
+                         <items>
+                             <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="Active" />
+                                 <String fx:value="Frozen" />
+                             </FXCollections>
+                         </items>
+                     </ComboBox>
+                        <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee Type:" />
+                        <ComboBox fx:id="employeesTypeComboBox" layoutX="21.0" layoutY="150.0" onAction="#selectEmployeeType" prefWidth="150.0" >
+                         <items>
+                             <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="Chain Employee" />
+                                 <String fx:value="Customer Service" />
+                                 <String fx:value="Store Manager" />
+                                 <String fx:value="Chain Manager" />
+                             </FXCollections>
+                         </items>
+                     </ComboBox>
+                         <Text layoutX="21.0" layoutY="200.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee:" />
+                        <Text layoutX="281.0" layoutY="150.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status" />
+                        <ComboBox fx:id="employeeStatusComboBox" disable="false" layoutX="281.0" layoutY="154.0" onAction="#editEmployeeStatus" prefWidth="150.0" />
+                        <Button fx:id="editEmployeeBtn" layoutX="476.0" layoutY="176.0" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
+                        <ComboBox fx:id="selectEmployeeComboBox" disable="false" layoutX="21.0" layoutY="203.0" onAction="#selectEmployee" prefWidth="150.0" />
+                        <Text layoutX="281.0" layoutY="199.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store" />
+                        <ComboBox fx:id="selectStoreComboBox" disable="false" layoutX="281.0" layoutY="203.0" onAction="#editManagerStore" prefWidth="150.0" />
                      </children>
                   </AnchorPane>
                </content>
