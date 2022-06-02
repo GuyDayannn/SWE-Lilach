@@ -50,6 +50,7 @@ public class App extends Application {
     private static Stage appStage;
 
     private static CatalogItem currentItemDisplayed;
+    private static CatalogItem createdItem = null;
     private static CatalogItem itemByID;
     private static int DataBaseConnected = 0;
     private static Stage loadingStage;
@@ -381,4 +382,14 @@ public class App extends Application {
     public static void setPickupStore(Store pickupStore) {
         App.pickupStore = pickupStore;
     }
+
+    public static CatalogItem getCreatedItem() {
+        return createdItem;
+    }
+
+    public static void setCreatedItem(CatalogItem createdItem) {
+        App.createdItem = createdItem;
+    }
+
+
 }
