@@ -156,16 +156,18 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
-    public static String registerChainEmployee(String fullName, String email, String username, String rawPassword)
+    public static ChainEmployee registerChainEmployee(String fullName, String email, String username, String rawPassword)
             throws HibernateException {
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
+        ChainEmployee chainEmployee= null;
 
         try {
             String hexSalt = generateHexSalt();
-            session.save(
-                    new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
+            chainEmployee = new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(chainEmployee);
+
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
@@ -175,20 +177,20 @@ public class DatabaseHandler {
 
         tryFlushSession(session);
 
-        return Constants.SUCCESS_MSG;
+        return chainEmployee;
     }
 
-    public static String registerStoreManager(String fullName, String email, String username, String rawPassword)
+    public static StoreManager registerStoreManager(String fullName, String email, String username, String rawPassword)
             throws HibernateException {
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
-
+        StoreManager storeManager= null;
         try {
             String hexSalt = generateHexSalt();
-            session.save(
-                    new StoreManager(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            storeManager = new StoreManager(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(storeManager); }
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
             session.close();
@@ -197,7 +199,7 @@ public class DatabaseHandler {
 
         tryFlushSession(session);
 
-        return Constants.SUCCESS_MSG;
+        return storeManager;
     }
 
     public static String freezeCustomer(Customer customer, boolean toFreeze) {
@@ -318,6 +320,7 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
+
     public static void saveItems(List<CatalogItem> items) {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
@@ -330,7 +333,7 @@ public class DatabaseHandler {
     public static List<Store> initStores(List<StoreManager> managers, List<ChainEmployee> employees) {
         List<Store> stores = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            List<ChainEmployee> storeEmployees = new ArrayList<>();
+            List<ChainEmployee> storeEmployees = new ArrayList<>();;
             storeEmployees.add(employees.get(2*i));
             storeEmployees.add(employees.get((2*i)+1));
             stores.add(new Store("Store" + i, "Address" + i, managers.get(i), storeEmployees));
@@ -419,32 +422,31 @@ public class DatabaseHandler {
 
     }
 
-    public static void createEmployees() throws Exception{
+    public static List<ChainEmployee> createEmployees() throws Exception{
+        List<ChainEmployee> chainEmployees = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
-            registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i);
+            chainEmployees.add(registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i));
         }
+        return chainEmployees;
 
+    }
+
+    public static List<StoreManager> createStoreManagers() throws Exception {
+        List<StoreManager> storeManagers = new ArrayList<>();
         for (int i = 1; i <= 11; i++) {
-            registerStoreManager("Manager" + i, "Manager" + i + "@lilach.co.il", "Manager" + i, "Manager" + i);
+            storeManagers.add(registerStoreManager("Manager" + i, "Manager" + i + "@lilach.co.il", "Manager" + i, "Manager" + i));
         }
+        return storeManagers;
     }
 
     public static void initializeDatabaseIfEmpty() throws Exception {
         // Assume that we initialize only if the catalog is empty
         if (!getAllEntities(CatalogItem.class).isEmpty())
             return;
-        createEmployees();
-        List<User> users = getUsers();
-        List<StoreManager> managers = new ArrayList<>();
-        List<ChainEmployee> employees = new ArrayList<>();
-        for (User user : users) {
-            if (user.getClass() == StoreManager.class) {
-                managers.add((StoreManager)user);
-            }
-            if(user.getClass() == ChainEmployee.class) {
-                employees.add((ChainEmployee)user);
-            }
-        }
+
+        List<StoreManager> managers = createStoreManagers();
+        List<ChainEmployee> employees = createEmployees();
+
         List<Store> stores = initStores(managers, employees);
         saveStores(stores);
         List<Store> pickupStores = stores.stream().filter((store) -> !store.getName().equals(Constants.WAREHOUSE_NAME))

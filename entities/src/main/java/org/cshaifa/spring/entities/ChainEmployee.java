@@ -1,13 +1,16 @@
 package org.cshaifa.spring.entities;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "chain_employees")
-@Inheritance(strategy = InheritanceType.JOINED)
+//@Inheritance(strategy = InheritanceType.JOINED)
 public class ChainEmployee extends Employee {
 
-    @OneToOne(cascade = CascadeType.ALL )
+    @ManyToOne(cascade = {CascadeType.ALL})
     private Store store;
 
     public ChainEmployee(String fullName, String username, String email, String password, String passwordSalt) {
