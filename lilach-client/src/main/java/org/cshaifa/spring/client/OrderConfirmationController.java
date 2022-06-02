@@ -196,7 +196,7 @@ public class OrderConfirmationController {
                 return;
             }
 
-            ((Customer) App.getCurrentUser()).addOrder(createOrderTask.getValue().getOrder());
+            App.setCurrentUser(createOrderTask.getValue().getOrder().getCustomer());
             clearCart();
 
             App.hideLoading();

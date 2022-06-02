@@ -140,10 +140,10 @@ public class ClientHandler {
     }
 
     public static RegisterResponse registerCustomer(String fullName, String username, String email, String password,
-            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList)
+            List<Store> stores, SubscriptionType subscriptionType, String creditCard, List<Complaint> complaintList)
             throws IOException, InterruptedException {
         RegisterRequest registerRequest = new RegisterRequest(fullName, username, email, password, stores,
-                subscriptionType, complaintList);
+                subscriptionType, creditCard, complaintList);
         client.openConnection();
         client.sendToServer(registerRequest);
         return (RegisterResponse) waitForMsgFromServer(registerRequest.getRequestId());

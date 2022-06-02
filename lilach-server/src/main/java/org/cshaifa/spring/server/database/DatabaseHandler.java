@@ -131,7 +131,7 @@ public class DatabaseHandler {
     }
 
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
-            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) throws Exception {
+            List<Store> stores, SubscriptionType subscriptionType, String creditCard, List<Complaint> complaintList) throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -146,7 +146,7 @@ public class DatabaseHandler {
         try {
             String hexSalt = generateHexSalt();
             Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
-                    hexSalt, stores, false, subscriptionType, complaintList);
+                    hexSalt, stores, false, subscriptionType, creditCard, complaintList);
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
@@ -393,7 +393,7 @@ public class DatabaseHandler {
         for (int i = 1; i <= 20; i++) {
             String email = "example" + i + "@mail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE,
-                    complaintList);
+                    "12341234",complaintList);
         }
         for (int i = 1; i <= 20; i++) {
             registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i);

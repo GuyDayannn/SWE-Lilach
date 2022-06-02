@@ -136,7 +136,7 @@ public class LilachServer extends AbstractServer {
                         String message = DatabaseHandler.registerCustomer(registerRequest.getFullName(),
                                 registerRequest.getEmail(), registerRequest.getUsername(),
                                 registerRequest.getPassword(), registerRequest.getStores(),
-                                registerRequest.getSubscriptionType(), registerRequest.getComplaintList());
+                                registerRequest.getSubscriptionType(), registerRequest.getCreditCard(), registerRequest.getComplaintList());
                         if (message.equals(Constants.SUCCESS_MSG)) {
                             User user = DatabaseHandler.getUserByEmail(registerRequest.getEmail());
                             // TODO: maybe catch this separately
