@@ -55,4 +55,12 @@ public class Delivery implements Serializable {
     public void setMessage(String message) { this.message = message; }
 
     public void setDeliveryCompleted(boolean deliveryCompleted) { this.deliveryCompleted = deliveryCompleted; }
+
+    public boolean isImmediate() {
+        return immediate;
+    }
+
+    public void setImmediate(boolean immediate) {
+        this.immediate = immediate;
+    }
 }

@@ -1,28 +1,21 @@
 package org.cshaifa.spring.server;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.requests.*;
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Complaint;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.User;
-import org.cshaifa.spring.entities.requests.AddComplaintRequest;
 import org.cshaifa.spring.entities.responses.*;
-import org.cshaifa.spring.entities.responses.AddComplaintResponse;
-import org.cshaifa.spring.entities.responses.RegisterResponse;
-import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.server.database.DatabaseHandler;
 import org.cshaifa.spring.server.ocsf.AbstractServer;
 import org.cshaifa.spring.server.ocsf.ConnectionToClient;
 import org.cshaifa.spring.utils.Constants;
+import org.cshaifa.spring.utils.EmailUtils;
 import org.hibernate.HibernateException;
 
+import java.io.IOException;
+import java.util.List;
+
 public class LilachServer extends AbstractServer {
+
+    private static final String IMMEDIATE_ORDER_MAIL_SUBJECT = "Your order has arrived!";
 
     public LilachServer(int port) {
         super(port);
@@ -170,6 +163,12 @@ public class LilachServer extends AbstractServer {
                                 createOrderRequest.getOrderDate(), createOrderRequest.getSupplyDate(),
                                 createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
+                            if (order.isDelivery()) {
+                                if (order.getDeliveryDetails().isImmediate())
+                                    EmailUtils.sendEmail(order.getCustomer().getEmail(), order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT, "Your order #" + order.getId() + " has arrived!");
+                                else
+                                    EmailUtils.sendEmailAt(order.getCustomer().getEmail(), order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT, "Your order #" + order.getId() + " has arrived!", order.getSupplyDate());
+                            }
                             client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
                         } else {
                             client.sendToClient(new CreateOrderResponse(requestId, false, Constants.FAIL_MSG));
