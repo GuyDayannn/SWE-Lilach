@@ -415,7 +415,7 @@ public class DatabaseHandler {
     public static void createCustomers(List<Store> stores) throws Exception {
         List<Complaint> complaintList = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
-            String email = "example" + i + "@mail.com";
+            String email = "customer" + i + "@gmail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE,
                     complaintList);
         }

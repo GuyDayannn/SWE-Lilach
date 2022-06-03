@@ -13,6 +13,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -43,9 +44,6 @@ public class CustomerProfileController {
     private TextArea complaintDescription;
 
     @FXML
-    private ListView<Complaint> complaintList;
-
-    @FXML
     private TextField complaintOrderID;
 
     @FXML
@@ -56,9 +54,6 @@ public class CustomerProfileController {
 
     @FXML
     private Button newComplaintButton;
-
-    @FXML
-    private ListView<?> orderList;
 
     @FXML
     private Button signOutButton;
@@ -347,7 +342,6 @@ public class CustomerProfileController {
             data.addAll(customerComplaintList);
             complaintTable.setItems(data);
 
-
             App.hideLoading();
 
         });
@@ -418,6 +412,17 @@ public class CustomerProfileController {
             orderTable.setItems(data);
 
             addButtonToTable();
+
+            orderTable.setRowFactory(tv -> {
+                TableRow<Order> row = new TableRow<>();
+                row.setOnMouseClicked(event -> {
+                    if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
+                            && event.getClickCount() == 2) {
+                        // TODO: Maybe add order details pop-up
+                    }
+                });
+                return row ;
+            });
 
             App.hideLoading();
 
