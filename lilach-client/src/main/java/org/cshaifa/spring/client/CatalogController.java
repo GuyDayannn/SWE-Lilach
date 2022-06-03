@@ -8,9 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.stage.Stage;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
+import org.cshaifa.spring.entities.responses.DeleteItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
@@ -241,7 +243,37 @@ public class CatalogController {
         removeItemButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                // TODO: Handle item removal
+                Task<DeleteItemResponse> deleteItemTask = App.createTimedTask(() -> {
+                    return ClientHandler.deleteItem(item);
+                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+                deleteItemTask.setOnSucceeded(e ->{
+                    DeleteItemResponse response = deleteItemTask.getValue();
+                    if(!response.isSuccessful()) {
+                        // TODO: maybe log the specific exception somewhere
+                        App.hideLoading();
+                        System.err.println("Deleting item failed");
+                        return;
+                    }
+
+                    //TODO: update list - delete item
+                    int itemIndex = catalogItems.indexOf(item);
+                    itemCells.remove(itemIndex);
+                    catalogItems.remove(item);
+                    refreshList();
+                    App.hideLoading();
+                });
+
+                deleteItemTask.setOnFailed(e -> {
+                    App.hideLoading();
+                    // TODO: maybe properly log it somewhere
+                    deleteItemTask.getException().printStackTrace();
+                });
+
+                Stage rootStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                App.showLoading(rootVBox, rootStage, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+                new Thread(deleteItemTask).start();
+
             }
         });
         if (App.getCurrentUser() == null) {

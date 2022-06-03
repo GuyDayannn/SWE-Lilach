@@ -21,13 +21,18 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "catalog_items")
+@Where(clause = "DELETED = 0")
 public class CatalogItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(name = "DELETED")
+    private Integer deleted = 0;
 
     @Column(name = "item_name")
     private String name;
@@ -85,6 +90,8 @@ public class CatalogItem implements Serializable {
     public long getId() {
         return id;
     }
+
+    public void setDeleted(Integer deleted) { this.deleted = deleted; }
 
     public double getDiscount() {
         return discountPercent;

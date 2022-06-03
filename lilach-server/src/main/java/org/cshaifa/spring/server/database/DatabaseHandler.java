@@ -501,6 +501,14 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
+    public static void deleteItem(CatalogItem itemToDelete) throws HibernateException {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        itemToDelete.setDeleted(1);
+        updateDB(session, itemToDelete);
+        tryFlushSession(session);
+    }
+
     public static void updateComplaint(Complaint newComplaint) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
