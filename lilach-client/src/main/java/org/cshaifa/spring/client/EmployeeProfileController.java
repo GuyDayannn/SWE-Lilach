@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class EmployeeProfileController {
-    //FXML objects
+    @FXML
+    private Button editEmployeeBtn;
     @FXML
     private TextField customerAccountText;
     @FXML
@@ -375,6 +376,130 @@ public class EmployeeProfileController {
         }
     }
 
+    void initEditEmployees(){
+        employeesTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
+            System.out.println(t);
+            System.out.println(t1);
+            if (t1!=null && t1.equals("Chain Employee")) {
+                System.out.println("hadpasa");
+                selectEmployeeComboBox.setDisable(false);
+                selectEmployeeComboBox.getItems().clear();
+                employeeStatusComboBox.getItems().clear();
+                ObservableList<String> employeeNames = FXCollections.observableArrayList();
+                if (chainEmployeeList.size() >= 1) {
+                    for (Employee employee : chainEmployeeList) {
+                        employeeNames.add(employee.getFullName());
+                    }
+                }
+                selectEmployeeComboBox.getItems().addAll(employeeNames);
+                employeeStatusComboBox.setDisable(false);
+                ObservableList<String> employeeTypes = FXCollections.observableArrayList();
+                employeeTypes.add("Customer Service");
+                employeeTypes.add("Store Manager");
+                employeeTypes.add("Chain Manager");
+                employeeStatusComboBox.getItems().addAll(employeeTypes);
+            }
+
+            if (t1!=null && t1.equals("Customer Service")) {
+                selectEmployeeComboBox.setDisable(false);
+                selectEmployeeComboBox.getItems().clear();
+                employeeStatusComboBox.getItems().clear();
+                ObservableList<String> employeeNames = FXCollections.observableArrayList();
+                if (customerServiceList.size() >= 1) {
+                    for (Employee employee : customerServiceList) {
+                        employeeNames.add(employee.getFullName());
+                    }
+                }
+                selectEmployeeComboBox.getItems().addAll(employeeNames);
+                employeeStatusComboBox.setDisable(false);
+                ObservableList<String> employeeTypes = FXCollections.observableArrayList();
+                employeeTypes.add("Chain Employee");
+                employeeTypes.add("Store Manager");
+                employeeTypes.add("Chain Manager");
+                employeeStatusComboBox.getItems().addAll(employeeTypes);
+            }
+
+            if (t1!=null && t1.equals("Store Manager")) {
+                selectEmployeeComboBox.setDisable(false);
+                selectEmployeeComboBox.getItems().clear();
+                employeeStatusComboBox.getItems().clear();
+                ObservableList<String> employeeNames = FXCollections.observableArrayList();
+                if (storeManagersList.size() >= 1) {
+                    for (Employee employee : storeManagersList) {
+                        employeeNames.add(employee.getFullName());
+                    }
+                }
+                employeeStatusComboBox.setDisable(false);
+                selectEmployeeComboBox.getItems().addAll(employeeNames);
+                ObservableList<String> employeeTypes = FXCollections.observableArrayList();
+                employeeTypes.add("Chain Employee");
+                employeeTypes.add("Customer Service");
+                employeeTypes.add("Chain Manager");
+                employeeStatusComboBox.getItems().addAll(employeeTypes);
+            }
+
+            if (t1!=null && t1.equals("Chain Manager")) {
+                selectEmployeeComboBox.setDisable(false);
+                selectEmployeeComboBox.getItems().clear();
+                employeeStatusComboBox.getItems().clear();
+                ObservableList<String> employeeNames = FXCollections.observableArrayList();
+                if (storeManagersList.size() >= 1) {
+                    // TODO: Add chain manager class
+                    for (Employee employee : storeManagersList) {
+                        employeeNames.add(employee.getFullName());
+                    }
+                }
+                selectEmployeeComboBox.getItems().addAll(employeeNames);
+                employeeStatusComboBox.setDisable(false);
+                ObservableList<String> employeeTypes = FXCollections.observableArrayList();
+                employeeTypes.add("Store Manager");
+                employeeTypes.add("Customer Service");
+                employeeTypes.add("Chain Manager");
+                employeeStatusComboBox.getItems().addAll(employeeTypes);
+            }
+        });
+
+        employeeStatusComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
+            System.out.println(t);
+            System.out.println(t1);
+            if (t1!=null && t1.equals("Store Manager")) {
+                System.out.println("chosen store manager");
+                selectStoreComboBox.setDisable(false);
+
+                Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
+                    return ClientHandler.getStores();
+                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+                getStoresTask.setOnSucceeded(e -> {
+                    if (getStoresTask.getValue() == null) {
+                        App.hideLoading();
+                        System.err.println("Getting stores failed");
+                        return;
+                    }
+                    GetStoresResponse response = getStoresTask.getValue();
+                    if (!response.isSuccessful()) {
+                        // TODO: maybe log the specific exception somewhere
+                        App.hideLoading();
+                        System.err.println("Getting stores failed");
+                        return;
+                    }
+                    storesList = response.getStores();
+
+                    for (Store store : storesList) {
+                        //System.out.println(store.getName());
+                        selectStoreComboBox.getItems().add(store.getName());
+                    }
+                });
+
+                getStoresTask.setOnFailed(e -> {
+                    // TODO: maybe log somewhere else...
+                    getStoresTask.getException().printStackTrace();
+                });
+                new Thread(getStoresTask).start();
+            }
+        });
+    }
+
     void initUsers(){
         Task<GetUsersResponse> getUsersTask = App.createTimedTask(() -> {
             return ClientHandler.getUsers();
@@ -412,7 +537,7 @@ public class EmployeeProfileController {
                 else if(user.getClass().isAssignableFrom(CustomerServiceEmployee.class)){
                     customerServiceList.add((CustomerServiceEmployee) user);
                     employeeList.add((Employee) user);
-                    System.out.println("added customer serviceemployee");
+                    System.out.println("added customer service employee");
 
                 }
                 else if(user.getClass().isAssignableFrom(Customer.class)){
@@ -423,57 +548,6 @@ public class EmployeeProfileController {
                     System.out.println("Couldn't classify user");
                 }
             }
-
-            employeesTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
-                    System.out.println(t);
-                    System.out.println(t1);
-                    if (t1.equals("Chain Employee")) {
-                        System.out.println("hadpasa");
-                        selectEmployeeComboBox.setDisable(false);
-                        ObservableList<String> employeeNames = FXCollections.observableArrayList();
-                        if (chainEmployeeList.size() >= 1) {
-                            for (Employee employee : chainEmployeeList) {
-                                employeeNames.add(employee.getFullName());
-                            }
-                        }
-                        selectEmployeeComboBox.getItems().addAll(employeeNames);
-                    }
-
-                    if (t1.equals("Customer Service")) {
-                        selectEmployeeComboBox.setDisable(false);
-                        ObservableList<String> employeeNames = FXCollections.observableArrayList();
-                        if (customerServiceList.size() >= 1) {
-                            for (Employee employee : customerServiceList) {
-                                employeeNames.add(employee.getFullName());
-                            }
-                        }
-                        selectEmployeeComboBox.getItems().addAll(employeeNames);
-                    }
-
-                    if (t1.equals("Store Manager")) {
-                        selectEmployeeComboBox.setDisable(false);
-                        ObservableList<String> employeeNames = FXCollections.observableArrayList();
-                        if (storeManagersList.size() >= 1) {
-                            for (Employee employee : storeManagersList) {
-                                employeeNames.add(employee.getFullName());
-                            }
-                        }
-                        selectEmployeeComboBox.getItems().addAll(employeeNames);
-                    }
-
-                    if (t1.equals("Chain Manager")) {
-                        selectEmployeeComboBox.setDisable(false);
-                        ObservableList<String> employeeNames = FXCollections.observableArrayList();
-                        if (storeManagersList.size() >= 1) {
-                            // TODO: Add chain manager class
-                            for (Employee employee : storeManagersList) {
-                                employeeNames.add(employee.getFullName());
-                            }
-                        }
-                        selectEmployeeComboBox.getItems().addAll(employeeNames);
-                    }
-            });
-
 
             for (Customer customer : customerList) {
                 //System.out.println(customer.getUsername());
@@ -525,6 +599,7 @@ public class EmployeeProfileController {
         initComplaints();
         initStores();
         initUsers();
+        initEditEmployees();
 
     }
     public void viewAllComplaints(ActionEvent event) {
@@ -635,24 +710,18 @@ public class EmployeeProfileController {
 //                break;
 //            }
 //        }
-//        //TODO: add employee status: is it a chain employee, customer service, store manager
+//
 
     }
 
     public void editEmployeeStatus(ActionEvent event) {
-//        String selectedStatus = emplo.getValue();
-//        if(selectedStatus.equals("Store Manager")){
-//            selectedCustomer.freeze();
-//        }
-//        else if(selectedStatus.equals("Customer Service Employee")){
-//            selectedCustomer.unfreeze();
-//        }
-//        else if(selectedStatus.equals("Chain Employee")){
-//
-//        }
+
     }
 
     public void editEmployee(ActionEvent event) {
+
+
+
     }
 
 

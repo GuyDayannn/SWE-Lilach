@@ -193,7 +193,7 @@ public class CustomerProfileController {
                 t.start();
                 t.join();
                 customerComplaintList.clear();
-                complaintTable.getItems().clear();
+                //complaintTable.getItems().clear();
                 getComplaints(); //adding new complaint to UI
             } catch (InterruptedException interruptedException) {
                 interruptedException.printStackTrace();
@@ -243,17 +243,16 @@ public class CustomerProfileController {
                                 cancelOrderText.setText(Constants.CANCEL_ORDER);
                                 cancelOrderText.setTextFill(Color.GREEN);
 
-                                //TODO: remove in UI
                                 if (!response.isSuccessful()) {
                                     // TODO: maybe log the specific exception somewhere
                                     App.hideLoading();
-                                    System.err.println("Cancel oeder failed!");
+                                    System.err.println("Cancel order failed!");
                                 }
                             });
 
                             removeOrderTask.setOnFailed(e -> {
                                 // TODO: maybe properly log it somewhere
-                                System.out.println("Cancel oeder failed!");
+                                System.out.println("Cancel order failed!");
                                 added_complaint_text.setText(Constants.CANCEL_ORDER_FAILED);
                                 added_complaint_text.setTextFill(Color.RED);
                                 removeOrderTask.getException().printStackTrace();
@@ -264,7 +263,6 @@ public class CustomerProfileController {
                                 t.start();
                                 t.join();
                                 customerOrderList.clear();
-                                complaintTable.getItems().clear();
                                 getOrders(); //removing order from UI
                             } catch (InterruptedException interruptedException) {
                                 interruptedException.printStackTrace();

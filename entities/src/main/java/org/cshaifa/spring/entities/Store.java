@@ -36,7 +36,7 @@ public class Store implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<ChainEmployee> employees;
 
-    @OneToOne(cascade = {CascadeType.ALL})
+    @OneToOne
     private StoreManager storeManager;
 
     public Store() {

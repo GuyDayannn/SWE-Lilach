@@ -131,11 +131,11 @@
                      </ComboBox>
                          <Text layoutX="21.0" layoutY="200.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee:" />
                         <Text layoutX="281.0" layoutY="150.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status" />
-                        <ComboBox fx:id="employeeStatusComboBox" disable="false" layoutX="281.0" layoutY="154.0" onAction="#editEmployeeStatus" prefWidth="150.0" />
+                        <ComboBox fx:id="employeeStatusComboBox" disable="true" layoutX="281.0" layoutY="154.0" onAction="#editEmployeeStatus" prefWidth="150.0" />
                         <Button fx:id="editEmployeeBtn" layoutX="476.0" layoutY="176.0" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
-                        <ComboBox fx:id="selectEmployeeComboBox" disable="false" layoutX="21.0" layoutY="203.0" onAction="#selectEmployee" prefWidth="150.0" />
+                        <ComboBox fx:id="selectEmployeeComboBox" disable="true" layoutX="21.0" layoutY="203.0" onAction="#selectEmployee" prefWidth="150.0" />
                         <Text layoutX="281.0" layoutY="199.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store" />
-                        <ComboBox fx:id="selectStoreComboBox" disable="false" layoutX="281.0" layoutY="203.0" onAction="#editManagerStore" prefWidth="150.0" />
+                        <ComboBox fx:id="selectStoreComboBox" disable="true" layoutX="281.0" layoutY="203.0" onAction="#editManagerStore" prefWidth="150.0" />
                      </children>
                   </AnchorPane>
                </content>
