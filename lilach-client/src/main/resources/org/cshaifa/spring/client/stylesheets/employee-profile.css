@@ -1,0 +1,29 @@
+.root {
+
+}
+
+.button {
+    -fx-background-insets: 2;
+    -fx-background-radius: 2;
+    -fx-border-color: green;
+    -fx-border-radius: 2;
+    -fx-border-insets: 2;
+}
+
+.button:hover{
+    -fx-background-color: linear-gradient(#519349, #90ce7f);
+    -fx-text-fill: white;
+}
+
+.accordion .titled-pane .title {
+    -fx-background-color: linear-gradient(to bottom, #1dbbdd44, #93f9b944);
+    -fx-border-color: green;
+    -fx-border-insets: 2;
+    -fx-border-radius: 2;
+    -fx-background-insets: 2;
+    -fx-background-radius: 2;
+}
+
+.anchor-pane {
+    -fx-background-color: linear-gradient(to bottom, #1dbbdd44, #93f9b944);
+}

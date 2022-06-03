@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CustomerProfileController">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" stylesheets="@stylesheets/customer-profile.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CustomerProfileController">
    <children>
-      <Text fx:id="welcomeText" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, _____________">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Text>
-      <TabPane layoutY="32.0" prefHeight="568.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
+      <HBox prefHeight="40.0" prefWidth="800.0">
+         <children>
+            <HBox alignment="BOTTOM_LEFT" prefHeight="30.0" prefWidth="400.0">
+               <children>
+                  <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, _____________">
+                     <font>
+                        <Font name="Trebuchet MS Italic" size="24.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" layoutX="400.0" prefHeight="30.0" prefWidth="400.0" spacing="5.0">
+               <children>
+                  <Button fx:id="viewCatalogButton" mnemonicParsing="false" onAction="#openCatalog" text="View Catalog" />
+                  <Button fx:id="refreshBtn" mnemonicParsing="false" onAction="#refreshProfile" text="Refresh" />
+                  <Button fx:id="signOutButton" mnemonicParsing="false" onAction="#logOut" text="Sign Out" />
+               </children>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </HBox>
+         </children>
+      </HBox>
+      <TabPane layoutY="40.0" prefHeight="560.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="                           Orders                           ">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane maxHeight="500.0" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="800.0" styleClass="anchor-pane" translateX="5.0" translateY="10.0">
                      <children>
-                        <ListView fx:id="orderList" layoutX="-113.0" layoutY="-16.0" prefHeight="408.0" prefWidth="800.0" />
-                        <TableView fx:id="orderTable" layoutY="35.0" prefHeight="346.0" prefWidth="687.0">
+                        <TableView fx:id="orderTable" prefHeight="500.0" prefWidth="800.0">
                           <columns>
                             <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="Order ID" />
                             <TableColumn fx:id="orderSumColumn" prefWidth="95.0" text="Order Sum" />
@@ -37,48 +55,45 @@
 <!--                              <TableColumn fx:id="ordersItemsColumn" prefWidth="199.0" text="Order's Items" />-->
 <!--                              <TableColumn fx:id="cancelOrderColumn" prefWidth="91.0" text="Cancel Order" />-->
                           </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
                         </TableView>
-                        <Label fx:id="cancelOrderText" layoutX="316.0" layoutY="14.0" />
+                        <Label fx:id="cancelOrderText" prefHeight="18.0" prefWidth="69.0" />
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
           <Tab text="                           Complaints                           ">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane maxHeight="225.0" minHeight="0.0" minWidth="0.0" prefHeight="225.0" prefWidth="800.0" styleClass="anchor-pane" translateX="5.0" translateY="10.0">
                      <children>
-
-                        <ListView fx:id="complaintList" layoutY="36.0" prefHeight="200.0" prefWidth="800.0" />
-                        <Button fx:id="newComplaintButton" layoutX="450.0" layoutY="381.0" mnemonicParsing="false" onAction="#sendComplaint" text="Open New Complaint" />
+                        <TableView fx:id="complaintTable" prefHeight="225.0" prefWidth="800.0">
+                          <columns>
+                              <TableColumn fx:id="complaintIdColumn" minWidth="20.0" prefWidth="40.0" text="ID" />
+                              <TableColumn fx:id="complaintStatusColumn" prefWidth="100.0" text="Status" />
+                              <TableColumn fx:id="complaintDescriptionColumn" prefWidth="180.0" text="Complaint description" />
+                              <TableColumn fx:id="complaintResponseColumn" prefWidth="180.0" text="Response" />
+                              <TableColumn fx:id="complaintCompensationAmountColumn" minWidth="0.0" prefWidth="133.5999755859375" text="Compensation Amount" />
+                              <TableColumn fx:id="complaintDateColumn" prefWidth="66.40008544921875" text="Date" />
+                              <TableColumn fx:id="complaintStoreColumn" maxWidth="141.0" prefWidth="100.0" text="Store" />
+                          </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                        <Button fx:id="newComplaintButton" layoutX="600.0" layoutY="285.0" mnemonicParsing="false" onAction="#sendComplaint" text="Open New Complaint" />
                         <Text layoutX="22.0" layoutY="265.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
-                        <TextArea fx:id="complaintDescription" layoutX="21.0" layoutY="270.0" prefHeight="246.0" prefWidth="345.0" />
-                        <AnchorPane layoutX="2.0" layoutY="36.0" prefHeight="200.0" prefWidth="695.0">
-                           <children>
-                              <TableView fx:id="complaintTable" prefHeight="200.0" prefWidth="800.0">
-                                <columns>
-                                    <TableColumn fx:id="complaintIdColumn" prefWidth="44.0" text="ID" />
-                                    <TableColumn fx:id="complaintStatusColumn" prefWidth="113.0" text="Status" />
-                                    <TableColumn fx:id="complaintDescriptionColumn" prefWidth="180.0" text="Complaint description" />
-                                    <TableColumn fx:id="complaintResponseColumn" prefWidth="120.0" text="Response" />
-                                    <TableColumn fx:id="complaintCompensationAmountColumn" minWidth="0.0" prefWidth="135.0" text="Compensation Amount" />
-                                    <TableColumn fx:id="complaintDateColumn" prefWidth="98.0" text="Date" />
-                                    <TableColumn fx:id="complaintStoreColumn" maxWidth="141.0" prefWidth="105.0" text="Store" />
-                                </columns>
-                              </TableView>
-                           </children>
-                        </AnchorPane>
+                        <TextArea fx:id="complaintDescription" layoutX="21.0" layoutY="279.0" prefHeight="220.0" prefWidth="346.0" />
                         <Label fx:id="added_complaint_text" layoutX="271.0" layoutY="9.0" text="" />
                         <Label fx:id="invalid_customer_text" layoutX="352.0" layoutY="9.0" text="" />
-                        <ComboBox fx:id="storesComboBox" layoutX="496.0" layoutY="310.0" onAction="#selectStore" prefHeight="25.0" prefWidth="123.0" promptText="Stores" />
-                        <Text layoutX="400.0" layoutY="327.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" wrappingWidth="86.0" />
+                        <ComboBox fx:id="storesComboBox" layoutX="385.0" layoutY="290.0" onAction="#selectStore" prefHeight="25.0" prefWidth="123.0" promptText="Stores" />
+                        <Text layoutX="385.0" layoutY="284.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" wrappingWidth="86.0" />
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
         </tabs>
       </TabPane>
-      <Button fx:id="signOutButton" layoutX="723.0" layoutY="3.0" mnemonicParsing="false" onAction="#logOut" text="Sign Out" />
-      <Button fx:id="viewCatalogButton" layoutX="623.0" layoutY="3.0" mnemonicParsing="false" onAction="#openCatalog" text="View Catalog" />
-      <Button fx:id="refreshBtn" layoutX="555.0" layoutY="4.0" mnemonicParsing="false" onAction="#refreshProfile" text="Refresh" />
    </children>
 </AnchorPane>

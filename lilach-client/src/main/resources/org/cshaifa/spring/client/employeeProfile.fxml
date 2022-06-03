@@ -2,6 +2,7 @@
 
 <?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -11,23 +12,39 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
+<AnchorPane prefHeight="500.0" prefWidth="600.0" stylesheets="@stylesheets/employee-profile.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
    <children>
-      <Text fx:id="welcomeText" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, ___________" wrappingWidth="203.48004150390625">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Text>
-      <Button fx:id="exitButton" layoutX="548.0" layoutY="6.0" mnemonicParsing="false" onAction="#exitProfile" prefHeight="27.0" prefWidth="51.0" text="Exit" />
-      <Button fx:id="catalogButton" layoutX="437.0" layoutY="6.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="110.0" text="Edit Catalog" />
-      <Accordion layoutY="32.0" prefHeight="500.0" prefWidth="600.0">
+      <HBox prefHeight="40.0" prefWidth="600.0">
+         <children>
+            <HBox alignment="BOTTOM_LEFT" prefHeight="40.0" prefWidth="300.0">
+               <children>
+                  <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, _____________">
+                     <font>
+                        <Font name="Trebuchet MS Italic" size="24.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="300.0" spacing="5.0">
+               <children>
+                  <Button fx:id="catalogButton" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="110.0" text="Edit Catalog" />
+                  <Button fx:id="exitButton" mnemonicParsing="false" onAction="#exitProfile" prefHeight="27.0" prefWidth="51.0" text="Exit" />
+               </children>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </HBox>
+         </children>
+      </HBox>
+      <Accordion layoutY="40.0" prefHeight="460.0" prefWidth="600.0">
         <panes>
           <TitledPane fx:id="paneStoreReport" animated="false" text="View Store Report" visible="true">
             <content>
-              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="265.0" prefWidth="598.0" visible="true">
+              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="265.0" prefWidth="598.0" styleClass="anchor-pane" visible="true">
                      <children>
                         <Text layoutX="28.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:">
                            <font>
@@ -69,7 +86,7 @@
           </TitledPane>
           <TitledPane fx:id="paneChainReport" animated="false" text="View Chain Report">
             <content>
-              <AnchorPane fx:id="viewChainReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane fx:id="viewChainReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
 <!--                     <children>-->
 <!--                        <Label fx:id="updated_complaint_text" layoutX="54.0" layoutY="247.0" prefHeight="18.0" prefWidth="231.0" />-->
 <!--                     </children>-->
@@ -78,7 +95,7 @@
           </TitledPane>
           <TitledPane animated="false" text="View/Handle Complaints">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
                      <children>
                         <ComboBox fx:id="complaintComboBox" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
                         <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
@@ -98,7 +115,7 @@
           </TitledPane>
             <TitledPane fx:id="handleUsersPane" animated="false" text="View/Handle Users">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="590.0">
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="590.0" styleClass="anchor-pane">
                      <children>
                         <ComboBox fx:id="customerComboBox" layoutX="14.0" layoutY="29.0" onAction="#selectCustomer" prefWidth="150.0" />
                         <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Customer" />
@@ -116,7 +133,7 @@
                          </items>
                      </ComboBox>
                         <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee Type:" />
-                        <ComboBox fx:id="employeesTypeComboBox" layoutX="21.0" layoutY="150.0" onAction="#selectEmployeeType" prefWidth="150.0" >
+                        <ComboBox fx:id="employeesTypeComboBox" layoutX="21.0" layoutY="150.0" onAction="#selectEmployeeType" prefWidth="150.0">
                          <items>
                              <FXCollections fx:factory="observableArrayList">
                                  <String fx:value="Chain Employee" />
