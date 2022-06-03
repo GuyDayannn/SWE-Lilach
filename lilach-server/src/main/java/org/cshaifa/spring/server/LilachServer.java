@@ -2,13 +2,13 @@ package org.cshaifa.spring.server;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Executors;
 
-import org.cshaifa.spring.entities.*;
-import org.cshaifa.spring.entities.requests.AddComplaintRequest;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Complaint;
+import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Order;
+import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.requests.AddComplaintRequest;
 import org.cshaifa.spring.entities.requests.CreateItemRequest;
@@ -26,7 +26,6 @@ import org.cshaifa.spring.entities.requests.UpdateComplaintRequest;
 import org.cshaifa.spring.entities.requests.UpdateItemRequest;
 import org.cshaifa.spring.entities.requests.UpdateOrdersRequest;
 import org.cshaifa.spring.entities.responses.AddComplaintResponse;
-import org.cshaifa.spring.entities.responses.AddComplaintResponse;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.CreateOrderResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
@@ -41,16 +40,16 @@ import org.cshaifa.spring.entities.responses.RegisterResponse;
 import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.entities.responses.UpdateOrdersResponse;
-import org.cshaifa.spring.entities.responses.RegisterResponse;
-import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
-import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.server.database.DatabaseHandler;
 import org.cshaifa.spring.server.ocsf.AbstractServer;
 import org.cshaifa.spring.server.ocsf.ConnectionToClient;
 import org.cshaifa.spring.utils.Constants;
+import org.cshaifa.spring.utils.EmailUtils;
 import org.hibernate.HibernateException;
 
 public class LilachServer extends AbstractServer {
+
+    private static final String IMMEDIATE_ORDER_MAIL_SUBJECT = "Your order has arrived!";
 
     public LilachServer(int port) {
         super(port);
@@ -184,6 +183,12 @@ public class LilachServer extends AbstractServer {
                                 createOrderRequest.getOrderDate(), createOrderRequest.getSupplyDate(),
                                 createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
+                            if (order.isDelivery()) {
+                                if (order.getDeliveryDetails().isImmediate())
+                                    EmailUtils.sendEmail(order.getCustomer().getEmail(), order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT, "Your order #" + order.getId() + " has arrived!");
+                                else
+                                    EmailUtils.sendEmailAt(order.getCustomer().getEmail(), order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT, "Your order #" + order.getId() + " has arrived!", order.getSupplyDate());
+                            }
                             client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
                         } else {
                             client.sendToClient(new CreateOrderResponse(requestId, false, Constants.FAIL_MSG));
