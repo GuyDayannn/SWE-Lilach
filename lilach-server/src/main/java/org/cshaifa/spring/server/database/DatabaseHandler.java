@@ -180,6 +180,30 @@ public class DatabaseHandler {
         return chainEmployee;
     }
 
+    public static CustomerServiceEmployee registerCustomerService(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        CustomerServiceEmployee customerServiceEmployee= null;
+
+        try {
+            String hexSalt = generateHexSalt();
+            customerServiceEmployee = new CustomerServiceEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(customerServiceEmployee);
+
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return customerServiceEmployee;
+    }
+
     public static StoreManager registerStoreManager(String fullName, String email, String username, String rawPassword)
             throws HibernateException {
 
@@ -200,6 +224,50 @@ public class DatabaseHandler {
         tryFlushSession(session);
 
         return storeManager;
+    }
+
+    public static ChainManager registerChainManager(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        ChainManager chainManager= null;
+        try {
+            String hexSalt = generateHexSalt();
+            chainManager = new ChainManager(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(chainManager); }
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return chainManager;
+    }
+
+    public static SystemAdmin registerSystemAdmin(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        SystemAdmin systemAdmin= null;
+        try {
+            String hexSalt = generateHexSalt();
+            systemAdmin = new SystemAdmin(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(systemAdmin); }
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return systemAdmin;
     }
 
     public static String freezeCustomer(Customer customer, boolean toFreeze) {
@@ -431,12 +499,33 @@ public class DatabaseHandler {
 
     }
 
+    public static List<CustomerServiceEmployee> createCustomerService() throws Exception{
+        List<CustomerServiceEmployee> customerServiceEmployees = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            customerServiceEmployees.add(registerCustomerService("cust service Employee" + i, "custServiceEmployee" + i + "@lilach.co.il", "custServiceEmployee" + i, "custServiceEmployeeEmployee" + i));
+        }
+        return customerServiceEmployees;
+
+    }
+
     public static List<StoreManager> createStoreManagers() throws Exception {
         List<StoreManager> storeManagers = new ArrayList<>();
         for (int i = 1; i <= 11; i++) {
             storeManagers.add(registerStoreManager("Manager" + i, "Manager" + i + "@lilach.co.il", "Manager" + i, "Manager" + i));
         }
         return storeManagers;
+    }
+
+    public static ChainManager createChainManager() throws Exception {
+        ChainManager chainManager = registerChainManager("ChainManager" + 0, "ChainManager" + 0 + "@lilach.co.il", "ChainManager" + 0, "ChainManager" + 0);
+
+        return chainManager;
+    }
+
+    public static SystemAdmin createSystemAdmin() throws Exception {
+        SystemAdmin systemAdmin = registerSystemAdmin("SystemAdmin" + 0, "SystemAdmin" + 0 + "@lilach.co.il", "SystemAdmin" + 0, "SystemAdmin" + 0);
+
+        return systemAdmin;
     }
 
     public static void initializeDatabaseIfEmpty() throws Exception {
@@ -446,6 +535,9 @@ public class DatabaseHandler {
 
         List<StoreManager> managers = createStoreManagers();
         List<ChainEmployee> employees = createEmployees();
+        List<CustomerServiceEmployee> customerServiceEmployees = createCustomerService();
+        createChainManager();
+        createSystemAdmin();
 
         List<Store> stores = initStores(managers, employees);
         saveStores(stores);
@@ -583,64 +675,112 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-        Store oldStore = chainEmployee.getStore();
+        System.out.println("inside DB handler edit employee");
+
+        Store oldStore = null;
+        if(chainEmployee.getStore()!=null){
+            oldStore = chainEmployee.getStore();
+        }
+
         switch (currType) {
-            case "Chain Employee":
+            case "Chain Employee" -> {
+                System.out.println("case chain employee");
                 ChainEmployee employeeToDelete = chainEmployee;
-                oldStore.removeEmployee(employeeToDelete);
+                if(oldStore != null) {
+                    oldStore.removeEmployee(employeeToDelete);
+                }
                 if (strNewType.equals("Customer Service Employee")) {
                     CustomerServiceEmployee customerServiceEmployee = (CustomerServiceEmployee) chainEmployee;
                     session.save(customerServiceEmployee);
 
-                } else if(strNewType.equals("Store Manager")){
+                } else if (strNewType.equals("Store Manager")) {
                     //removing prev attachment
-                    oldStore.getStoreManager().removeStore();
-                    oldStore.removeManager();
+                    if(oldStore != null) {
+                        oldStore.getStoreManager().removeStore();
+                        oldStore.removeManager();
+                    }
                     //adding new connections
                     StoreManager storeManager = (StoreManager) chainEmployee;
                     storeManager.setStore(store);
                     session.save(storeManager);
-
-                }
-                else{//chain manager
+                } else {//chain manager
                     ChainManager chainManager = (ChainManager) chainEmployee;
-                    session.save(chainManager); //TODO: what to do with old chain manager?
+                    session.save(chainManager);
                 }
-                    break;
-            case "Store Manager":
+            }
+            case "Store Manager" -> {
+                System.out.println("case store manager");
                 StoreManager managerToDelete = (StoreManager) chainEmployee;
-                oldStore.removeManager();
-                if(strNewType.equals("Customer Service Employee")) {
-                    CustomerServiceEmployee customerServiceEmployee = (CustomerServiceEmployee) chainEmployee;
-                    session.save(customerServiceEmployee);
+                if(oldStore != null){
+                    oldStore.removeManager();
                 }
-                else if(strNewType.equals("Chain Employee")) {
+                if (strNewType.equals("Customer Service Employee")) {
+                   // CustomerServiceEmployee customerServiceEmployee = (CustomerServiceEmployee) chainEmployee;
+                    CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                            chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
+                    session.save(customerServiceEmployee);
+                } else if (strNewType.equals("Chain Employee")) {
                     ChainEmployee chainEmployee1 = chainEmployee;
                     store.addEmployee(chainEmployee1);
                     chainEmployee1.setStore(store);
                     session.save(chainEmployee1);
-                }
-                else{ //chain manager
-                    ChainManager chainManager = (ChainManager) chainEmployee;
+                } else { //chain manager
+                    ChainManager chainManager = new ChainManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                            chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
+                    //ChainManager chainManager = (ChainManager) chainEmployee;
                     session.save(chainManager);
                 }
-
-                break;
-            case "Customer Service":
+            }
+            case "Customer Service" -> {
                 CustomerServiceEmployee customerServiceToDelete = (CustomerServiceEmployee) chainEmployee;
-                break;
-            default:
+                if (strNewType.equals("Chain Employee")) { //turn into chain employee
+                    ChainEmployee employee = (ChainEmployee) chainEmployee;
+                    employee.setStore(store);
+                    session.save(employee);
+                } else if (strNewType.equals("Store Manager")) {
+                    StoreManager storeManager = new StoreManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                            chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt(), store);
+//                    StoreManager storeManager = (StoreManager) chainEmployee;
+//                    storeManager.setStore(store);
+                    session.save(storeManager);
+                } else {//chain manager
+                    ChainManager chainManager = new ChainManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                            chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
+                    //ChainManager chainManager = (ChainManager) chainEmployee;
+                    session.save(chainManager);
+                }
+            }
+            case "Chain Manager"-> {
                 ChainManager chainManagerToDelete = (ChainManager) chainEmployee;
-                break;
+                if (strNewType.equals("Chain Employee")) { //turn into chain employee
+                    ChainEmployee employee = (ChainEmployee) chainEmployee;
+                    employee.setStore(store);
+                    session.save(employee);
+                } else if (strNewType.equals("Store Manager")) {
+                    StoreManager storeManager = new StoreManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                            chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt(), store);
+//                    StoreManager storeManager = (StoreManager) chainEmployee;
+//                    storeManager.setStore(store);
+                    session.save(storeManager);
+                } else {//customer service employee
+                    CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                            chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
+                    //CustomerServiceEmployee customerServiceEmployee = (CustomerServiceEmployee) chainEmployee;
+                    session.save(customerServiceEmployee);
+                }
+            }
+            default -> {
+                System.out.println("default case shouldn't get here! error");}
         }
-        if(strNewType.equals("Store Manager")){
-
-        }
+        //TODO: remove necessary stores from: complaints, customers, orders, employees, store manager
+        //all attached by label
         try {
             if(oldStore!=null) {
                 session.update(oldStore);
             }
-            session.update(store);
+            if(store!=null){
+                session.update(store);
+            }
             session.delete(chainEmployee);
         }
         catch (Exception e){
@@ -648,12 +788,11 @@ public class DatabaseHandler {
             if(oldStore!=null){
                 session.merge(oldStore);
             }
-            session.merge(session);
-            session.merge(store);
+            if(store!=null){
+                session.merge(store);
+            }
         }
-
         tryFlushSession(session);
-
     }
 
     private static <T> void updateDB(Session session, T toUpdate) {

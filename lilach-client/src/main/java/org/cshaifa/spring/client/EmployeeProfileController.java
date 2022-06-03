@@ -124,6 +124,7 @@ public class EmployeeProfileController {
     private List<StoreManager> storeManagersList= new ArrayList<>();
     private List<Employee> employeeList= new ArrayList<>();
     private ChainManager chainManager;
+    private SystemAdmin systemAdmin;
 
     private LocalDate reportStartDate;
     private LocalDate reportEndDate;
@@ -213,7 +214,14 @@ public class EmployeeProfileController {
             updated_complaint_text.setText("Failed to close complaint");
             updated_complaint_text.setTextFill(Color.RED);
         });
-        new Thread(updateComplaintTask).start();
+        //new Thread(updateComplaintTask).start();
+        try {
+            Thread t2 = new Thread(updateComplaintTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
     }
 
     @FXML
@@ -311,8 +319,6 @@ public class EmployeeProfileController {
 
             data.addAll(complaintListID); //adding to dropdown combo
             complaintComboBox.setItems(data);
-            //new Thread(getComplaintsTask).start();
-
         });
 
         getComplaintsTask.setOnFailed(e -> {
@@ -321,16 +327,14 @@ public class EmployeeProfileController {
         });
 
         try {
-//            Thread t1 = new Thread(getComplaintsTask);
-//            t1.start();
-//            t1.join();
             Thread t2 = new Thread(getComplaintsTask);
             t2.start();
             t2.join();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
-
         }
+//        new Thread(getComplaintsTask).start();
+
     }
 
 
@@ -359,7 +363,6 @@ public class EmployeeProfileController {
                 storeComboBox.getItems().add(store.getName());
             }
 
-            //new Thread(getStoresTask).start();
         });
 
         getStoresTask.setOnFailed(e -> {
@@ -367,16 +370,14 @@ public class EmployeeProfileController {
             getStoresTask.getException().printStackTrace();
         });
         try {
-//            Thread t1 = new Thread(getComplaintsTask);
-//            t1.start();
-//            t1.join();
             Thread t2 = new Thread(getStoresTask);
             t2.start();
             t2.join();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
-
         }
+        //new Thread(getStoresTask).start();
+
     }
 
     void initEditEmployees(){
@@ -498,7 +499,17 @@ public class EmployeeProfileController {
                     // TODO: maybe log somewhere else...
                     getStoresTask.getException().printStackTrace();
                 });
-                new Thread(getStoresTask).start();
+
+                try {
+                    Thread t2 = new Thread(getStoresTask);
+                    t2.start();
+                    t2.join();
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+
+                }
+
+                //new Thread(getStoresTask).start();
             }
         });
     }
@@ -548,6 +559,10 @@ public class EmployeeProfileController {
                     chainManager = (ChainManager) user;
                     System.out.println("added chain manager");
                 }
+                else if(user.getClass().isAssignableFrom(SystemAdmin.class)){
+                    systemAdmin = (SystemAdmin) user;
+                    System.out.println("added system admin");
+                }
                 else{
                     System.out.println("Couldn't classify user");
                 }
@@ -571,6 +586,7 @@ public class EmployeeProfileController {
             interruptedException.printStackTrace();
 
         }
+        //new Thread(getUsersTask).start();
     }
 
     @FXML
@@ -659,28 +675,21 @@ public class EmployeeProfileController {
             // TODO: maybe log somewhere else...
             editCustomerTask.getException().printStackTrace();
         });
-        new Thread(editCustomerTask).start();
+        //new Thread(editCustomerTask).start();
+        try {
+            Thread t2 = new Thread(editCustomerTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
 
-//        try {
-//            Thread t1 = new Thread(editCustomerTask);
-//            t1.start();
-//            t1.join();
-//            //customerComboBox.valueProperty().setValue(null);
-////            customerList.clear();
-////            employeeList.clear();
-////            customerServiceList.clear();
-////            storeManagersList.clear();
-////            chainEmployeeList.clear();
-////
-//            //initUsers();
-//        } catch (InterruptedException interruptedException) {
-//            interruptedException.printStackTrace();
-//
-//        }
     }
 
 
     public void createTaskEmployeeUpdate(ChainEmployee employee, Store store, String newType, String currType){
+        System.out.println("inserted createTaskEmployeeUpdate");
+
         Task<EditEmployeeResponse> editEmployeeTask = App.createTimedTask(() -> {
             return ClientHandler.editEmployee(employee, store, newType, currType);
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
@@ -703,8 +712,14 @@ public class EmployeeProfileController {
             editEmployeeTask.getException().printStackTrace();
         });
 
-        new Thread(editEmployeeTask).start();
-
+        //new Thread(editEmployeeTask).start();
+        try {
+            Thread t2 = new Thread(editEmployeeTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
     }
 
 
@@ -745,10 +760,12 @@ public class EmployeeProfileController {
 
 
     public void editEmployee(ActionEvent event) {
+        System.out.println("inserted into editEmployee");
         String selectedStatus = employeeStatusComboBox.getValue();
         String employeeName = selectEmployeeComboBox.getValue();
 
         if(employeesTypeComboBox.equals("Store Manager")){
+            System.out.println("inserted into editEmployee store manager");
             StoreManager selectedManager = null;
             for(StoreManager manager: storeManagersList) {
                 if (manager.getUsername().equals(employeeName)) {
@@ -760,6 +777,7 @@ public class EmployeeProfileController {
                     selectedStatus, "Store Manager");
         }
         else if(employeesTypeComboBox.equals("Chain Employee")){
+            System.out.println("inserted into editEmployee chain employee");
             ChainEmployee selectedEmployee = null;
             for(ChainEmployee employee: chainEmployeeList) {
                 if (employee.getUsername().equals(employeeName)) {

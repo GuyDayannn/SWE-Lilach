@@ -7,7 +7,7 @@ import javax.persistence.*;
 //@Inheritance(strategy = InheritanceType.JOINED)
 public class ChainEmployee extends Employee {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Store store;
 
     public ChainEmployee(String fullName, String username, String email, String password, String passwordSalt) {
