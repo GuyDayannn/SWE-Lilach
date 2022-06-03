@@ -29,102 +29,64 @@ import java.util.concurrent.TimeUnit;
 
 public class CustomerProfileController {
     @FXML
-    public Button refreshBtn;
-
+    private Text welcomeText;
     @FXML
-    private TextField compensationAmount;
-
+    public Button refreshBtn;
+    @FXML
+    public Button signOutButton;
+    @FXML
+    public Button viewCatalogButton;
     @FXML
     private TextArea complaintDescription;
-
-    @FXML
-    private TextField complaintOrderID;
-
-    @FXML
-    private TextField complaintResponse;
-
-    @FXML
-    private TextField complaintStatus;
-
-    @FXML
-    private Button newComplaintButton;
-
-    @FXML
-    private Button signOutButton;
-
-    @FXML
-    private Button viewCatalogButton;
-
-    @FXML
-    private ComboBox<Text> itemComboBox;
-
     @FXML
     private ComboBox<Long> storesComboBox;
-
-    @FXML
-    private Text welcomeText;
-
-    @FXML
-    private TableView<Complaint> complaintTable;
-
-    @FXML
-    private TableColumn<Complaint, Long> complaintIdColumn;
-
-    @FXML
-    private TableColumn<Complaint, Boolean> complaintStatusColumn;
-
-    @FXML
-    private TableColumn<Complaint, String> complaintDescriptionColumn;
-
-    @FXML
-    private TableColumn<Complaint, String> complaintResponseColumn;
-
-    @FXML
-    private TableColumn<Complaint, Double> complaintCompensationAmountColumn;
-
-    @FXML
-    private TableColumn<Complaint, Long> complaintStoreColumn;
-
-    @FXML
-    private TableColumn<Complaint, Date> complaintDateColumn;
-
-    @FXML
-    private TableColumn<Order, Void> colBtn = new TableColumn("Cancel Order");
-
     @FXML
     private Label invalid_customer_text;
-
     @FXML
     private Label added_complaint_text;
-
     @FXML
     private Label cancelOrderText;
 
-    private Customer customer;
+    //Complaint Table
+    @FXML
+    private TableView<Complaint> complaintTable;
+    @FXML
+    private TableColumn<Complaint, Long> complaintIdColumn;
+    @FXML
+    private TableColumn<Complaint, String> complaintStatusColumn;
+    @FXML
+    private TableColumn<Complaint, String> complaintDescriptionColumn;
+    @FXML
+    private TableColumn<Complaint, String> complaintResponseColumn;
+    @FXML
+    private TableColumn<Complaint, Double> complaintCompensationAmountColumn;
+    @FXML
+    private TableColumn<Complaint, String> complaintStoreColumn;
+    @FXML
+    private TableColumn<Complaint, Date> complaintDateColumn;
 
+    //Order Table
     @FXML
     private TableView<Order> orderTable;
-
     @FXML
     private TableColumn<Order, Long> orderIdColumn;
-
     @FXML
     private TableColumn<Order, String> orderSumColumn;
-
     @FXML
     private TableColumn<Order, Date> orderDateColumn;
-
     @FXML
     private TableColumn<Order, Date> supplyDateColumn;
-
     @FXML
     private TableColumn<Order, String> isCompletedColumn;
+    @FXML
+    private TableColumn<Order, Void> colBtn = new TableColumn("Cancel Order");
 
+    //Variables
+    private Customer customer;
     private List<Order> customerOrderList = new ArrayList<>();
-    private List<Order> ordersList;
     private List<Complaint> customerComplaintList = new ArrayList<>();
     private List<Store> storeList;
-    //private List<Store> customerStoresList = new ArrayList<>();
+
 
 
     @FXML
@@ -197,7 +159,6 @@ public class CustomerProfileController {
         }
     }
 
-
     private void addButtonToTable() { //adding cancel order button
 
         Callback<TableColumn<Order, Void>, TableCell<Order, Void>> cellFactory = new Callback<TableColumn<Order, Void>, TableCell<Order, Void>>() {
@@ -232,7 +193,7 @@ public class CustomerProfileController {
 
                                 removeOrderTask.setOnSucceeded(e -> {
                                     UpdateOrdersResponse response = removeOrderTask.getValue();
-                                    ordersList.remove(data);//remove in UI locally
+                                    //ordersList.remove(data);//remove in UI locally
                                     customerOrderList.remove(data);
                                     cancelOrderText.setText(Constants.CANCEL_ORDER);
                                     cancelOrderText.setTextFill(Color.GREEN);
@@ -314,7 +275,6 @@ public class CustomerProfileController {
                 invalid_customer_text.setTextFill(Color.RED);
             }
             List<Complaint> complaintList = response.getComplaintList();
-            //List<Complaint> customerComplaintList = new ArrayList<>();
             for (Complaint complaint : complaintList) {
                 if (complaint.getCustomer().getId() == customer.getId()) {
                     customerComplaintList.add(complaint);
@@ -327,8 +287,12 @@ public class CustomerProfileController {
                     new SimpleLongProperty(cellData.getValue().getId()).asObject());
 
             complaintStatusColumn.setText("Status");
-            complaintStatusColumn.setCellValueFactory(cellData ->
-                    new SimpleBooleanProperty(cellData.getValue().getIsComplaintOpen()));
+            complaintStatusColumn.setCellValueFactory(cellData -> {
+                if (cellData.getValue().getIsComplaintOpen()) {
+                    return new SimpleStringProperty("Open");
+                }
+                return new SimpleStringProperty("Pending Response");
+            });
 
             complaintDescriptionColumn.setText("Description");
             complaintDescriptionColumn.setCellValueFactory(cellData ->
@@ -344,7 +308,7 @@ public class CustomerProfileController {
 
             complaintStoreColumn.setText("Store");
             complaintStoreColumn.setCellValueFactory(cellData ->
-                    new SimpleLongProperty(cellData.getValue().getStore().getId()).asObject());
+                    new SimpleStringProperty(Long.toString(cellData.getValue().getStore().getId())));
 
             complaintDateColumn.setText("Date");
             complaintDateColumn.setCellValueFactory(new PropertyValueFactory<>("complaintTimestamp"));
@@ -369,7 +333,6 @@ public class CustomerProfileController {
             interruptedException.printStackTrace();
         }
     }
-
 
     public void getOrders() {
         Task<GetOrdersResponse> getOrdersTask = App.createTimedTask(() -> {
@@ -397,7 +360,7 @@ public class CustomerProfileController {
                 invalid_customer_text.setText("failed to get customer ");
                 invalid_customer_text.setTextFill(Color.RED);
             }
-            ordersList = response.getOrdersList();
+            List<Order> ordersList = response.getOrdersList();
             for (Order order :  ordersList) {
                 if (order.getCustomer().getId() == customer.getId()) {
                     customerOrderList.add(order);
@@ -412,7 +375,7 @@ public class CustomerProfileController {
             orderSumColumn.setText("Total Price");
             orderSumColumn.setCellValueFactory(cellData -> {
                 double totalPrice = cellData.getValue().getTotal();
-                String totalPriceText = String.format("%.2f", totalPrice);
+                String totalPriceText = String.format("%,.2f", totalPrice);
                 return new SimpleStringProperty(totalPriceText);
             });
 
@@ -465,7 +428,6 @@ public class CustomerProfileController {
         }
     }
 
-
     @FXML
     public void initialize()  {
         if (App.getCurrentUser()!=null) {
@@ -482,36 +444,27 @@ public class CustomerProfileController {
             if (App.getCurrentUser() instanceof Customer)
                 customer = (Customer) App.getCurrentUser();
         }
+
         getComplaints();
 
         getOrders();
 
-        if(customer!=null){
+        if(customer!=null) {
             storeList = customer.getStores();
             List<Long>  storesListID = new ArrayList<Long>();
             ObservableList<Long> data = FXCollections.observableArrayList();
             //showing customer only his complaints
-            if(storeList.size()>=1){
+            if (storeList.size()>=1) {
                 for (int i = 0; i < storeList.size(); i++) {
                     Long id = (storeList.get(i).getId()-1);
                     if(id!=0.0){
                         storesListID.add(id);
                     }
-
                 }
             }
 
             data.addAll(storesListID); //adding to dropdown combo
             storesComboBox.setItems(data);
         }
-    }
-
-    public void selectStore(ActionEvent event) {
-        if(storesComboBox.getValue()!= null){
-            long storeID  = storesComboBox.getValue(); //getting selected complaint ID
-
-            Store store = storeList.get((int) storeID);
-        }
-
     }
 }
