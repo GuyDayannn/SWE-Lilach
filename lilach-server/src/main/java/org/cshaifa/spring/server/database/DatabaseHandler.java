@@ -579,6 +579,83 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
+    public static void editEmployee(ChainEmployee chainEmployee, Store store, String strNewType, String currType) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        Store oldStore = chainEmployee.getStore();
+        switch (currType) {
+            case "Chain Employee":
+                ChainEmployee employeeToDelete = chainEmployee;
+                oldStore.removeEmployee(employeeToDelete);
+                if (strNewType.equals("Customer Service Employee")) {
+                    CustomerServiceEmployee customerServiceEmployee = (CustomerServiceEmployee) chainEmployee;
+                    session.save(customerServiceEmployee);
+
+                } else if(strNewType.equals("Store Manager")){
+                    //removing prev attachment
+                    oldStore.getStoreManager().removeStore();
+                    oldStore.removeManager();
+                    //adding new connections
+                    StoreManager storeManager = (StoreManager) chainEmployee;
+                    storeManager.setStore(store);
+                    session.save(storeManager);
+
+                }
+                else{//chain manager
+                    ChainManager chainManager = (ChainManager) chainEmployee;
+                    session.save(chainManager); //TODO: what to do with old chain manager?
+                }
+                    break;
+            case "Store Manager":
+                StoreManager managerToDelete = (StoreManager) chainEmployee;
+                oldStore.removeManager();
+                if(strNewType.equals("Customer Service Employee")) {
+                    CustomerServiceEmployee customerServiceEmployee = (CustomerServiceEmployee) chainEmployee;
+                    session.save(customerServiceEmployee);
+                }
+                else if(strNewType.equals("Chain Employee")) {
+                    ChainEmployee chainEmployee1 = chainEmployee;
+                    store.addEmployee(chainEmployee1);
+                    chainEmployee1.setStore(store);
+                    session.save(chainEmployee1);
+                }
+                else{ //chain manager
+                    ChainManager chainManager = (ChainManager) chainEmployee;
+                    session.save(chainManager);
+                }
+
+                break;
+            case "Customer Service":
+                CustomerServiceEmployee customerServiceToDelete = (CustomerServiceEmployee) chainEmployee;
+                break;
+            default:
+                ChainManager chainManagerToDelete = (ChainManager) chainEmployee;
+                break;
+        }
+        if(strNewType.equals("Store Manager")){
+
+        }
+        try {
+            if(oldStore!=null) {
+                session.update(oldStore);
+            }
+            session.update(store);
+            session.delete(chainEmployee);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            if(oldStore!=null){
+                session.merge(oldStore);
+            }
+            session.merge(session);
+            session.merge(store);
+        }
+
+        tryFlushSession(session);
+
+    }
+
     private static <T> void updateDB(Session session, T toUpdate) {
         try {
             session.update(toUpdate);
@@ -601,5 +678,6 @@ public class DatabaseHandler {
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
     }
+
 
 }

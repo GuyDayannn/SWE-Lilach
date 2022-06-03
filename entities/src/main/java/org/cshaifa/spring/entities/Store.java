@@ -131,6 +131,12 @@ public class Store implements Serializable {
 
     public void removeOrder(Order order) {this.orders.remove(order);}
 
+    public void removeEmployee(ChainEmployee chainEmployee) {this.employees.remove(chainEmployee);}
+
+    public void removeManager() {this.storeManager = null;}
+
+    public void addEmployee(ChainEmployee chainEmployee) {this.employees.add(chainEmployee);}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

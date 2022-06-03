@@ -67,7 +67,21 @@ public class LilachServer extends AbstractServer {
                         e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
                     }
-                } else if (request instanceof UpdateComplaintRequest updateComplaintRequest) {
+                } else if (request instanceof EditEmployeeRequest editEmployeeRequest) {
+                    ChainEmployee chainEmployee = editEmployeeRequest.getUpdatedChainEmployee();
+                    Store store = editEmployeeRequest.getStore();
+                    String strNewType = editEmployeeRequest.getNewType();
+                    String strCurrType = editEmployeeRequest.getCurrType();
+                    try {
+                        DatabaseHandler.editEmployee(chainEmployee, store, strNewType, strCurrType);
+                        client.sendToClient(new EditEmployeeResponse(requestId, true,"edited" ));
+                    } catch (HibernateException e) {
+                        e.printStackTrace();
+                        client.sendToClient(new EditEmployeeResponse(requestId, "false"));
+                    }
+                }
+
+                else if (request instanceof UpdateComplaintRequest updateComplaintRequest) {
                     Complaint updatedComplaint = updateComplaintRequest.getUpdatedComplaint();
                     try {
                         DatabaseHandler.updateComplaint(updatedComplaint);

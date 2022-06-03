@@ -8,14 +8,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Complaint;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Delivery;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.SubscriptionType;
-import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.requests.*;
 import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
@@ -200,6 +193,14 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(freezeCustomerRequest);
         return (FreezeCustomerResponse) waitForMsgFromServer(freezeCustomerRequest.getRequestId());
+    }
+
+    public static EditEmployeeResponse editEmployee(ChainEmployee chainEmployee, Store store, String newType, String currType)
+            throws IOException, InterruptedException {
+        EditEmployeeRequest editEmployeeRequest = new EditEmployeeRequest(chainEmployee, store, newType, currType);
+        client.openConnection();
+        client.sendToServer(editEmployeeRequest);
+        return (EditEmployeeResponse) waitForMsgFromServer(editEmployeeRequest.getRequestId());
     }
 
 }
