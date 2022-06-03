@@ -17,7 +17,7 @@
 }
 
 .border-pane {
-    -fx-background-color: linear-gradient(rgba(81, 147, 73, 0.54), rgba(144, 206, 127, 0.46));
+    -fx-background-color: linear-gradient(rgba(81, 147, 73, 0.56), rgba(144, 206, 127, 0.64));
 }
 
 .anchor-pane {

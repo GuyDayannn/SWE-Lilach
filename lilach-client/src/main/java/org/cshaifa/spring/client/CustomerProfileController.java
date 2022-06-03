@@ -1,10 +1,6 @@
 package org.cshaifa.spring.client;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -13,8 +9,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
@@ -22,10 +18,8 @@ import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -115,7 +109,7 @@ public class CustomerProfileController {
     private TableColumn<Order, Long> orderIdColumn;
 
     @FXML
-    private TableColumn<Order, Double> orderSumColumn;
+    private TableColumn<Order, String> orderSumColumn;
 
     @FXML
     private TableColumn<Order, Date> orderDateColumn;
@@ -124,7 +118,7 @@ public class CustomerProfileController {
     private TableColumn<Order, Date> supplyDateColumn;
 
     @FXML
-    private TableColumn<Order, Boolean> isCompletedColumn;
+    private TableColumn<Order, String> isCompletedColumn;
 
     private List<Order> customerOrderList = new ArrayList<>();
     private List<Order> ordersList;
@@ -215,53 +209,62 @@ public class CustomerProfileController {
 
                     {
                         btn.setOnAction((ActionEvent event) -> {
-                            Order data = getTableView().getItems().get(getIndex());
 
-                            Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                            if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 3) {
-                                //return customer full amount
-                                //TODO
-                            } else if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 1) {
-                                //return customer 50% of order sum
-                            } else {
-                                //not returning customer
-                            }
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Cancel order?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
+                            alert.showAndWait();
 
-                            Task<UpdateOrdersResponse> removeOrderTask = App.createTimedTask(() -> {
-                                return ClientHandler.updateOrders(data);
-                            }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+                            if (alert.getResult() == ButtonType.YES) {
+                                Order data = getTableView().getItems().get(getIndex());
 
-                            removeOrderTask.setOnSucceeded(e -> {
-                                UpdateOrdersResponse response = removeOrderTask.getValue();
-                                ordersList.remove(data);//remove in UI locally
-                                customerOrderList.remove(data);
-                                cancelOrderText.setText(Constants.CANCEL_ORDER);
-                                cancelOrderText.setTextFill(Color.GREEN);
-
-                                if (!response.isSuccessful()) {
-                                    // TODO: maybe log the specific exception somewhere
-                                    App.hideLoading();
-                                    System.err.println("Cancel order failed!");
+                                Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 3) {
+                                    //return customer full amount
+                                    //TODO
+                                } else if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 1) {
+                                    //return customer 50% of order sum
+                                } else {
+                                    //not returning customer
                                 }
-                            });
 
-                            removeOrderTask.setOnFailed(e -> {
-                                // TODO: maybe properly log it somewhere
-                                System.out.println("Cancel order failed!");
-                                added_complaint_text.setText(Constants.CANCEL_ORDER_FAILED);
-                                added_complaint_text.setTextFill(Color.RED);
-                                removeOrderTask.getException().printStackTrace();
-                            });
+                                Task<UpdateOrdersResponse> removeOrderTask = App.createTimedTask(() -> {
+                                    return ClientHandler.updateOrders(data);
+                                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-                            try{
-                                Thread t = new Thread(removeOrderTask);
-                                t.start();
-                                t.join();
-                                customerOrderList.clear();
-                                getOrders(); //removing order from UI
-                            } catch (InterruptedException interruptedException) {
-                                interruptedException.printStackTrace();
+                                removeOrderTask.setOnSucceeded(e -> {
+                                    UpdateOrdersResponse response = removeOrderTask.getValue();
+                                    ordersList.remove(data);//remove in UI locally
+                                    customerOrderList.remove(data);
+                                    cancelOrderText.setText(Constants.CANCEL_ORDER);
+                                    cancelOrderText.setTextFill(Color.GREEN);
+
+                                    if (!response.isSuccessful()) {
+                                        // TODO: maybe log the specific exception somewhere
+                                        App.hideLoading();
+                                        System.err.println("Cancel order failed!");
+                                    }
+                                });
+
+                                removeOrderTask.setOnFailed(e -> {
+                                    // TODO: maybe properly log it somewhere
+                                    System.out.println("Cancel order failed!");
+                                    added_complaint_text.setText(Constants.CANCEL_ORDER_FAILED);
+                                    added_complaint_text.setTextFill(Color.RED);
+                                    removeOrderTask.getException().printStackTrace();
+                                });
+
+                                try{
+                                    Thread t = new Thread(removeOrderTask);
+                                    t.start();
+                                    t.join();
+                                    customerOrderList.clear();
+                                    getOrders(); //removing order from UI
+                                } catch (InterruptedException interruptedException) {
+                                    interruptedException.printStackTrace();
+                                }
                             }
+
+
+
 
                         });
 
@@ -319,24 +322,31 @@ public class CustomerProfileController {
             }
             ObservableList<Complaint> data = FXCollections.observableArrayList();
 
+            complaintIdColumn.setText("Complaint ID");
             complaintIdColumn.setCellValueFactory(cellData ->
                     new SimpleLongProperty(cellData.getValue().getId()).asObject());
 
+            complaintStatusColumn.setText("Status");
             complaintStatusColumn.setCellValueFactory(cellData ->
                     new SimpleBooleanProperty(cellData.getValue().getIsComplaintOpen()));
 
+            complaintDescriptionColumn.setText("Description");
             complaintDescriptionColumn.setCellValueFactory(cellData ->
                     new SimpleStringProperty(cellData.getValue().getComplaintDescription()));
 
+            complaintResponseColumn.setText("Response");
             complaintResponseColumn.setCellValueFactory(cellData ->
                     new SimpleStringProperty(cellData.getValue().getComplaintResponse()));
 
+            complaintCompensationAmountColumn.setText("Compensation");
             complaintCompensationAmountColumn.setCellValueFactory(cellData ->
                     new SimpleDoubleProperty(cellData.getValue().getCompensationAmount()).asObject());
 
+            complaintStoreColumn.setText("Store");
             complaintStoreColumn.setCellValueFactory(cellData ->
                     new SimpleLongProperty(cellData.getValue().getStore().getId()).asObject());
 
+            complaintDateColumn.setText("Date");
             complaintDateColumn.setCellValueFactory(new PropertyValueFactory<>("complaintTimestamp"));
 
             data.addAll(customerComplaintList);
@@ -395,18 +405,30 @@ public class CustomerProfileController {
             }
             ObservableList<Order> data = FXCollections.observableArrayList();
 
+            orderIdColumn.setText("Order ID");
             orderIdColumn.setCellValueFactory(cellData ->
                     new SimpleLongProperty(cellData.getValue().getId()).asObject());
 
-            orderSumColumn.setCellValueFactory(cellData ->
-                    new SimpleDoubleProperty(cellData.getValue().getTotal()).asObject());
+            orderSumColumn.setText("Total Price");
+            orderSumColumn.setCellValueFactory(cellData -> {
+                double totalPrice = cellData.getValue().getTotal();
+                String totalPriceText = String.format("%.2f", totalPrice);
+                return new SimpleStringProperty(totalPriceText);
+            });
 
+            orderDateColumn.setText("Order Date");
             orderDateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
 
+            supplyDateColumn.setText("Supply Date");
             supplyDateColumn.setCellValueFactory(new PropertyValueFactory<>("supplyDate"));
 
-            isCompletedColumn.setCellValueFactory(cellData ->
-                    new SimpleBooleanProperty(cellData.getValue().isCompleted()));
+            isCompletedColumn.setText("Completed");
+            isCompletedColumn.setCellValueFactory(cellData -> {
+                if (cellData.getValue().isCompleted() == true) {
+                    return new SimpleStringProperty("Yes");
+                }
+                return new SimpleStringProperty("No");
+            });
 
             data.addAll(customerOrderList);
             orderTable.setItems(data);

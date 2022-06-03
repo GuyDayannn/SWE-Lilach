@@ -73,6 +73,16 @@
     -fx-background-color: transparent;
 }
 
+.table-view .virtual-flow .scroll-bar:horizontal * {
+    -fx-min-width: 0;
+    -fx-pref-width: 0;
+    -fx-max-width: 0;
+
+    -fx-min-height: 0;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+}
+
 .table-view .virtual-flow .scroll-bar .increment-button,
 .table-view .virtual-flow .scroll-bar .decrement-button {
     -fx-opacity: 0;
