@@ -702,15 +702,6 @@ public class EmployeeProfileController {
     }
 
     public void selectEmployee(ActionEvent event) {
-//        employeeStatusText.clear();
-//        String employeeUsername = employeeComboBox.getSelectionModel().toString();
-//        for(Employee employee: employeeList){
-//            if(employee.getUsername().equals(employeeUsername)){
-//                selectedEmployee = employee;
-//                break;
-//            }
-//        }
-//
 
     }
 
@@ -720,10 +711,7 @@ public class EmployeeProfileController {
 
     public void editEmployee(ActionEvent event) {
 
-
-
     }
-
 
     public void selectEmployeeType(ActionEvent event) {
     }

@@ -43,8 +43,8 @@
     -fx-padding: 2 0 2 10px;
 }
 
-.table-row-cell:selected .text {
-    -fx-fill: black ;
+.table-row-cell:selected {
+    -fx-background-text-fill: black;
 }
 
 .table-row-cell:hover {
