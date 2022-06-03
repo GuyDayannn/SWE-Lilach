@@ -3,6 +3,8 @@ package org.cshaifa.spring.client;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -17,16 +19,10 @@ import javafx.scene.paint.Color;
 
 public class CustomerLoginController {
     @FXML
-    private Button cancelBtn;
-
-    @FXML
-    private Button loginBtn;
+    private ImageView lilachLogo;
 
     @FXML
     private BorderPane rootPane;
-
-    @FXML
-    private Label loginMessageLabel;
 
     @FXML
     private TextField usernameTxtField;
@@ -48,8 +44,8 @@ public class CustomerLoginController {
         if (!usernameTxtField.getText().isBlank() && !pwdTxtField.getText().isBlank()) {
             validateLogin();
         } else {
-            loginMessageLabel.setText("Please enter username and password");
-            loginMessageLabel.setVisible(true);
+            invalid_login_text.setText("Please enter username and password");
+            invalid_login_text.setVisible(true);
         }
     }
 
@@ -89,7 +85,11 @@ public class CustomerLoginController {
         new Thread(loginTask).start();
     }
 
+    @FXML
     void initialize() {
-        loginMessageLabel.setText("");
+        Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
+        lilachLogo.setImage(image);
+        lilachLogo.setFitHeight(50);
+        invalid_login_text.setText("");
     }
 }

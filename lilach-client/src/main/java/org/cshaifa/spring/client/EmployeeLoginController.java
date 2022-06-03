@@ -6,10 +6,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.utils.Constants;
+
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -21,16 +24,10 @@ import java.util.concurrent.TimeUnit;
 
 public class EmployeeLoginController {
     @FXML
-    private Button cancelBtn;
-
-    @FXML
-    private Button loginBtn;
+    private ImageView lilachLogo;
 
     @FXML
     private BorderPane rootPane;
-
-    @FXML
-    private Label loginMessageLabel;
 
     @FXML
     private TextField usernameTxtField;
@@ -52,8 +49,8 @@ public class EmployeeLoginController {
         if (!usernameTxtField.getText().isBlank() && !pwdTxtField.getText().isBlank()) {
             validateLogin();
         } else {
-            loginMessageLabel.setText("Please enter username and password");
-            loginMessageLabel.setVisible(true);
+            invalid_login_text.setText("Please enter username and password");
+            invalid_login_text.setVisible(true);
         }
     }
 
@@ -98,7 +95,11 @@ public class EmployeeLoginController {
         new Thread(loginTask).start();
     }
 
+    @FXML
     void initialize() {
-        loginMessageLabel.setText("");
+        Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
+        lilachLogo.setImage(image);
+        lilachLogo.setFitHeight(50);
+        invalid_login_text.setText("");
     }
 }
