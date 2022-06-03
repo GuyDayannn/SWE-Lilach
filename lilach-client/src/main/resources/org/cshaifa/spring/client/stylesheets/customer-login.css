@@ -1,0 +1,38 @@
+.root {
+    -fx-text-fill: white;
+    -fx-font-style: Italic;
+    -fx-font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+.text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.55);
+}
+
+.text-field:focused {
+    -fx-background-color: rgb(255, 255, 255);
+}
+
+.invalid-text {
+    -fx-text-fill: red;
+}
+
+.border-pane {
+    -fx-background-color: linear-gradient(rgba(81, 147, 73, 0.54), rgba(144, 206, 127, 0.46));
+}
+
+.anchor-pane {
+    -fx-background-color: transparent;
+}
+
+.button {
+    -fx-background-color: linear-gradient(rgba(232, 232, 232, 0.21), rgba(40, 99, 29, 0.2));
+    -fx-background-insets: 5;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-insets: 5;
+}
+
+.button:hover{
+    -fx-border-color: white;
+    -fx-text-fill: white;
+}

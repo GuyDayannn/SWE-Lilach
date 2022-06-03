@@ -721,6 +721,8 @@ public class EmployeeProfileController {
             createTaskCustUpdate(true);
         }
 
+
+
     }
 
     public void selectAccountStatus(ActionEvent event) {
