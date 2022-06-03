@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -87,13 +88,15 @@ public class EmployeeProfileController {
     @FXML
     private Label updated_complaint_text;
     @FXML
-    private TitledPane paneStoreReport;
+    private Accordion employeeControls;
     @FXML
-    private TitledPane paneChainReport;
+    private TitledPane viewReportsPane;
+    @FXML
+    private TitledPane generateReportsPane;
+    @FXML
+    private TitledPane handleComplaintsPane;
     @FXML
     private TitledPane handleUsersPane;
-    @FXML
-    private TitledPane viewTwoReportsPane;
     @FXML
     private ComboBox<String> storeComboBox;
     @FXML
@@ -112,6 +115,16 @@ public class EmployeeProfileController {
     private ComboBox<String> selectStoreComboBox;
     @FXML
     private ComboBox<String> employeeStatusComboBox;
+    @FXML
+    private Button addReportViewButton;
+    @FXML
+    private Button viewExistingReportsButton;
+    @FXML
+    private ComboBox<String> selectReport1CB;
+    @FXML
+    private ComboBox<String> selectReport2CB;
+    @FXML
+    private Text selectReport2CBText;
 
     // Variables
     private List<Complaint> complaintList;
@@ -336,7 +349,6 @@ public class EmployeeProfileController {
 //        new Thread(getComplaintsTask).start();
 
     }
-
 
     void initStores(){
         Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
@@ -596,6 +608,15 @@ public class EmployeeProfileController {
         } else {
             welcomeText.setText("Welcome, unknown employee");
         }
+
+        addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                selectReport2CB.setVisible(true);
+                selectReport2CBText.setVisible(true);
+            }
+        });
+
         //TODO: edit to show only to authorized users
         if (App.getCurrentUser() != null) {
             /*
@@ -606,31 +627,21 @@ public class EmployeeProfileController {
                 viewTwoReportsPane.setVisible(false);
             }*/
             if (App.getCurrentUser().getClass() == StoreManager.class) {
-                paneChainReport.setVisible(false);
-                handleUsersPane.setVisible(false);
-                viewTwoReportsPane.setVisible(false);
-            }else if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
-                paneStoreReport.setVisible(false);
-                paneChainReport.setVisible(false);
-                handleUsersPane.setVisible(false);
-                viewTwoReportsPane.setVisible(false);
+                employeeControls.getPanes().remove(handleUsersPane);
+            } else if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
+                employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleUsersPane);
             } else if (App.getCurrentUser().getClass() == ChainManager.class) {
-            paneStoreReport.setVisible(false);
-            paneChainReport.setVisible(false);
-
-        }
-        else if (App.getCurrentUser().getClass() == SystemAdmin.class) {
-                //else it's system admin and he can see all options
+                employeeControls.getPanes().remove(handleUsersPane);
+            } else if (App.getCurrentUser().getClass() == SystemAdmin.class) {
+                employeeControls.getPanes().remove(handleComplaintsPane);
             }
         }
+
         //calling db server tasks to get data
         initComplaints();
         initStores();
         initUsers();
         initEditEmployees();
-
-    }
-    public void viewAllComplaints(ActionEvent event) {
 
     }
 
@@ -686,7 +697,6 @@ public class EmployeeProfileController {
 
     }
 
-
     public void createTaskEmployeeUpdate(ChainEmployee employee, Store store, String newType, String currType){
         System.out.println("inserted createTaskEmployeeUpdate");
 
@@ -722,8 +732,7 @@ public class EmployeeProfileController {
         }
     }
 
-
-
+    @FXML
     public void editCustomerStatus(ActionEvent event) {
         String selectedStatus = customerStatusComboBox.getValue();
         boolean createTask = false;
@@ -735,14 +744,14 @@ public class EmployeeProfileController {
             //selectedCustomer.unfreeze();
             createTaskCustUpdate(true);
         }
-
-
-
     }
 
+    @FXML
     public void selectAccountStatus(ActionEvent event) {
+
     }
 
+    @FXML
     public void selectEmployee(ActionEvent event) {
 //        employeeStatusText.clear();
 //        String employeeUsername = employeeComboBox.getSelectionModel().toString();
@@ -756,11 +765,12 @@ public class EmployeeProfileController {
 
     }
 
+    @FXML
     public void editEmployeeStatus(ActionEvent event) {
 
     }
 
-
+    @FXML
     public void editEmployee(ActionEvent event) {
         System.out.println("inserted into editEmployee");
         String selectedStatus = employeeStatusComboBox.getValue();
@@ -808,10 +818,13 @@ public class EmployeeProfileController {
         }
     }
 
-
+    @FXML
     public void selectEmployeeType(ActionEvent event) {
+
     }
 
+    @FXML
     public void editManagerStore(ActionEvent event) {
+
     }
 }

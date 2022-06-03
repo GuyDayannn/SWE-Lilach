@@ -5,6 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -13,9 +14,12 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <AnchorPane prefHeight="500.0" prefWidth="600.0" stylesheets="@stylesheets/employee-profile.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
    <children>
       <HBox prefHeight="40.0" prefWidth="600.0">
@@ -40,60 +44,121 @@
             </HBox>
          </children>
       </HBox>
-      <Accordion layoutY="40.0" prefHeight="460.0" prefWidth="600.0">
+      <Accordion fx:id="employeeControls" layoutY="40.0" prefHeight="460.0" prefWidth="600.0">
         <panes>
-          <TitledPane fx:id="paneStoreReport" animated="false" text="View Store Report" visible="true">
+          <TitledPane fx:id="generateReportsPane" animated="false" text="Generate Store Reports" visible="true">
             <content>
-              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="265.0" prefWidth="598.0" styleClass="anchor-pane" visible="true">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="325.0" prefWidth="600.0" styleClass="anchor-pane" visible="true">
                      <children>
-                        <Text layoutX="28.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Text>
-                        <ComboBox fx:id="storeComboBox" layoutX="28.0" layoutY="45.0" onAction="#selectStore" prefWidth="202.0" />
-                        <Text layoutX="28.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Text>
-                        <ComboBox fx:id="reportTypeComboBox" layoutX="28.0" layoutY="122.0" onAction="#selectReportType" prefWidth="202.0">
-                            <items>
-                                <FXCollections fx:factory="observableArrayList">
-                                    <String fx:value="Orders" />
-                                    <String fx:value="Revenue" />
-                                    <String fx:value="Complaints" />
-                                </FXCollections>
-                            </items>
-                        </ComboBox>
-                        <Text layoutX="332.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Text>
-                        <DatePicker fx:id="startDatePicker" layoutX="332.0" layoutY="45.0" onAction="#setStartDate" />
-                        <Text layoutX="332.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Text>
-                        <DatePicker fx:id="endDatePicker" layoutX="332.0" layoutY="122.0" onAction="#setEndDate" />
-                        <Button fx:id="generateReportButton" layoutX="28.0" layoutY="187.0" mnemonicParsing="false" onAction="#generateReport" prefWidth="110.0" text="Generate Report" />
-                        <Button fx:id="viewReportButton" disable="true" layoutX="149.0" layoutY="187.0" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
+                        <VBox prefHeight="325.0" prefWidth="600.0">
+                           <children>
+                              <HBox prefHeight="200.0" prefWidth="600.0">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" translateX="-28.0">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Text>
+                                          <HBox alignment="CENTER" spacing="5.0">
+                                             <children>
+                                                <ComboBox fx:id="storeComboBox" onAction="#selectStore" prefWidth="175.0" />
+                                                <CheckBox mnemonicParsing="false" text="Chain" />
+                                             </children>
+                                          </HBox>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:" translateX="-28.0">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Text>
+                                          <ComboBox fx:id="reportTypeComboBox" onAction="#selectReportType" prefWidth="175.0" translateX="-28.0">
+                                              <items>
+                                                  <FXCollections fx:factory="observableArrayList">
+                                                      <String fx:value="Orders" />
+                                                      <String fx:value="Revenue" />
+                                                      <String fx:value="Complaints" />
+                                                  </FXCollections>
+                                              </items>
+                                          </ComboBox>
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Text>
+                                          <DatePicker fx:id="startDatePicker" onAction="#setStartDate" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Text>
+                                          <DatePicker fx:id="endDatePicker" onAction="#setEndDate" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="25.0">
+                                 <children>
+                                    <Button fx:id="generateReportButton" mnemonicParsing="false" onAction="#generateReport" prefWidth="110.0" text="Generate Report" />
+                                    <Button fx:id="viewReportButton" disable="true" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="100.0" prefWidth="600.0" />
+                           </children>
+                        </VBox>
                      </children>
                   </AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane fx:id="paneChainReport" animated="false" text="View Chain Report">
+          <TitledPane fx:id="viewReportsPane" animated="false" text="View Existing Reports">
             <content>
-              <AnchorPane fx:id="viewChainReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
-<!--                     <children>-->
-<!--                        <Label fx:id="updated_complaint_text" layoutX="54.0" layoutY="247.0" prefHeight="18.0" prefWidth="231.0" />-->
-<!--                     </children>-->
-                  </AnchorPane>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
+                     <children>
+                        <HBox alignment="CENTER" prefHeight="200.0" prefWidth="600.0">
+                           <children>
+                              <VBox prefHeight="200.0" prefWidth="400.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="400.0">
+                                       <children>
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report 1:" />
+                                                <ComboBox fx:id="selectReport1CB" prefWidth="150.0" />
+                                             </children>
+                                          </VBox>
+                                           <Button fx:id="addReportViewButton" mnemonicParsing="false" text="Add Report">
+                                               <graphic>
+                                                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                       <image>
+                                                           <Image url="@images/plus.png" />
+                                                       </image>
+                                                   </ImageView>
+                                               </graphic></Button>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="400.0">
+                                       <children>
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
+                                             <children>
+                                                <Text fx:id="selectReport2CBText" strokeType="OUTSIDE" strokeWidth="0.0" visible="false" text="Select Report 2:" />
+                                                <ComboBox fx:id="selectReport2CB" visible="false" prefWidth="150.0" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Button fx:id="viewExistingReportsButton" mnemonicParsing="false" disable="true" text="View Report" />
+                           </children>
+                        </HBox>
+                     </children></AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="View/Handle Complaints">
+          <TitledPane fx:id="handleComplaintsPane" animated="false" text="View/Handle Complaints">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
                      <children>
@@ -152,11 +217,6 @@
                         <ComboBox fx:id="selectStoreComboBox" disable="true" layoutX="281.0" layoutY="203.0" onAction="#editManagerStore" prefWidth="150.0" />
                      </children>
                   </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane fx:id="viewTwoReports" prefHeight="200.0" prefWidth="200.0" text="View Two Reports">
-               <content>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" />
                </content>
             </TitledPane>
         </panes>
