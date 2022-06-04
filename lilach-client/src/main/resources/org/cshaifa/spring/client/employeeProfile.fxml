@@ -214,7 +214,7 @@
                          </items>
                      </ComboBox>
                         <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee Type:" />
-                        <ComboBox fx:id="employeesTypeComboBox" layoutX="21.0" layoutY="150.0" onAction="#selectEmployeeType" prefWidth="150.0">
+                        <ComboBox fx:id="employeesTypeComboBox" layoutX="21.0" layoutY="150.0" prefWidth="150.0">
                          <items>
                              <FXCollections fx:factory="observableArrayList">
                                  <String fx:value="Chain Employee" />

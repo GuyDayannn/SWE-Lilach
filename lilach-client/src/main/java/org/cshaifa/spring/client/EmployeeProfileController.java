@@ -205,18 +205,13 @@ public class EmployeeProfileController {
                 selectEmployeeComboBox.getItems().clear();
                 employeeStatusComboBox.getItems().clear();
                 ObservableList<String> employeeNames = FXCollections.observableArrayList();
-                if (storeManagersList.size() >= 1) {
-                    // TODO: Add chain manager class
-                    for (Employee employee : storeManagersList) {
-                        employeeNames.add(employee.getFullName());
-                    }
-                }
+                employeeNames.add(chainManager.getFullName());
                 selectEmployeeComboBox.getItems().addAll(employeeNames);
                 employeeStatusComboBox.setDisable(false);
                 ObservableList<String> employeeTypes = FXCollections.observableArrayList();
                 employeeTypes.add("Store Manager");
                 employeeTypes.add("Customer Service");
-                employeeTypes.add("Chain Manager");
+                employeeTypes.add("Customer Service");
                 employeeStatusComboBox.getItems().addAll(employeeTypes);
             }
         });
@@ -224,8 +219,8 @@ public class EmployeeProfileController {
         employeeStatusComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
             System.out.println(t);
             System.out.println(t1);
-            if (t1!=null && t1.equals("Store Manager")) {
-                System.out.println("chosen store manager");
+            if (t1!=null && (t1.equals("Store Manager") || t1.equals("Chain Employee"))) {
+                System.out.println("chosen store manager / chain employee");
                 selectStoreComboBox.setDisable(false);
 
                 Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
@@ -747,11 +742,11 @@ public class EmployeeProfileController {
         String selectedStatus = employeeStatusComboBox.getValue();
         String employeeName = selectEmployeeComboBox.getValue();
 
-        if(employeesTypeComboBox.equals("Store Manager")){
+        if(employeesTypeComboBox.getValue().equals("Store Manager")){
             System.out.println("inserted into editEmployee store manager");
             StoreManager selectedManager = null;
             for(StoreManager manager: storeManagersList) {
-                if (manager.getUsername().equals(employeeName)) {
+                if (manager.getFullName().equals(employeeName)) {
                     selectedManager = manager;
                     break;
                 }
@@ -759,11 +754,11 @@ public class EmployeeProfileController {
             createTaskEmployeeUpdate(selectedManager, selectedManager.getStore(),
                     selectedStatus, "Store Manager");
         }
-        else if(employeesTypeComboBox.equals("Chain Employee")){
+        else if(employeesTypeComboBox.getValue().equals("Chain Employee")){
             System.out.println("inserted into editEmployee chain employee");
             ChainEmployee selectedEmployee = null;
             for (ChainEmployee employee: chainEmployeeList) {
-                if (employee.getUsername().equals(employeeName)) {
+                if (employee.getFullName().equals(employeeName)) {
                     selectedEmployee = employee;
                     break;
                 }
@@ -771,10 +766,10 @@ public class EmployeeProfileController {
             createTaskEmployeeUpdate(selectedEmployee, selectedEmployee.getStore(),
                     selectedStatus, "Chain Employee");
         }
-        else if (employeesTypeComboBox.equals("Customer Service")) {
+        else if (employeesTypeComboBox.getValue().equals("Customer Service")) {
             CustomerServiceEmployee selectedEmployee = null;
             for(CustomerServiceEmployee employee: customerServiceList) {
-                if (employee.getUsername().equals(employeeName)) {
+                if (employee.getFullName().equals(employeeName)) {
                     selectedEmployee = employee;
                     break;
                 }
