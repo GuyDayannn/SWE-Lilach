@@ -17,6 +17,9 @@ public class Constants {
     public static final String WAREHOUSE_NAME = "Lilach Warehouse";
     public static final String CANCEL_ORDER = "You've successfully deleted the order";
     public static final String CANCEL_ORDER_FAILED = "Couldn't delete the order";
+    public static final String GENERATE_REPORT_SUCCESS = "Report generated successfully";
+    public static final String GENERATE_REPORT_FAILED = "Generating report failed";
+    public static final String MISSING_REQUIREMENTS = "Insert required data";
 
 
     public static final int SERVER_PORT = 8194;

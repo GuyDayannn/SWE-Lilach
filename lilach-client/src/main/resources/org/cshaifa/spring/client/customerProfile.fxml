@@ -11,86 +11,95 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" stylesheets="@stylesheets/customer-profile.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CustomerProfileController">
    <children>
-      <HBox prefHeight="40.0" prefWidth="800.0">
+      <VBox prefHeight="600.0" prefWidth="800.0">
          <children>
-            <HBox alignment="BOTTOM_LEFT" prefHeight="30.0" prefWidth="400.0">
+            <HBox prefHeight="40.0" prefWidth="800.0">
                <children>
-                  <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, _____________">
-                     <font>
-                        <Font name="Trebuchet MS Italic" size="24.0" />
-                     </font>
-                  </Text>
+                  <HBox alignment="BOTTOM_LEFT" prefHeight="30.0" prefWidth="400.0">
+                     <children>
+                        <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, _____________">
+                           <font>
+                              <Font name="Trebuchet MS Italic" size="24.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" layoutX="400.0" prefHeight="30.0" prefWidth="400.0" spacing="5.0">
+                     <children>
+                        <Button fx:id="viewCatalogButton" mnemonicParsing="false" onAction="#openCatalog" text="View Catalog" />
+                        <Button fx:id="refreshBtn" mnemonicParsing="false" onAction="#refreshProfile" text="Refresh" />
+                        <Button fx:id="signOutButton" mnemonicParsing="false" onAction="#logOut" text="Sign Out" />
+                     </children>
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </HBox>
                </children>
             </HBox>
-            <HBox alignment="CENTER_RIGHT" layoutX="400.0" prefHeight="30.0" prefWidth="400.0" spacing="5.0">
+            <TabPane prefHeight="540.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="                           Orders                           ">
+                  <content>
+                    <AnchorPane maxHeight="500.0" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="800.0" styleClass="anchor-pane" translateX="5.0" translateY="10.0">
+                           <children>
+                              <TableView fx:id="orderTable" prefHeight="500.0" prefWidth="800.0">
+                                <columns>
+                                  <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="Order ID" />
+                                  <TableColumn fx:id="orderSumColumn" prefWidth="95.0" text="Order Sum" />
+                                    <TableColumn fx:id="orderDateColumn" prefWidth="121.0" text="Order Date" />
+                                    <TableColumn fx:id="supplyDateColumn" prefWidth="127.0" text="Supply Date" />
+                                    <TableColumn fx:id="isCompletedColumn" prefWidth="151.0" text="Is Completed" />
+      <!--                              <TableColumn fx:id="ordersItemsColumn" prefWidth="199.0" text="Order's Items" />-->
+      <!--                              <TableColumn fx:id="cancelOrderColumn" prefWidth="91.0" text="Cancel Order" />-->
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="                           Complaints                           ">
+                  <content>
+                    <AnchorPane maxHeight="225.0" minHeight="0.0" minWidth="0.0" prefHeight="225.0" prefWidth="800.0" styleClass="anchor-pane" translateX="5.0" translateY="10.0">
+                           <children>
+                              <TableView fx:id="complaintTable" prefHeight="225.0" prefWidth="800.0">
+                                <columns>
+                                    <TableColumn fx:id="complaintIdColumn" minWidth="20.0" prefWidth="40.0" text="ID" />
+                                    <TableColumn fx:id="complaintStatusColumn" prefWidth="100.0" text="Status" />
+                                    <TableColumn fx:id="complaintDescriptionColumn" prefWidth="180.0" text="Complaint description" />
+                                    <TableColumn fx:id="complaintResponseColumn" prefWidth="180.0" text="Response" />
+                                    <TableColumn fx:id="complaintCompensationAmountColumn" minWidth="0.0" prefWidth="133.5999755859375" text="Compensation" />
+                                    <TableColumn fx:id="complaintStoreColumn" maxWidth="141.0" prefWidth="52.7999267578125" text="Store" />
+                                    <TableColumn fx:id="complaintDateColumn" prefWidth="91.2000732421875" text="Date" />
+                                </columns>
+                              </TableView>
+                              <Button fx:id="newComplaintButton" layoutX="600.0" layoutY="284.0" mnemonicParsing="false" onAction="#sendComplaint" text="Open New Complaint" />
+                              <Text layoutX="22.0" layoutY="270.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
+                              <TextArea fx:id="complaintDescription" layoutX="22.0" layoutY="280.0" prefHeight="220.0" prefWidth="340.0" />
+                              <ComboBox fx:id="storesComboBox" layoutX="385.0" layoutY="290.0" prefHeight="25.0" prefWidth="123.0" promptText="Stores" />
+                              <Text layoutX="385.0" layoutY="284.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" wrappingWidth="86.0" />
+                              <Label fx:id="added_complaint_text" layoutX="385.0" layoutY="350.0" text="" />
+                              <Label fx:id="invalid_customer_text" layoutX="385.0" layoutY="370.0" text="" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+            <HBox alignment="CENTER" prefHeight="20.0" prefWidth="800.0">
                <children>
-                  <Button fx:id="viewCatalogButton" mnemonicParsing="false" onAction="#openCatalog" text="View Catalog" />
-                  <Button fx:id="refreshBtn" mnemonicParsing="false" onAction="#refreshProfile" text="Refresh" />
-                  <Button fx:id="signOutButton" mnemonicParsing="false" onAction="#logOut" text="Sign Out" />
+                  <Label fx:id="cancelOrderText" />
                </children>
-               <HBox.margin>
-                  <Insets right="5.0" />
-               </HBox.margin>
             </HBox>
          </children>
-      </HBox>
-      <TabPane layoutY="40.0" prefHeight="560.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-          <Tab text="                           Orders                           ">
-            <content>
-              <AnchorPane maxHeight="500.0" minHeight="0.0" minWidth="0.0" prefHeight="500.0" prefWidth="800.0" styleClass="anchor-pane" translateX="5.0" translateY="10.0">
-                     <children>
-                        <TableView fx:id="orderTable" prefHeight="500.0" prefWidth="800.0">
-                          <columns>
-                            <TableColumn fx:id="orderIdColumn" prefWidth="75.0" text="Order ID" />
-                            <TableColumn fx:id="orderSumColumn" prefWidth="95.0" text="Order Sum" />
-                              <TableColumn fx:id="orderDateColumn" prefWidth="121.0" text="Order Date" />
-                              <TableColumn fx:id="supplyDateColumn" prefWidth="127.0" text="Supply Date" />
-                              <TableColumn fx:id="isCompletedColumn" prefWidth="151.0" text="Is Completed" />
-<!--                              <TableColumn fx:id="ordersItemsColumn" prefWidth="199.0" text="Order's Items" />-->
-<!--                              <TableColumn fx:id="cancelOrderColumn" prefWidth="91.0" text="Cancel Order" />-->
-                          </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </TableView>
-                        <Label fx:id="cancelOrderText" prefHeight="18.0" prefWidth="69.0" />
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-          <Tab text="                           Complaints                           ">
-            <content>
-              <AnchorPane maxHeight="225.0" minHeight="0.0" minWidth="0.0" prefHeight="225.0" prefWidth="800.0" styleClass="anchor-pane" translateX="5.0" translateY="10.0">
-                     <children>
-                        <TableView fx:id="complaintTable" prefHeight="225.0" prefWidth="800.0">
-                          <columns>
-                              <TableColumn fx:id="complaintIdColumn" minWidth="20.0" prefWidth="40.0" text="ID" />
-                              <TableColumn fx:id="complaintStatusColumn" prefWidth="100.0" text="Status" />
-                              <TableColumn fx:id="complaintDescriptionColumn" prefWidth="180.0" text="Complaint description" />
-                              <TableColumn fx:id="complaintResponseColumn" prefWidth="180.0" text="Response" />
-                              <TableColumn fx:id="complaintCompensationAmountColumn" minWidth="0.0" prefWidth="133.5999755859375" text="Compensation" />
-                              <TableColumn fx:id="complaintStoreColumn" maxWidth="141.0" prefWidth="52.7999267578125" text="Store" />
-                              <TableColumn fx:id="complaintDateColumn" prefWidth="91.2000732421875" text="Date" />
-                          </columns>
-                        </TableView>
-                        <Button fx:id="newComplaintButton" layoutX="600.0" layoutY="285.0" mnemonicParsing="false" onAction="#sendComplaint" text="Open New Complaint" />
-                        <Text layoutX="22.0" layoutY="265.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
-                        <TextArea fx:id="complaintDescription" layoutX="21.0" layoutY="279.0" prefHeight="220.0" prefWidth="346.0" />
-                        <Label fx:id="added_complaint_text" layoutX="271.0" layoutY="9.0" text="" />
-                        <Label fx:id="invalid_customer_text" layoutX="352.0" layoutY="9.0" text="" />
-                        <ComboBox fx:id="storesComboBox" layoutX="385.0" layoutY="290.0" prefHeight="25.0" prefWidth="123.0" promptText="Stores" />
-                        <Text layoutX="385.0" layoutY="284.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" wrappingWidth="86.0" />
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-        </tabs>
-      </TabPane>
+      </VBox>
    </children>
 </AnchorPane>

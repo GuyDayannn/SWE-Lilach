@@ -138,6 +138,7 @@ public class EmployeeProfileController {
     private Report report;
     private Customer selectedCustomer = new Customer();
 
+
     // Init lists from database
     void initEditEmployees() {
         employeesTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
@@ -507,6 +508,23 @@ public class EmployeeProfileController {
         }
     }
 
+    private void messageDisappearanceTask(long millis, Label label) {
+        Task<Void> sleeper = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    Thread.sleep(millis);
+                } catch (InterruptedException e) {
+                }
+                return null;
+            }
+        };
+        sleeper.setOnSucceeded(sleeperEvent -> {
+            label.setVisible(false);
+        });
+
+        new Thread(sleeper).start();
+    }
 
     // Top HBox Event Handlers
     @FXML
@@ -582,18 +600,20 @@ public class EmployeeProfileController {
             if (success) {
                 viewReportButton.setDisable(false);
                 generateMessageText.setFill(Color.GREEN);
-                generateMessageText.setText("Report generated successfully.");
+                generateMessageText.setText(Constants.GENERATE_REPORT_SUCCESS);
+                System.out.println("Report generated successfully.");
             }
             else {
                 generateMessageText.setFill(Color.RED);
-                generateMessageText.setText("Generating report failed.");
+                generateMessageText.setText(Constants.GENERATE_REPORT_FAILED);
+                System.out.println("Generating report failed.");
             }
 
         }
         else {
-            System.out.println("Insert required data.");
             generateMessageText.setFill(Color.RED);
-            generateMessageText.setText("Insert required data.");
+            generateMessageText.setText(Constants.MISSING_REQUIREMENTS);
+            System.out.println("Insert required data.");
         }
 
     }
@@ -612,6 +632,7 @@ public class EmployeeProfileController {
         // TODO: Get report images
         App.popUpLaunch(viewExistingReportsButton, "TwoReportsPopUp");
     }
+
 
     // Handle Complaints Handlers
     @FXML

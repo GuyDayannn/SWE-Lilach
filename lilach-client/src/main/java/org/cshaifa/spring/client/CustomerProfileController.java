@@ -112,12 +112,10 @@ public class CustomerProfileController {
 
     @FXML
     void sendComplaint(ActionEvent event) throws ExecutionException, InterruptedException {
-        if (customer != null && !complaintDescription.getText().isEmpty()) {
+        if (customer != null && !complaintDescription.getText().isEmpty() && storesComboBox.getValue()!=null) {
             int storeID = storesComboBox.getValue().intValue();
             Store store = storeList.get(storeID-1);
             Task<AddComplaintResponse> addComplaintTask = App.createTimedTask(() -> {
-                System.out.printf("customer is: ", customer.getUsername());
-                System.out.printf("%d%n", customer.getId());
                 return ClientHandler.addComplaint(complaintDescription.getText().strip(), customer, store);
             }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
@@ -135,8 +133,10 @@ public class CustomerProfileController {
             addComplaintTask.setOnFailed(e2 -> {
                 // TODO: maybe properly log it somewhere
                 System.out.println("Add complaint failed!");
+                added_complaint_text.setVisible(true);
                 added_complaint_text.setText(Constants.UPDATED_COMPLAINT_FAILED);
                 added_complaint_text.setTextFill(Color.RED);
+                messageDisappearanceTask(4000, added_complaint_text);
                 addComplaintTask.getException().printStackTrace();
             });
             try {
@@ -151,12 +151,34 @@ public class CustomerProfileController {
             }
 
             System.out.println("Add complaint Success!");
+            added_complaint_text.setVisible(true);
             added_complaint_text.setText(Constants.UPDATED_COMPLAINT);
             added_complaint_text.setTextFill(Color.GREEN);
+            messageDisappearanceTask(4000, added_complaint_text);
         } else {
-            invalid_customer_text.setText("failed to get customer ");
+            invalid_customer_text.setVisible(true);
+            invalid_customer_text.setText(Constants.MISSING_REQUIREMENTS);
             invalid_customer_text.setTextFill(Color.RED);
+            messageDisappearanceTask(4000, invalid_customer_text);
         }
+    }
+
+    private void messageDisappearanceTask(long millis, Label label) {
+        Task<Void> sleeper = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    Thread.sleep(millis);
+                } catch (InterruptedException e) {
+                }
+                return null;
+            }
+        };
+        sleeper.setOnSucceeded(sleeperEvent -> {
+            label.setVisible(false);
+        });
+
+        new Thread(sleeper).start();
     }
 
     private void addButtonToTable() { //adding cancel order button
@@ -177,26 +199,24 @@ public class CustomerProfileController {
                             if (alert.getResult() == ButtonType.YES) {
                                 Order data = getTableView().getItems().get(getIndex());
 
-                                Timestamp nowTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                                if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 3) {
-                                    //return customer full amount
-                                    //TODO
-                                } else if (nowTimestamp.getTime() - data.getSupplyDate().getTime() >= 1) {
-                                    //return customer 50% of order sum
-                                } else {
-                                    //not returning customer
-                                }
-
                                 Task<UpdateOrdersResponse> removeOrderTask = App.createTimedTask(() -> {
                                     return ClientHandler.updateOrders(data);
                                 }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
                                 removeOrderTask.setOnSucceeded(e -> {
                                     UpdateOrdersResponse response = removeOrderTask.getValue();
-                                    //ordersList.remove(data);//remove in UI locally
                                     customerOrderList.remove(data);
+                                    cancelOrderText.setVisible(true);
                                     cancelOrderText.setText(Constants.CANCEL_ORDER);
                                     cancelOrderText.setTextFill(Color.GREEN);
+
+                                    messageDisappearanceTask(4000, cancelOrderText);
+
+                                    Timestamp cancelTime = new Timestamp(Calendar.getInstance().getTime().getTime());
+                                    System.out.println("Cancellation time:\t" + cancelTime);
+                                    String refundAmount = String.format("%,.2f", data.getRefundAmount(cancelTime));
+                                    Alert cancelMessage = new Alert(Alert.AlertType.INFORMATION, "This is your refund amount: " + refundAmount, ButtonType.CLOSE);
+                                    cancelMessage.showAndWait();
 
                                     if (!response.isSuccessful()) {
                                         // TODO: maybe log the specific exception somewhere
@@ -208,8 +228,11 @@ public class CustomerProfileController {
                                 removeOrderTask.setOnFailed(e -> {
                                     // TODO: maybe properly log it somewhere
                                     System.out.println("Cancel order failed!");
-                                    added_complaint_text.setText(Constants.CANCEL_ORDER_FAILED);
-                                    added_complaint_text.setTextFill(Color.RED);
+                                    cancelOrderText.setVisible(true);
+                                    cancelOrderText.setText(Constants.CANCEL_ORDER_FAILED);
+                                    cancelOrderText.setTextFill(Color.RED);
+
+                                    messageDisappearanceTask(4000, cancelOrderText);
                                     removeOrderTask.getException().printStackTrace();
                                 });
 
@@ -245,7 +268,7 @@ public class CustomerProfileController {
             }
         };
         colBtn.setCellFactory(cellFactory);
-        if (orderTable.getColumns().contains(colBtn)==false)
+        if (!orderTable.getColumns().contains(colBtn))
             orderTable.getColumns().add(colBtn);
     }
 

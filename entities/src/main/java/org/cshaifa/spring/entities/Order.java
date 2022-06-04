@@ -1,6 +1,7 @@
 package org.cshaifa.spring.entities;
 
 import java.io.Serializable;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
 
@@ -127,5 +128,28 @@ public class Order implements Serializable {
 
     public long getId() {
         return id;
+    }
+
+    public double getRefundAmount(Timestamp cancelTime) {
+        if (cancelTime.after(supplyDate)) {
+            return 0;
+        }
+        System.out.println("Supply Date:\t" + supplyDate);
+        long milliseconds = supplyDate.getTime() - cancelTime.getTime();
+        int seconds = (int) milliseconds / 1000;
+        int hours = seconds / 3600;
+        int minutes = (seconds % 3600) / 60;
+        seconds = (seconds % 3600) % 60;
+
+        if (hours >= 3) {
+            return total;
+        }
+        else if (hours >= 1) {
+            return 0.5*total;
+        }
+        else if (hours < 0) {   // overflow
+            return total;
+        }
+        else return 0;
     }
 }
