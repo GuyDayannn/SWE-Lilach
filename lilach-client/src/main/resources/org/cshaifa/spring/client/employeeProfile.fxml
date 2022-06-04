@@ -12,14 +12,14 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
 <AnchorPane prefHeight="500.0" prefWidth="600.0" stylesheets="@stylesheets/employee-profile.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
    <children>
       <HBox prefHeight="40.0" prefWidth="600.0">
@@ -64,7 +64,7 @@
                                           <HBox alignment="CENTER" spacing="5.0">
                                              <children>
                                                 <ComboBox fx:id="storeComboBox" onAction="#selectStore" prefWidth="175.0" />
-                                                <CheckBox mnemonicParsing="false" text="Chain" />
+                                                <CheckBox fx:id="chainReport" mnemonicParsing="false" onAction="#selectChain" text="Chain" />
                                              </children>
                                           </HBox>
                                           <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:" translateX="-28.0">
@@ -107,7 +107,14 @@
                                     <Button fx:id="viewReportButton" disable="true" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
                                  </children>
                               </HBox>
-                              <HBox prefHeight="100.0" prefWidth="600.0" />
+                              <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="600.0">
+                                 <children>
+                                    <Text fx:id="generateMessageText" strokeType="OUTSIDE" strokeWidth="0.0">
+                                       <font>
+                                          <Font name="System Italic" size="12.0" />
+                                       </font>
+                                    </Text>
+                                 </children></HBox>
                            </children>
                         </VBox>
                      </children>
@@ -130,7 +137,7 @@
                                                 <ComboBox fx:id="selectReport1CB" prefWidth="150.0" />
                                              </children>
                                           </VBox>
-                                           <Button fx:id="addReportViewButton" mnemonicParsing="false" text="Add Report">
+                                           <Button fx:id="addReportViewButton" mnemonicParsing="false" text="Add Report" translateY="8.0">
                                                <graphic>
                                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                        <image>
@@ -144,15 +151,15 @@
                                        <children>
                                           <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
                                              <children>
-                                                <Text fx:id="selectReport2CBText" strokeType="OUTSIDE" strokeWidth="0.0" visible="false" text="Select Report 2:" />
-                                                <ComboBox fx:id="selectReport2CB" visible="false" prefWidth="150.0" />
+                                                <Text fx:id="selectReport2CBText" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report 2:" visible="false" />
+                                                <ComboBox fx:id="selectReport2CB" prefWidth="150.0" visible="false" />
                                              </children>
                                           </VBox>
                                        </children>
                                     </HBox>
                                  </children>
                               </VBox>
-                              <Button fx:id="viewExistingReportsButton" mnemonicParsing="false" disable="true" text="View Report" />
+                              <Button fx:id="viewExistingReportsButton" disable="true" mnemonicParsing="false" text="View Report" />
                            </children>
                         </HBox>
                      </children></AnchorPane>

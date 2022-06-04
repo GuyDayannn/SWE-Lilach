@@ -31,10 +31,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Report {
 
@@ -47,6 +44,17 @@ public class Report {
     private LocalDate endDate;
 
     private String reportPath;
+
+
+    public Report(ReportType reportType, Store store, LocalDate startDate, LocalDate endDate) {
+        this.reportType = reportType;
+        this.store = store;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public Report() {
+    }
 
     Map<LocalDate, Integer> getDailyOrderValues(List<Order> orders) {
         Map<LocalDate, Integer> dailyValues = new HashMap<>();
@@ -73,7 +81,6 @@ public class Report {
 
         return dailyValues;
     }
-
 
     Map<LocalDate, Integer> getDailyRevenueValues(List<Order> orders) {
         Map<LocalDate, Integer> dailyValues = new HashMap<>();
@@ -120,7 +127,6 @@ public class Report {
         return dailyValues;
     }
 
-
     public XYDataset createDataset(Map<LocalDate, Integer> dailyValues) {
 
         ZoneId defaultZoneId = ZoneId.systemDefault();
@@ -141,41 +147,25 @@ public class Report {
         return dataset;
     }
 
-    public Report(ReportType reportType, Store store, LocalDate startDate, LocalDate endDate) {
-        this.reportType = reportType;
-        this.store = store;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
+    public String getReportPath() { return reportPath; }
 
-    public Report() {
-    }
-
-    public String getReportPath(){return reportPath;}
-
-    public void generateHistogram() {
-        if (store == null) {
-            // Generate histogram for entire chain
-        }
-        else {
-            // Generate histogram for store
-        }
+    public boolean generateHistogram() {
         XYDataset dataset = null;
         String histTitle="";
-        if(store!=null){
-            if(reportType== ReportType.ORDERS){ //numbers of orders per date
+        if (store!=null) {
+            if (reportType== ReportType.ORDERS){ //numbers of orders per date
                 List<Order> storeOrders = store.getOrders();
                 Map<LocalDate, Integer> dailyValues = getDailyOrderValues(storeOrders);
                 dataset = createDataset(dailyValues);
                 histTitle = store.getName()+" Orders Histogram";
             }
-            else if(reportType== ReportType.COMPLAINTS){
+            else if (reportType== ReportType.COMPLAINTS){
                 List<Complaint> complaintList = store.getComplaints();
                 Map<LocalDate, Integer> dailyValues = getDailyComplaints(complaintList);
                 dataset = createDataset(dailyValues);
                 histTitle = store.getName()+" Complaint Histogram";
             }
-            else if(reportType== ReportType.REVENUE){
+            else if (reportType== ReportType.REVENUE){
                 List<Order> storeOrders = store.getOrders();
                 Map<LocalDate, Integer> dailyValues = getDailyRevenueValues(storeOrders);
                 dataset = createDataset(dailyValues);
@@ -202,12 +192,77 @@ public class Report {
 
         try {
             //reportPath = "E:\\java-proj\\SWE-Lilach\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
-            reportPath = "..\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+            reportPath = "..\\entities\\src\\main\\images\\histograms\\histogram_"+store.getName()+"_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
             File histFile = new File(reportPath);
             ChartUtils.saveChartAsPNG(histFile.getAbsoluteFile(), chart, 500, 270);
+            return true;
         } catch (IOException e) {
             System.out.println("Creating histogram image failed.");
             e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public boolean generateChainHistogram(List<Store> storeList) {
+        XYDataset dataset = null;
+        String histTitle="";
+        if (storeList!=null) {
+            switch (reportType) {
+                case ORDERS -> {
+                    List<Order> allOrders = new ArrayList<>();
+                    for (Store store : storeList) {
+                        allOrders.addAll(store.getOrders());
+                    }
+                    Map<LocalDate, Integer> dailyValues = getDailyOrderValues(allOrders);
+                    dataset = createDataset(dailyValues);
+                    histTitle = "Lilach Chain Orders Histogram";
+                }
+                case COMPLAINTS -> {
+                    List<Complaint> allComplaints = new ArrayList<>();
+                    for (Store store : storeList) {
+                        allComplaints.addAll(store.getComplaints());
+                    }
+                    Map<LocalDate, Integer> dailyValues = getDailyComplaints(allComplaints);
+                    dataset = createDataset(dailyValues);
+                    histTitle = "Lilach Chain Complaint Histogram";
+                }
+                case REVENUE -> {
+                    List<Order> allOrders = new ArrayList<>();
+                    for (Store store : storeList) {
+                        allOrders.addAll(store.getOrders());
+                    }
+                    Map<LocalDate, Integer> dailyValues = getDailyRevenueValues(allOrders);
+                    dataset = createDataset(dailyValues);
+                    histTitle = "Lilach Chain Revenue Histogram";
+                }
+            }
+        }
+
+        final XYItemRenderer renderer1 = new XYBarRenderer();
+
+        final DateAxis domainAxis = new DateAxis("Date");
+        final ValueAxis rangeAxis = new NumberAxis("Value");
+
+        final XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer1);
+
+        final JFreeChart chart = new JFreeChart(histTitle, plot);
+        final ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
+        chartPanel.setMouseZoomable(true, false);
+
+        //JFreeChart histogram = ChartFactory.createTimeSeriesChart("JFreeChart Histogram", "Time", "Revenue", dataset);
+
+        try {
+            //reportPath = "E:\\java-proj\\SWE-Lilach\\entities\\src\\main\\images\\histograms\\histogram_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+            reportPath = "..\\entities\\src\\main\\images\\histograms\\histogram_"+"Lilach"+"_"+reportType.toString()+ "_"+startDate.toString() + "_" + endDate.toString() + ".png" ;
+            File histFile = new File(reportPath);
+            ChartUtils.saveChartAsPNG(histFile.getAbsoluteFile(), chart, 500, 270);
+            return true;
+        } catch (IOException e) {
+            System.out.println("Creating histogram image failed.");
+            e.printStackTrace();
+            return false;
         }
 
     }

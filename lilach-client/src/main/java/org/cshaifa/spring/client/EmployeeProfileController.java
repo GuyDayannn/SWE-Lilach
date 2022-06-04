@@ -50,7 +50,7 @@ public class EmployeeProfileController {
     private TitledPane handleUsersPane;
 
 
-    // Generate Store Reports
+    // Generate Store Reports Pane
     @FXML
     private ComboBox<String> storeComboBox;
     @FXML
@@ -61,9 +61,13 @@ public class EmployeeProfileController {
     private DatePicker endDatePicker;
     @FXML
     private Button viewReportButton;
+    @FXML
+    private CheckBox chainReport;
+    @FXML
+    private Text generateMessageText;
 
 
-    // View Existing Reports
+    // View Existing Reports Pane
     @FXML
     private Button addReportViewButton;
     @FXML
@@ -76,7 +80,7 @@ public class EmployeeProfileController {
     private Text selectReport2CBText;
 
 
-    // View/Handle Complaints
+    // View/Handle Complaints  Pane
     @FXML
     private TextArea complaintDescription;
     @FXML
@@ -93,7 +97,7 @@ public class EmployeeProfileController {
     private Label updated_complaint_text;
 
 
-    // View/Handle Users
+    // View/Handle Users Pane
     @FXML
     private Button editEmployeeBtn;
     @FXML
@@ -133,12 +137,11 @@ public class EmployeeProfileController {
     private Customer selectedCustomer = new Customer();
 
     // Init lists from database
-    void initEditEmployees(){
+    void initEditEmployees() {
         employeesTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
             System.out.println(t);
             System.out.println(t1);
             if (t1!=null && t1.equals("Chain Employee")) {
-                System.out.println("hadpasa");
                 selectEmployeeComboBox.setDisable(false);
                 selectEmployeeComboBox.getItems().clear();
                 employeeStatusComboBox.getItems().clear();
@@ -267,7 +270,7 @@ public class EmployeeProfileController {
         });
     }
 
-    void initUsers(){
+    void initUsers() {
         Task<GetUsersResponse> getUsersTask = App.createTimedTask(() -> {
             return ClientHandler.getUsers();
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
@@ -342,7 +345,7 @@ public class EmployeeProfileController {
         //new Thread(getUsersTask).start();
     }
 
-    void initComplaints(){
+    void initComplaints() {
         //initialize complaints below:
         Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
             return ClientHandler.getComplaints();
@@ -395,7 +398,7 @@ public class EmployeeProfileController {
 
     }
 
-    void initStores(){
+    void initStores() {
         Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
             return ClientHandler.getStores();
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
@@ -439,7 +442,7 @@ public class EmployeeProfileController {
 
 
     // Create tasks
-    public void createTaskCustUpdate(boolean toFreeze){
+    public void createTaskCustomerUpdate(boolean toFreeze){
         Task<FreezeCustomerResponse> editCustomerTask = App.createTimedTask(() -> {
             return ClientHandler.freezeCustomer(selectedCustomer, toFreeze);
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
@@ -527,11 +530,23 @@ public class EmployeeProfileController {
     @FXML
     void selectStore(ActionEvent event) {
         String storeName = storeComboBox.getValue();
-        for(Store store: storesList){
+        for (Store store: storesList) {
             if(store.getName().equals(storeName)){
                 reportStore = store;
                 break;
             }
+        }
+    }
+
+    @FXML
+    void selectChain(ActionEvent event) {
+        if (chainReport.isSelected()) {
+            reportStore = null;
+            storeComboBox.setDisable(true);
+        }
+        else {
+            selectStore(event);
+            storeComboBox.setDisable(false);
         }
     }
 
@@ -557,9 +572,32 @@ public class EmployeeProfileController {
 
     @FXML
     void generateReport(ActionEvent event) {
-        report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
-        report.generateHistogram();
-        viewReportButton.setDisable(false);
+        if (reportType!=null && reportStartDate!=null && reportEndDate!=null) {
+            report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
+
+            boolean success = false;
+            if (chainReport.isSelected()) {
+                success = report.generateChainHistogram(storesList);
+            }
+            else {
+                success = report.generateHistogram();
+            }
+            if (success) {
+                viewReportButton.setDisable(false);
+                generateMessageText.setFill(Color.GREEN);
+                generateMessageText.setText("Report generated successfully.");
+            }
+            else {
+                generateMessageText.setFill(Color.RED);
+                generateMessageText.setText("Generating report failed.");
+            }
+
+        }
+        else {
+            System.out.println("Insert required data.");
+            generateMessageText.setFill(Color.RED);
+            generateMessageText.setText("Insert required data.");
+        }
 
     }
 
@@ -671,11 +709,11 @@ public class EmployeeProfileController {
         boolean createTask = false;
         if(selectedStatus.equals("Active") && selectedCustomer.isFrozen()){
             //selectedCustomer.freeze();
-            createTaskCustUpdate(false);
+            createTaskCustomerUpdate(false);
         }
         if(selectedStatus.equals("Frozen") && !selectedCustomer.isFrozen()){
             //selectedCustomer.unfreeze();
-            createTaskCustUpdate(true);
+            createTaskCustomerUpdate(true);
         }
     }
 
@@ -781,6 +819,7 @@ public class EmployeeProfileController {
                 viewTwoReportsPane.setVisible(false);
             }*/
             if (App.getCurrentUser().getClass() == StoreManager.class) {
+                chainReport.setVisible(false);
                 employeeControls.getPanes().remove(handleUsersPane);
             } else if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
                 employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleUsersPane);
