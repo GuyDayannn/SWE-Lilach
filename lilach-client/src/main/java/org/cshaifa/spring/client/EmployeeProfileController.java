@@ -71,6 +71,8 @@ public class EmployeeProfileController {
     @FXML
     private Button addReportViewButton;
     @FXML
+    private Button removeReportViewButton;
+    @FXML
     private Button viewExistingReportsButton;
     @FXML
     private ComboBox<String> selectReport1CB;
@@ -609,6 +611,13 @@ public class EmployeeProfileController {
     }
 
 
+    // View Existing Reports Handlers
+    @FXML
+    void viewExistingReports(ActionEvent event) {
+        // TODO: Get report images
+        App.popUpLaunch(viewExistingReportsButton, "TwoReportsPopUp");
+    }
+
     // Handle Complaints Handlers
     @FXML
     void openComplaint(ActionEvent event) {
@@ -806,6 +815,17 @@ public class EmployeeProfileController {
             public void handle(ActionEvent event) {
                 selectReport2CB.setVisible(true);
                 selectReport2CBText.setVisible(true);
+                removeReportViewButton.setVisible(true);
+                addReportViewButton.setVisible(false);
+            }
+        });
+        removeReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                selectReport2CB.setVisible(false);
+                selectReport2CBText.setVisible(false);
+                removeReportViewButton.setVisible(false);
+                addReportViewButton.setVisible(true);
             }
         });
 

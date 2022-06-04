@@ -51,7 +51,6 @@ public class App extends Application {
 
     private static CatalogItem currentItemDisplayed;
     private static CatalogItem itemByID;
-    private static int DataBaseConnected = 0;
     private static Stage loadingStage;
     private static Node loadingRootNode;
     private static ScheduledFuture<Void> scheduledCancelButtonShow;
@@ -88,6 +87,7 @@ public class App extends Application {
     private static String cardExpDate;
 
     private static boolean enteredSupplyDetails = false;
+
     private static Report report;
 
     @Override

@@ -155,11 +155,20 @@
                                                 <ComboBox fx:id="selectReport2CB" prefWidth="150.0" visible="false" />
                                              </children>
                                           </VBox>
+                                          <Button fx:id="removeReportViewButton" visible="false" mnemonicParsing="false" text="Remove">
+                                             <graphic>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@images/remove.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </Button>
                                        </children>
                                     </HBox>
                                  </children>
                               </VBox>
-                              <Button fx:id="viewExistingReportsButton" disable="true" mnemonicParsing="false" text="View Report" />
+                              <Button fx:id="viewExistingReportsButton" disable="true" mnemonicParsing="false" onAction="#viewExistingReports" text="View Report" />
                            </children>
                         </HBox>
                      </children></AnchorPane>
