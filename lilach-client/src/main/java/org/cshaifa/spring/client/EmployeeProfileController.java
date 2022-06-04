@@ -9,10 +9,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
@@ -29,64 +27,17 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class EmployeeProfileController {
-    @FXML
-    private Button editEmployeeBtn;
-    @FXML
-    private TextField customerAccountText;
-    @FXML
-    private TextField employeeStatusText;
-    @FXML
-    private ComboBox<String> customerComboBox;
-    @FXML
-    private ComboBox<String> customerStatusComboBox;
-    @FXML
-    private Button editCatalogButton;
-    @FXML
-    private Button exitButton;
-    @FXML
-    private Button cancelButton;
-    @FXML
-    private Button catalogButton;
-    @FXML
-    private TableView<CatalogItem> catalogTable;
-    @FXML
-    private Button closeComplaintButton;
-    @FXML
-    private TextField compensationamount;
-    @FXML
-    private ComboBox<Long> complaintComboBox;
-    @FXML
-    private TextField complaintStatus;
-    @FXML
-    private TextArea complaintdescription;
-    @FXML
-    private TextField complaintresponse;
-    @FXML
-    private TextField discountAmount;
-    @FXML
-    private ComboBox<Text> itemComboBox;
-    @FXML
-    private CheckBox selectAllCheckbox;
-    @FXML
-    private TableColumn<CatalogItem, Double> discountColumn;
-    @FXML
-    private TableColumn<CatalogItem, Long> idColumn;
-    @FXML
-    private TableColumn<CatalogItem, String> itemNameColumn;
-    @FXML
-    private TableColumn<CatalogItem, Double> itemPriceColumn;
-    @FXML
-    private TableColumn<CatalogItem, Boolean> onsaleColumn;
-    @FXML
-    private TableColumn<CatalogItem, Boolean> selectColumn;
-    @FXML
-    private Button updateSalesButton;
-    @FXML
-    private Button viewComplaint;
+
+    // Top HBox
     @FXML
     private Text welcomeText;
     @FXML
-    private Label updated_complaint_text;
+    private Button catalogButton;
+    @FXML
+    private Button exitButton;
+
+
+    // Accordion Objects
     @FXML
     private Accordion employeeControls;
     @FXML
@@ -97,6 +48,9 @@ public class EmployeeProfileController {
     private TitledPane handleComplaintsPane;
     @FXML
     private TitledPane handleUsersPane;
+
+
+    // Generate Store Reports
     @FXML
     private ComboBox<String> storeComboBox;
     @FXML
@@ -107,14 +61,9 @@ public class EmployeeProfileController {
     private DatePicker endDatePicker;
     @FXML
     private Button viewReportButton;
-    @FXML
-    private ComboBox<String> employeesTypeComboBox;
-    @FXML
-    private ComboBox<String> selectEmployeeComboBox;
-    @FXML
-    private ComboBox<String> selectStoreComboBox;
-    @FXML
-    private ComboBox<String> employeeStatusComboBox;
+
+
+    // View Existing Reports
     @FXML
     private Button addReportViewButton;
     @FXML
@@ -126,272 +75,64 @@ public class EmployeeProfileController {
     @FXML
     private Text selectReport2CBText;
 
+
+    // View/Handle Complaints
+    @FXML
+    private TextArea complaintDescription;
+    @FXML
+    private TextField complaintResponse;
+    @FXML
+    private TextField complaintStatus;
+    @FXML
+    private Button closeComplaintButton;
+    @FXML
+    private TextField compensationAmount;
+    @FXML
+    private ComboBox<Long> complaintComboBox;
+    @FXML
+    private Label updated_complaint_text;
+
+
+    // View/Handle Users
+    @FXML
+    private Button editEmployeeBtn;
+    @FXML
+    private TextField customerAccountText;
+    @FXML
+    private TextField employeeStatusText;
+    @FXML
+    private ComboBox<String> customerComboBox;
+    @FXML
+    private ComboBox<String> customerStatusComboBox;
+    @FXML
+    private ComboBox<String> employeesTypeComboBox;
+    @FXML
+    private ComboBox<String> selectEmployeeComboBox;
+    @FXML
+    private ComboBox<String> selectStoreComboBox;
+    @FXML
+    private ComboBox<String> employeeStatusComboBox;
+
+
     // Variables
     private List<Complaint> complaintList;
     private List<Store> storesList;
     private List<User> userList;
     private List<Customer> customerList = new ArrayList<>();
-
     private List<ChainEmployee> chainEmployeeList= new ArrayList<>();
     private List<CustomerServiceEmployee> customerServiceList= new ArrayList<>();
     private List<StoreManager> storeManagersList= new ArrayList<>();
     private List<Employee> employeeList= new ArrayList<>();
     private ChainManager chainManager;
     private SystemAdmin systemAdmin;
-
     private LocalDate reportStartDate;
     private LocalDate reportEndDate;
     private ReportType reportType;
     private Store reportStore;
     private Report report;
-
     private Customer selectedCustomer = new Customer();
-    //private Employee selectedEmployee = null;
 
-
-
-    @FXML
-    void cancelUpdate(ActionEvent event) {
-        System.out.println("You clicked Cancel");
-        discountAmount.setText("");
-        //cancelButton.getScene().getWindow().s
-        //App.setContent("employee profile");
-    }
-
-    @FXML
-    void showCatalogIds(ActionEvent event) {
-        long selectedId = Long.parseLong(itemComboBox.getValue().toString());
-
-    }
-
-    @FXML
-    void openComplaint(ActionEvent event) {
-        //on view complaint click
-        //first clearning screens
-        complaintdescription.clear();
-        complaintStatus.clear();
-        compensationamount.clear();
-        complaintresponse.clear();
-
-        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
-        Complaint complaint = complaintList.get((int) complaintID);
-
-        complaintdescription.setText(complaint.getComplaintDescription());
-        String complaintStatusStr = "";
-        if (complaint.getIsComplaintOpen()) {
-            complaintStatusStr = "Open";
-        } else {
-            complaintStatusStr = "Closed";
-        }
-
-        complaintStatus.setText(complaintStatusStr);
-        compensationamount.setText((Double.toString(complaint.getCompensationAmount())));
-        complaintresponse.setText((complaint.getComplaintResponse()));
-    }
-
-    @FXML
-    void closeComplaint(ActionEvent event) { //TODO: fix it closes the correct complaint
-        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
-        Complaint updatedComplaint = complaintList.get((int) complaintID);
-        updatedComplaint.setComplaintResponse(complaintresponse.getText());
-        updatedComplaint.setComplaintOpen(false);
-        double compensationNum  = Double.parseDouble(compensationamount.getText());
-        updatedComplaint.setCompensationAmount(compensationNum);
-
-        complaintComboBox.valueProperty().setValue(null);
-        complaintresponse.setText("");
-        compensationamount.setText("");
-        complaintStatus.setText("");
-        complaintdescription.setText("");
-
-        Task<UpdateComplaintResponse> updateComplaintTask = App.createTimedTask(() -> {
-            return ClientHandler.updateComplaint(updatedComplaint);
-        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        updateComplaintTask.setOnSucceeded(e -> {
-            UpdateComplaintResponse response = updateComplaintTask.getValue();
-            if (!response.isSuccessful()) {
-                // TODO: maybe log the specific exception somewhere
-                System.err.println("Updating Complaint failed");
-                updated_complaint_text.setText("Failed to close complaint");
-                updated_complaint_text.setTextFill(Color.RED);
-                return;
-            }
-            updated_complaint_text.setText("You have successfully closed the complaint");
-            updated_complaint_text.setTextFill(Color.GREEN);
-        });
-
-        updateComplaintTask.setOnFailed(e -> {
-            // TODO: maybe properly log it somewhere
-            updateComplaintTask.getException().printStackTrace();
-            updated_complaint_text.setText("Failed to close complaint");
-            updated_complaint_text.setTextFill(Color.RED);
-        });
-        //new Thread(updateComplaintTask).start();
-        try {
-            Thread t2 = new Thread(updateComplaintTask);
-            t2.start();
-            t2.join();
-        } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-        }
-    }
-
-    @FXML
-    void exitProfile(ActionEvent event) throws IOException {
-        App.logoutUser();
-        App.setWindowTitle("primary");
-        App.setContent("primary");
-    }
-
-    @FXML
-    void goCatalog(ActionEvent event) throws IOException {
-        App.setWindowTitle("Edit Catalog");
-        App.setContent("catalog");
-    }
-
-    @FXML
-    void selectStore(ActionEvent event) {
-        String storeName = storeComboBox.getValue();
-        for(Store store: storesList){
-            if(store.getName().equals(storeName)){
-                reportStore = store;
-                break;
-            }
-        }
-    }
-
-    @FXML
-    void selectReportType(ActionEvent event) {
-        String report = reportTypeComboBox.getValue();
-        if(report.equals("Orders"))
-            reportType = ReportType.ORDERS;
-        else if (report.equals("Revenue"))
-            reportType = ReportType.REVENUE;
-        else if(report.equals("Complaints"))
-            reportType = ReportType.COMPLAINTS;
-    }
-
-    @FXML
-    void setStartDate(ActionEvent event) {
-        reportStartDate = startDatePicker.getValue();
-    }
-
-    @FXML
-    void setEndDate(ActionEvent event) {
-        reportEndDate = endDatePicker.getValue();
-    }
-
-    @FXML
-    void generateReport(ActionEvent event) {
-        report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
-        report.generateHistogram();
-        viewReportButton.setDisable(false);
-
-    }
-
-    @FXML
-    void viewReport(ActionEvent event) {
-        String path = report.getReportPath();
-        App.setCurrentReportDisplayed(report);
-        App.popUpLaunch(viewReportButton, "ReportPopUp");
-    }
-
-    void initComplaints(){
-        //initialize complaints below:
-        Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
-            return ClientHandler.getComplaints();
-        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        getComplaintsTask.setOnSucceeded(e -> {
-            if (getComplaintsTask.getValue() == null) {
-                App.hideLoading();
-                System.err.println("Getting complaints failed");
-                return;
-            }
-            GetComplaintsResponse response = getComplaintsTask.getValue();
-            if (!response.isSuccessful()) {
-                // TODO: maybe log the specific exception somewhere
-                App.hideLoading();
-                System.err.println("Getting complaints failed");
-                return;
-            }
-            complaintList = response.getComplaintList();
-
-            List<Long> complaintListID = new ArrayList<Long>();
-            ObservableList<Long> data = FXCollections.observableArrayList();
-            //showing customer only his complaints
-            if (complaintList.size() >= 1) {
-                for (int i = 0; i < complaintList.size()-1; i++) {
-                    Long id = (complaintList.get(i).getId()); //id 1 shows complaint 2
-                    if(id!=0.0) {
-                        complaintListID.add(id);
-                    } //TODO: fix index id jumps in 1
-                }
-            }
-
-            data.addAll(complaintListID); //adding to dropdown combo
-            complaintComboBox.setItems(data);
-        });
-
-        getComplaintsTask.setOnFailed(e -> {
-            // TODO: maybe log somewhere else...
-            getComplaintsTask.getException().printStackTrace();
-        });
-
-        try {
-            Thread t2 = new Thread(getComplaintsTask);
-            t2.start();
-            t2.join();
-        } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-        }
-//        new Thread(getComplaintsTask).start();
-
-    }
-
-    void initStores(){
-        Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
-            return ClientHandler.getStores();
-        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        getStoresTask.setOnSucceeded(e -> {
-            if (getStoresTask.getValue() == null) {
-                App.hideLoading();
-                System.err.println("Getting stores failed");
-                return;
-            }
-            GetStoresResponse response = getStoresTask.getValue();
-            if (!response.isSuccessful()) {
-                // TODO: maybe log the specific exception somewhere
-                App.hideLoading();
-                System.err.println("Getting stores failed");
-                return;
-            }
-            storesList = response.getStores();
-
-            for (Store store : storesList) {
-                //System.out.println(store.getName());
-                storeComboBox.getItems().add(store.getName());
-            }
-
-        });
-
-        getStoresTask.setOnFailed(e -> {
-            // TODO: maybe log somewhere else...
-            getStoresTask.getException().printStackTrace();
-        });
-        try {
-            Thread t2 = new Thread(getStoresTask);
-            t2.start();
-            t2.join();
-        } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-        }
-        //new Thread(getStoresTask).start();
-
-    }
-
+    // Init lists from database
     void initEditEmployees(){
         employeesTypeComboBox.valueProperty().addListener((ChangeListener<String>) (ov, t, t1) -> {
             System.out.println(t);
@@ -601,69 +342,103 @@ public class EmployeeProfileController {
         //new Thread(getUsersTask).start();
     }
 
-    @FXML
-    public void initialize() {
-        if (App.getCurrentUser() != null) {
-            welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
-        } else {
-            welcomeText.setText("Welcome, unknown employee");
-        }
+    void initComplaints(){
+        //initialize complaints below:
+        Task<GetComplaintsResponse> getComplaintsTask = App.createTimedTask(() -> {
+            return ClientHandler.getComplaints();
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-        addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                selectReport2CB.setVisible(true);
-                selectReport2CBText.setVisible(true);
+        getComplaintsTask.setOnSucceeded(e -> {
+            if (getComplaintsTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting complaints failed");
+                return;
             }
+            GetComplaintsResponse response = getComplaintsTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
+                System.err.println("Getting complaints failed");
+                return;
+            }
+            complaintList = response.getComplaintList();
+
+            List<Long> complaintListID = new ArrayList<Long>();
+            ObservableList<Long> data = FXCollections.observableArrayList();
+            //showing customer only his complaints
+            if (complaintList.size() >= 1) {
+                for (int i = 0; i < complaintList.size()-1; i++) {
+                    Long id = (complaintList.get(i).getId()); //id 1 shows complaint 2
+                    if(id!=0.0) {
+                        complaintListID.add(id);
+                    } //TODO: fix index id jumps in 1
+                }
+            }
+
+            data.addAll(complaintListID); //adding to dropdown combo
+            complaintComboBox.setItems(data);
         });
 
-        //TODO: edit to show only to authorized users
-        if (App.getCurrentUser() != null) {
-            /*
-            if(App.getCurrentUser().getClass() == ChainEmployee.class){
-                paneStoreReport.setVisible(false);
-                paneChainReport.setVisible(false);
-                handleUsersPane.setVisible(false);
-                viewTwoReportsPane.setVisible(false);
-            }*/
-            if (App.getCurrentUser().getClass() == StoreManager.class) {
-                employeeControls.getPanes().remove(handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
-                employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == ChainManager.class) {
-                employeeControls.getPanes().remove(handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == SystemAdmin.class) {
-                employeeControls.getPanes().remove(handleComplaintsPane);
-            }
-        }
+        getComplaintsTask.setOnFailed(e -> {
+            // TODO: maybe log somewhere else...
+            getComplaintsTask.getException().printStackTrace();
+        });
 
-        //calling db server tasks to get data
-        initComplaints();
-        initStores();
-        initUsers();
-        initEditEmployees();
+        try {
+            Thread t2 = new Thread(getComplaintsTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
+//        new Thread(getComplaintsTask).start();
 
     }
 
-    //methods for handle users below
-    @FXML
-    public void selectCustomer(ActionEvent event) {
-        customerAccountText.clear();
-        String custUsername = customerComboBox.getSelectionModel().getSelectedItem();
-        //Customer selectedCustomer = new Customer();
-        for(Customer customer: customerList){
-            if(customer.getUsername().equals(custUsername)){
-                selectedCustomer = customer;
-                break;
+    void initStores(){
+        Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
+            return ClientHandler.getStores();
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        getStoresTask.setOnSucceeded(e -> {
+            if (getStoresTask.getValue() == null) {
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
             }
+            GetStoresResponse response = getStoresTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                App.hideLoading();
+                System.err.println("Getting stores failed");
+                return;
+            }
+            storesList = response.getStores();
+
+            for (Store store : storesList) {
+                //System.out.println(store.getName());
+                storeComboBox.getItems().add(store.getName());
+            }
+
+        });
+
+        getStoresTask.setOnFailed(e -> {
+            // TODO: maybe log somewhere else...
+            getStoresTask.getException().printStackTrace();
+        });
+        try {
+            Thread t2 = new Thread(getStoresTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
         }
-        boolean isFrozen = selectedCustomer.isFrozen();
-        if(isFrozen)
-            customerAccountText.setText("Frozen");
-        else
-            customerAccountText.setText("Active");
+        //new Thread(getStoresTask).start();
+
     }
 
+
+    // Create tasks
     public void createTaskCustUpdate(boolean toFreeze){
         Task<FreezeCustomerResponse> editCustomerTask = App.createTimedTask(() -> {
             return ClientHandler.freezeCustomer(selectedCustomer, toFreeze);
@@ -732,6 +507,164 @@ public class EmployeeProfileController {
         }
     }
 
+
+    // Top HBox Event Handlers
+    @FXML
+    void goCatalog(ActionEvent event) throws IOException {
+        App.setWindowTitle("Edit Catalog");
+        App.setContent("catalog");
+    }
+
+    @FXML
+    void exitProfile(ActionEvent event) throws IOException {
+        App.logoutUser();
+        App.setWindowTitle("primary");
+        App.setContent("primary");
+    }
+
+
+    // Generate Reports Handlers
+    @FXML
+    void selectStore(ActionEvent event) {
+        String storeName = storeComboBox.getValue();
+        for(Store store: storesList){
+            if(store.getName().equals(storeName)){
+                reportStore = store;
+                break;
+            }
+        }
+    }
+
+    @FXML
+    void selectReportType(ActionEvent event) {
+        String report = reportTypeComboBox.getValue();
+        switch (report) {
+            case "Orders" -> reportType = ReportType.ORDERS;
+            case "Revenue" -> reportType = ReportType.REVENUE;
+            case "Complaints" -> reportType = ReportType.COMPLAINTS;
+        }
+    }
+
+    @FXML
+    void setStartDate(ActionEvent event) {
+        reportStartDate = startDatePicker.getValue();
+    }
+
+    @FXML
+    void setEndDate(ActionEvent event) {
+        reportEndDate = endDatePicker.getValue();
+    }
+
+    @FXML
+    void generateReport(ActionEvent event) {
+        report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
+        report.generateHistogram();
+        viewReportButton.setDisable(false);
+
+    }
+
+    @FXML
+    void viewReport(ActionEvent event) {
+        String path = report.getReportPath();
+        App.setCurrentReportDisplayed(report);
+        App.popUpLaunch(viewReportButton, "ReportPopUp");
+    }
+
+
+    // Handle Complaints Handlers
+    @FXML
+    void openComplaint(ActionEvent event) {
+        //on view complaint click
+        //first clearing screens
+        complaintDescription.clear();
+        complaintStatus.clear();
+        compensationAmount.clear();
+        complaintResponse.clear();
+
+        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
+        Complaint complaint = complaintList.get((int) complaintID);
+
+        complaintDescription.setText(complaint.getComplaintDescription());
+        String complaintStatusStr = "";
+        if (complaint.getIsComplaintOpen()) {
+            complaintStatusStr = "Open";
+        } else {
+            complaintStatusStr = "Closed";
+        }
+
+        complaintStatus.setText(complaintStatusStr);
+        compensationAmount.setText((Double.toString(complaint.getCompensationAmount())));
+        complaintResponse.setText((complaint.getComplaintResponse()));
+    }
+
+    @FXML
+    void closeComplaint(ActionEvent event) { //TODO: fix it closes the correct complaint
+        long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
+        Complaint updatedComplaint = complaintList.get((int) complaintID);
+        updatedComplaint.setComplaintResponse(complaintResponse.getText());
+        updatedComplaint.setComplaintOpen(false);
+        double compensationNum  = Double.parseDouble(compensationAmount.getText());
+        updatedComplaint.setCompensationAmount(compensationNum);
+
+        complaintComboBox.valueProperty().setValue(null);
+        complaintResponse.setText("");
+        compensationAmount.setText("");
+        complaintStatus.setText("");
+        complaintDescription.setText("");
+
+        Task<UpdateComplaintResponse> updateComplaintTask = App.createTimedTask(() -> {
+            return ClientHandler.updateComplaint(updatedComplaint);
+        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+        updateComplaintTask.setOnSucceeded(e -> {
+            UpdateComplaintResponse response = updateComplaintTask.getValue();
+            if (!response.isSuccessful()) {
+                // TODO: maybe log the specific exception somewhere
+                System.err.println("Updating Complaint failed");
+                updated_complaint_text.setText("Failed to close complaint");
+                updated_complaint_text.setTextFill(Color.RED);
+                return;
+            }
+            updated_complaint_text.setText("You have successfully closed the complaint");
+            updated_complaint_text.setTextFill(Color.GREEN);
+        });
+
+        updateComplaintTask.setOnFailed(e -> {
+            // TODO: maybe properly log it somewhere
+            updateComplaintTask.getException().printStackTrace();
+            updated_complaint_text.setText("Failed to close complaint");
+            updated_complaint_text.setTextFill(Color.RED);
+        });
+        //new Thread(updateComplaintTask).start();
+        try {
+            Thread t2 = new Thread(updateComplaintTask);
+            t2.start();
+            t2.join();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
+    }
+
+
+    // View/Handle Users
+    @FXML
+    public void selectCustomer(ActionEvent event) {
+        customerAccountText.clear();
+        String custUsername = customerComboBox.getSelectionModel().getSelectedItem();
+        //Customer selectedCustomer = new Customer();
+        for(Customer customer: customerList){
+            if(customer.getUsername().equals(custUsername)){
+                selectedCustomer = customer;
+                break;
+            }
+        }
+        boolean isFrozen = selectedCustomer.isFrozen();
+        if(isFrozen)
+            customerAccountText.setText("Frozen");
+        else
+            customerAccountText.setText("Active");
+    }
+
     @FXML
     public void editCustomerStatus(ActionEvent event) {
         String selectedStatus = customerStatusComboBox.getValue();
@@ -753,15 +686,6 @@ public class EmployeeProfileController {
 
     @FXML
     public void selectEmployee(ActionEvent event) {
-//        employeeStatusText.clear();
-//        String employeeUsername = employeeComboBox.getSelectionModel().toString();
-//        for(Employee employee: employeeList){
-//            if(employee.getUsername().equals(employeeUsername)){
-//                selectedEmployee = employee;
-//                break;
-//            }
-//        }
-//
 
     }
 
@@ -791,7 +715,7 @@ public class EmployeeProfileController {
         else if(employeesTypeComboBox.equals("Chain Employee")){
             System.out.println("inserted into editEmployee chain employee");
             ChainEmployee selectedEmployee = null;
-            for(ChainEmployee employee: chainEmployeeList) {
+            for (ChainEmployee employee: chainEmployeeList) {
                 if (employee.getUsername().equals(employeeName)) {
                     selectedEmployee = employee;
                     break;
@@ -800,7 +724,7 @@ public class EmployeeProfileController {
             createTaskEmployeeUpdate(selectedEmployee, selectedEmployee.getStore(),
                     selectedStatus, "Chain Employee");
         }
-        else if(employeesTypeComboBox.equals("Customer Service")){
+        else if (employeesTypeComboBox.equals("Customer Service")) {
             CustomerServiceEmployee selectedEmployee = null;
             for(CustomerServiceEmployee employee: customerServiceList) {
                 if (employee.getUsername().equals(employeeName)) {
@@ -825,6 +749,53 @@ public class EmployeeProfileController {
 
     @FXML
     public void editManagerStore(ActionEvent event) {
+
+    }
+
+
+
+
+    @FXML
+    public void initialize() {
+        if (App.getCurrentUser() != null) {
+            welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
+        } else {
+            welcomeText.setText("Welcome, unknown employee");
+        }
+
+        addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                selectReport2CB.setVisible(true);
+                selectReport2CBText.setVisible(true);
+            }
+        });
+
+        //TODO: edit to show only to authorized users
+        if (App.getCurrentUser() != null) {
+            /*
+            if(App.getCurrentUser().getClass() == ChainEmployee.class){
+                paneStoreReport.setVisible(false);
+                paneChainReport.setVisible(false);
+                handleUsersPane.setVisible(false);
+                viewTwoReportsPane.setVisible(false);
+            }*/
+            if (App.getCurrentUser().getClass() == StoreManager.class) {
+                employeeControls.getPanes().remove(handleUsersPane);
+            } else if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
+                employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleUsersPane);
+            } else if (App.getCurrentUser().getClass() == ChainManager.class) {
+                employeeControls.getPanes().remove(handleUsersPane);
+            } else if (App.getCurrentUser().getClass() == SystemAdmin.class) {
+                employeeControls.getPanes().remove(handleComplaintsPane);
+            }
+        }
+
+        //calling db server tasks to get data
+        initComplaints();
+        initStores();
+        initUsers();
+        initEditEmployees();
 
     }
 }
