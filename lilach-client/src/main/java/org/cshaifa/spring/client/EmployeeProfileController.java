@@ -741,7 +741,16 @@ public class EmployeeProfileController {
         System.out.println("inserted into editEmployee");
         String selectedStatus = employeeStatusComboBox.getValue();
         String employeeName = selectEmployeeComboBox.getValue();
-
+        Store selectedStore= null;
+        if(selectStoreComboBox.getValue()!=null){
+            String storeName = selectStoreComboBox.getValue();
+            for(Store store : storesList){
+                if(storeName.equals(store.getName())){
+                    selectedStore = store;
+                    break;
+                }
+            }
+        }
         if(employeesTypeComboBox.getValue().equals("Store Manager")){
             System.out.println("inserted into editEmployee store manager");
             StoreManager selectedManager = null;
@@ -751,8 +760,7 @@ public class EmployeeProfileController {
                     break;
                 }
             }
-            createTaskEmployeeUpdate(selectedManager, selectedManager.getStore(),
-                    selectedStatus, "Store Manager");
+            createTaskEmployeeUpdate(selectedManager, selectedStore, selectedStatus, "Store Manager");
         }
         else if(employeesTypeComboBox.getValue().equals("Chain Employee")){
             System.out.println("inserted into editEmployee chain employee");
@@ -763,8 +771,7 @@ public class EmployeeProfileController {
                     break;
                 }
             }
-            createTaskEmployeeUpdate(selectedEmployee, selectedEmployee.getStore(),
-                    selectedStatus, "Chain Employee");
+            createTaskEmployeeUpdate(selectedEmployee, selectedStore, selectedStatus, "Chain Employee");
         }
         else if (employeesTypeComboBox.getValue().equals("Customer Service")) {
             CustomerServiceEmployee selectedEmployee = null;
@@ -774,13 +781,11 @@ public class EmployeeProfileController {
                     break;
                 }
             }
-            createTaskEmployeeUpdate(selectedEmployee, null,
-                    selectedStatus, "Customer Service");
+            createTaskEmployeeUpdate(selectedEmployee, null, selectedStatus, "Customer Service");
         }
 
         else{//we're editing chain maneger
-            createTaskEmployeeUpdate(chainManager, null,
-                    selectedStatus, "Chain Manager");
+            createTaskEmployeeUpdate(chainManager, null, selectedStatus, "Chain Manager");
         }
     }
 

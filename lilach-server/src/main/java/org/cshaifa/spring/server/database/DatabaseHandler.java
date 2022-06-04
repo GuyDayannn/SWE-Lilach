@@ -727,9 +727,6 @@ public class DatabaseHandler {
                     System.out.println("case chain employee customer service");
                     CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee(chainEmployee.getFullName(), chainEmployee.getUsername(),
                             chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
-                    System.out.println("id of new cust service: " + customerServiceEmployee.getId());
-                    customerServiceEmployee.setId(100);
-                    System.out.println("id of new cust service: " + customerServiceEmployee.getId());
                     try {
                         if(oldStore!=null){
                             session.update(oldStore);}
@@ -743,13 +740,14 @@ public class DatabaseHandler {
                         session.merge(chainEmployee);
                     }
                     System.out.println("updated old store");
-
                     try {
                         session.save(customerServiceEmployee); //TODO: fix: flush first?
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
+                    System.out.println("id of new cust service: " + customerServiceEmployee.getId());
+                    //customerServiceEmployee.setId(100);
+                    //System.out.println("id of new cust service: " + customerServiceEmployee.getId());
                     System.out.println("saved customer service");
                 } else if (strNewType.equals("Store Manager")) {
                     //removing prev attachment
@@ -760,8 +758,27 @@ public class DatabaseHandler {
                     //adding new connections
                     StoreManager storeManager = new StoreManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
                             chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt(), store);
-                    session.delete(chainEmployee);
-                    session.save(storeManager);
+                    try {
+                        if(oldStore!=null){
+                            session.update(oldStore);}
+                        session.update(chainEmployee);
+                        session.delete(chainEmployee);
+                        //session.save(customerServiceEmployee);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if(oldStore!=null){
+                            session.merge(oldStore);}
+                        session.merge(chainEmployee);
+                    }
+                    System.out.println("updated old store");
+                    try {
+                        session.save(storeManager); //TODO: fix: flush first?
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+//                    session.delete(chainEmployee);
+//                    session.save(storeManager);
                 } else if (strNewType.equals("Chain Manager")) {
                     ChainManager chainManager = new ChainManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
                             chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
