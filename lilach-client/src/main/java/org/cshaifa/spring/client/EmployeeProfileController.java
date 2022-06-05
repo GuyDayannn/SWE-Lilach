@@ -123,7 +123,7 @@ public class EmployeeProfileController {
 
 
     // Variables
-    private List<Complaint> complaintList;
+    private List<Complaint> complaintList= new ArrayList<>();
     private List<Store> storesList;
     private List<User> userList;
     private List<Customer> customerList = new ArrayList<>();
@@ -677,7 +677,7 @@ public class EmployeeProfileController {
             //Complaint finalComplaint = selectedComplaint;
             System.out.println("complaint id is: " + complaintID);
             String desc ="";
-            if(selectedComplaint.getComplaintDescription()!=null){
+            if(!selectedComplaint.getComplaintDescription().equals(null)){
                 System.out.println("complaint description is: " + selectedComplaint.getComplaintDescription());
                //desc = selectedComplaint.getComplaintDescription();
                 complaintDescription.setText(selectedComplaint.getComplaintDescription());
