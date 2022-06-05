@@ -175,35 +175,83 @@
           </TitledPane>
           <TitledPane fx:id="handleComplaintsPane" animated="false" text="View/Handle Complaints">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
+              <AnchorPane minHeight="0.0" minWidth="0.0" styleClass="anchor-pane">
                      <children>
-                        <ComboBox fx:id="complaintComboBox" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
-                        <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
-                        <TextField fx:id="complaintDescription" alignment="TOP_LEFT" editable="false" layoutX="14.0" layoutY="90.0" prefHeight="186.0" prefWidth="262.0" styleClass="uneditable" text="" />
-                        <TextField fx:id="complaintResponse" alignment="TOP_LEFT" layoutX="299.0" layoutY="90.0" prefHeight="92.0" prefWidth="262.0" text="" />
-                        <Text layoutX="14.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
-                        <Text layoutX="299.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Response:" />
-                        <Button fx:id="viewComplaint" layoutX="175.0" layoutY="26.0" mnemonicParsing="false" onAction="#openComplaint" text="View" />
-                        <Text layoutX="299.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Compensation Amount:" />
-                        <TextField fx:id="compensationAmount" layoutX="299.0" layoutY="219.0" text="" />
-                        <Button fx:id="closeComplaintButton" layoutX="457.0" layoutY="215.0" mnemonicParsing="false" onAction="#closeComplaint" text="Close Complaint" />
-                        <Text layoutX="299.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Status:" />
-                        <TextField fx:id="complaintStatus" editable="false" layoutX="299.0" layoutY="29.0" styleClass="uneditable" text="" />
-                        <Label fx:id="updated_complaint_text" layoutX="299.0" layoutY="259.0" text="" />
+                        <VBox prefHeight="300.0" prefWidth="600.0" spacing="10.0">
+                           <children>
+                              <HBox prefHeight="75.0" prefWidth="600.0">
+                                 <children>
+                                    <VBox prefHeight="75.0" prefWidth="300.0">
+                                       <children>
+                                          <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="300.0" spacing="5.0">
+                                             <children>
+                                                <VBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="200.0" spacing="5.0">
+                                                   <children>
+                                                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
+                                                      <ComboBox fx:id="complaintComboBox" prefWidth="150.0" />
+                                                   </children>
+                                                </VBox>
+                                                <Button fx:id="viewComplaint" mnemonicParsing="false" onAction="#openComplaint" text="View" translateY="8.0" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="300.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Status:" />
+                                          <TextField fx:id="complaintStatus" editable="false" maxWidth="150.0" styleClass="uneditable" text="" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="225.0" prefWidth="600.0">
+                                 <children>
+                                    <VBox prefHeight="225.0" prefWidth="300.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
+                                          <TextField fx:id="complaintDescription" alignment="TOP_LEFT" editable="false" maxHeight="175.0" maxWidth="275.0" prefHeight="175.0" prefWidth="275.0" styleClass="uneditable" text="" />
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="225.0" prefWidth="300.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Response:" />
+                                          <TextField fx:id="complaintResponse" alignment="TOP_LEFT" maxHeight="100.0" maxWidth="275.0" prefHeight="100.0" prefWidth="275.0" text="" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Compensation Amount:" />
+                                          <TextField fx:id="compensationAmount" maxWidth="275.0" prefWidth="275.0" text="" />
+                                          <Button fx:id="closeComplaintButton" mnemonicParsing="false" onAction="#closeComplaint" text="Close Complaint" />
+                                          <Label fx:id="updated_complaint_text" text="" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
                      </children></AnchorPane>
             </content>
           </TitledPane>
             <TitledPane fx:id="handleUsersPane" animated="false" text="View/Handle Users">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="590.0" styleClass="anchor-pane">
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="600.0" styleClass="anchor-pane">
                      <children>
-                        <ComboBox fx:id="customerComboBox" layoutX="14.0" layoutY="29.0" onAction="#selectCustomer" prefWidth="150.0" />
-                        <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Customer" />
-                        <Button fx:id="editCustomerBtn" layoutX="476.0" layoutY="89.0" mnemonicParsing="false" onAction="#editCustomerStatus" text="Edit Customer" AnchorPane.bottomAnchor="260.0" />
-                        <Text layoutX="277.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Account  Status" />
-                        <TextField fx:id="customerAccountText" styleClass="uneditable" editable="false" layoutX="277.0" layoutY="29.0" text="" />
-                        <Text layoutX="21.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Customer Account Status:" />
-                        <ComboBox fx:id="customerStatusComboBox" layoutX="277.0" layoutY="81.0" onAction="#selectAccountStatus" prefWidth="150.0">
+                        <VBox prefHeight="325.0" prefWidth="600.0" spacing="10.0">
+                           <children>
+                              <HBox prefHeight="100.0" prefWidth="600.0">
+                                 <children>
+                                    <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Customer" />
+                                          <ComboBox fx:id="customerComboBox" onAction="#selectCustomer" prefWidth="150.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Account Status:" />
+                                          <TextField fx:id="customerAccountText" editable="false" maxWidth="100.0" styleClass="uneditable" text="" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Change Customer Account Status:" />
+                                          <ComboBox fx:id="customerStatusComboBox" onAction="#selectAccountStatus" prefWidth="150.0">
 <!--                         <items>-->
 <!--                             <FXCollections fx:factory="observableArrayList">-->
 <!--                                 <String fx:value="Active" />-->
@@ -211,25 +259,59 @@
 <!--                             </FXCollections>-->
 <!--                         </items>-->
                      </ComboBox>
-                        <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee Type:" />
-                        <ComboBox fx:id="employeesTypeComboBox" layoutX="21.0" layoutY="150.0" prefWidth="150.0">
-                         <items>
-                             <FXCollections fx:factory="observableArrayList">
-                                 <String fx:value="Chain Employee" />
-                                 <String fx:value="Customer Service" />
-                                 <String fx:value="Store Manager" />
-                                 <String fx:value="Chain Manager" />
-                             </FXCollections>
-                         </items>
-                     </ComboBox>
-                         <Text layoutX="21.0" layoutY="200.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee:" />
-                        <Text layoutX="281.0" layoutY="150.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status" />
-                        <ComboBox fx:id="employeeStatusComboBox" disable="true" layoutX="281.0" layoutY="154.0" onAction="#editEmployeeStatus" prefWidth="150.0" />
-                        <Button fx:id="editEmployeeBtn" layoutX="476.0" layoutY="176.0" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
-                        <ComboBox fx:id="selectEmployeeComboBox" disable="true" layoutX="21.0" layoutY="203.0" onAction="#selectEmployee" prefWidth="150.0" />
-                        <Text layoutX="281.0" layoutY="199.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store" />
-                        <ComboBox fx:id="selectStoreComboBox" disable="true" layoutX="281.0" layoutY="203.0" prefWidth="150.0" />
-                        <Label fx:id="editResultLabel" layoutX="171.0" layoutY="276.0" prefHeight="17.0" prefWidth="235.0" />
+                                       </children>
+                                    </VBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="100.0" spacing="5.0">
+                                       <children>
+                                          <Button fx:id="editCustomerBtn" mnemonicParsing="false" onAction="#editCustomerStatus" text="Edit Customer" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="100.0" prefWidth="600.0">
+                                 <children>
+                                    <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee Type:" />
+                                          <ComboBox fx:id="employeesTypeComboBox" prefWidth="150.0">
+                                           <items>
+                                               <FXCollections fx:factory="observableArrayList">
+                                                   <String fx:value="Chain Employee" />
+                                                   <String fx:value="Customer Service" />
+                                                   <String fx:value="Store Manager" />
+                                                   <String fx:value="Chain Manager" />
+                                               </FXCollections>
+                                           </items>
+                                       </ComboBox>
+                                           <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee:" />
+                                          <ComboBox fx:id="selectEmployeeComboBox" disable="true" onAction="#selectEmployee" prefWidth="150.0" />
+                                       </children>
+                                    </VBox>
+                                    <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status" />
+                                          <ComboBox fx:id="employeeStatusComboBox" disable="true" onAction="#editEmployeeStatus" prefWidth="150.0" />
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store" />
+                                          <ComboBox fx:id="selectStoreComboBox" disable="true" prefWidth="150.0" />
+                                       </children>
+                                    </VBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="100.0" spacing="5.0">
+                                       <children>
+                                          <Button fx:id="editEmployeeBtn" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="25.0" prefWidth="600.0">
+                                 <children>
+                                    <Label fx:id="editResultLabel" prefHeight="17.0" prefWidth="235.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
                      </children>
                   </AnchorPane>
                </content>
