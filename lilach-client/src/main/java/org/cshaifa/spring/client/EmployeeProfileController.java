@@ -84,7 +84,7 @@ public class EmployeeProfileController {
 
     // View/Handle Complaints  Pane
     @FXML
-    private TextArea complaintDescription;
+    private TextField complaintDescription;
     @FXML
     private TextField complaintResponse;
     @FXML
@@ -289,7 +289,7 @@ public class EmployeeProfileController {
                 return;
             }
             userList = response.getUsersList();
-            CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee();
+            //CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee();
             for(User user: userList){
                 if(user.getClass().isAssignableFrom(ChainEmployee.class) ){
                     chainEmployeeList.add((ChainEmployee) user);
@@ -313,10 +313,12 @@ public class EmployeeProfileController {
                 }
                 else if(user.getClass().isAssignableFrom(ChainManager.class)){
                     chainManager = (ChainManager) user;
+                    employeeList.add((Employee) user);
                     System.out.println("added chain manager");
                 }
                 else if(user.getClass().isAssignableFrom(SystemAdmin.class)){
                     systemAdmin = (SystemAdmin) user;
+                    employeeList.add((Employee) user);
                     System.out.println("added system admin");
                 }
                 else{
@@ -478,6 +480,7 @@ public class EmployeeProfileController {
             Thread t2 = new Thread(editCustomerTask);
             t2.start();
             t2.join();
+            initUsers();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
         }
@@ -523,6 +526,7 @@ public class EmployeeProfileController {
             Thread t2 = new Thread(editEmployeeTask);
             t2.start();
             t2.join();
+            initUsers();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
         }
@@ -656,76 +660,100 @@ public class EmployeeProfileController {
 
     // Handle Complaints Handlers
     @FXML
-    void openComplaint(ActionEvent event) {
-        //on view complaint click
+    void openComplaint(ActionEvent event) { //on view complaint click
         //first clearing screens
-        complaintDescription.clear();
-        complaintStatus.clear();
-        compensationAmount.clear();
-        complaintResponse.clear();
-
+//        complaintDescription.setText("");
+//        complaintStatus.setText("");
+//        compensationAmount.setText("");
+//        complaintResponse.setText("");
         long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
-        Complaint complaint = complaintList.get((int) complaintID);
-
-        complaintDescription.setText(complaint.getComplaintDescription());
-        String complaintStatusStr = "";
-        if (complaint.getIsComplaintOpen()) {
-            complaintStatusStr = "Open";
-        } else {
-            complaintStatusStr = "Closed";
+        Complaint selectedComplaint = null;
+        for(Complaint complaint: complaintList){
+            if(complaint.getId()==complaintID){
+                selectedComplaint = complaint;
+            }
         }
-
-        complaintStatus.setText(complaintStatusStr);
-        compensationAmount.setText((Double.toString(complaint.getCompensationAmount())));
-        complaintResponse.setText((complaint.getComplaintResponse()));
+        if(selectedComplaint!=null){
+            //Complaint finalComplaint = selectedComplaint;
+            System.out.println("complaint id is: " + complaintID);
+            String desc ="";
+            if(selectedComplaint.getComplaintDescription()!=null){
+                System.out.println("complaint description is: " + selectedComplaint.getComplaintDescription());
+               //desc = selectedComplaint.getComplaintDescription();
+                complaintDescription.setText(selectedComplaint.getComplaintDescription());
+            }
+            String complaintStatusStr = "";
+            if (selectedComplaint.getIsComplaintOpen()) {
+                complaintStatusStr = "Open";
+            } else {
+                complaintStatusStr = "Closed";
+            }
+            complaintStatus.setText(complaintStatusStr);
+            compensationAmount.setText(Double.toString(selectedComplaint.getCompensationAmount()));
+            if(selectedComplaint.getComplaintResponse()!=null){
+                complaintResponse.setText(selectedComplaint.getComplaintResponse());
+            }
+        } else{
+            System.out.println("complaint is null and id: ");
+        }
     }
 
+
     @FXML
-    void closeComplaint(ActionEvent event) { //TODO: fix it closes the correct complaint
+    void closeComplaint(ActionEvent event) {
         long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
-        Complaint updatedComplaint = complaintList.get((int) complaintID);
-        updatedComplaint.setComplaintResponse(complaintResponse.getText());
-        updatedComplaint.setComplaintOpen(false);
-        double compensationNum  = Double.parseDouble(compensationAmount.getText());
-        updatedComplaint.setCompensationAmount(compensationNum);
+        Complaint updatedComplaint = null;
+        for(Complaint complaint: complaintList){
+            if(complaint.getId()==complaintID){
+                updatedComplaint = complaint;
+            }
+        }
+        if(updatedComplaint!=null){
+            updatedComplaint.setComplaintResponse(complaintResponse.getText());
+            updatedComplaint.setComplaintOpen(false);
+            double compensationNum  = Double.parseDouble(compensationAmount.getText());
+            updatedComplaint.setCompensationAmount(compensationNum);
 
-        complaintComboBox.valueProperty().setValue(null);
-        complaintResponse.setText("");
-        compensationAmount.setText("");
-        complaintStatus.setText("");
-        complaintDescription.setText("");
+            complaintComboBox.valueProperty().setValue(null);
+            complaintResponse.setText("");
+            compensationAmount.setText("");
+            complaintStatus.setText("");
+            complaintDescription.setText("");
 
-        Task<UpdateComplaintResponse> updateComplaintTask = App.createTimedTask(() -> {
-            return ClientHandler.updateComplaint(updatedComplaint);
-        }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+            Complaint finalUpdatedComplaint = updatedComplaint;
+            Task<UpdateComplaintResponse> updateComplaintTask = App.createTimedTask(() -> {
+                return ClientHandler.updateComplaint(finalUpdatedComplaint);
+            }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-        updateComplaintTask.setOnSucceeded(e -> {
-            UpdateComplaintResponse response = updateComplaintTask.getValue();
-            if (!response.isSuccessful()) {
-                // TODO: maybe log the specific exception somewhere
-                System.err.println("Updating Complaint failed");
+            updateComplaintTask.setOnSucceeded(e -> {
+                UpdateComplaintResponse response = updateComplaintTask.getValue();
+                if (!response.isSuccessful()) {
+                    // TODO: maybe log the specific exception somewhere
+                    System.err.println("Updating Complaint failed");
+                    updated_complaint_text.setText("Failed to close complaint");
+                    updated_complaint_text.setTextFill(Color.RED);
+                    return;
+                }
+                updated_complaint_text.setText("You have successfully closed the complaint");
+                updated_complaint_text.setTextFill(Color.GREEN);
+            });
+
+            updateComplaintTask.setOnFailed(e -> {
+                // TODO: maybe properly log it somewhere
+                updateComplaintTask.getException().printStackTrace();
                 updated_complaint_text.setText("Failed to close complaint");
                 updated_complaint_text.setTextFill(Color.RED);
-                return;
+            });
+            //new Thread(updateComplaintTask).start();
+            try {
+                Thread t2 = new Thread(updateComplaintTask);
+                t2.start();
+                t2.join();
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
             }
-            updated_complaint_text.setText("You have successfully closed the complaint");
-            updated_complaint_text.setTextFill(Color.GREEN);
-        });
-
-        updateComplaintTask.setOnFailed(e -> {
-            // TODO: maybe properly log it somewhere
-            updateComplaintTask.getException().printStackTrace();
-            updated_complaint_text.setText("Failed to close complaint");
-            updated_complaint_text.setTextFill(Color.RED);
-        });
-        //new Thread(updateComplaintTask).start();
-        try {
-            Thread t2 = new Thread(updateComplaintTask);
-            t2.start();
-            t2.join();
-        } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
         }
+
     }
 
     // View/Handle Users
@@ -771,6 +799,10 @@ public class EmployeeProfileController {
             //selectedCustomer.unfreeze();
             createTaskCustomerUpdate(true);
         }
+
+        customerComboBox.valueProperty().setValue(null); //edit to clear all
+        customerStatusComboBox.valueProperty().setValue(null);
+        customerAccountText.clear();
     }
 
     @FXML
@@ -839,7 +871,7 @@ public class EmployeeProfileController {
         else{//we're editing chain maneger
             createTaskEmployeeUpdate(chainManager, null, selectedStatus, "Chain Manager");
         }
-        employeesTypeComboBox.valueProperty().setValue(null); //TODO: edit to clear all
+        employeesTypeComboBox.valueProperty().setValue(null); //edit to clear all
         selectStoreComboBox.valueProperty().setValue(null);
         employeeStatusComboBox.valueProperty().setValue(null);
         selectEmployeeComboBox.valueProperty().setValue(null);

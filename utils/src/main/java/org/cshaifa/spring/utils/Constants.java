@@ -25,7 +25,7 @@ public class Constants {
     public static final String EDIT_CUSTOMER_SUCCESS = "Successfully edited customer status";
     public static final String EDIT_CUSTOMER_FAILED = "Failed to edit customer status";
 
-    public static final int SERVER_PORT = 8083;
+    public static final int SERVER_PORT = 8113;
     public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
     public static final long UPDATE_INTERVAL = 5;

@@ -180,7 +180,7 @@
                      <children>
                         <ComboBox fx:id="complaintComboBox" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
                         <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
-                        <TextArea fx:id="complaintdescription" layoutX="14.0" layoutY="90.0" prefHeight="186.0" prefWidth="262.0" />
+                        <TextField fx:id="complaintdescription" layoutX="14.0" layoutY="90.0" prefHeight="186.0" prefWidth="262.0" text=""/>
                         <TextField fx:id="complaintresponse" layoutX="299.0" layoutY="90.0" prefHeight="92.0" prefWidth="262.0" text="" />
                         <Text layoutX="14.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
                         <Text layoutX="299.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Response:" />
