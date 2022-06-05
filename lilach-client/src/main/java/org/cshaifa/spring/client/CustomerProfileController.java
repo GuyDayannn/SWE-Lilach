@@ -215,7 +215,7 @@ public class CustomerProfileController {
                                     Timestamp cancelTime = new Timestamp(Calendar.getInstance().getTime().getTime());
                                     System.out.println("Cancellation time:\t" + cancelTime);
                                     String refundAmount = String.format("%,.2f", data.getRefundAmount(cancelTime));
-                                    Alert cancelMessage = new Alert(Alert.AlertType.INFORMATION, "This is your refund amount: " + refundAmount, ButtonType.CLOSE);
+                                    Alert cancelMessage = new Alert(Alert.AlertType.INFORMATION, "Your card has been refunded.\nThe refund amount is: " + refundAmount, ButtonType.CLOSE);
                                     cancelMessage.showAndWait();
 
                                     if (!response.isSuccessful()) {

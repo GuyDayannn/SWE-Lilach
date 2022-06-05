@@ -27,3 +27,16 @@
 .anchor-pane {
     -fx-background-color: linear-gradient(to bottom, #1dbbdd44, #93f9b944);
 }
+
+.uneditable {
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: rgba(0, 0, 0, 0.32);
+}
+
+.open-complaint {
+    -fx-text-fill: red;
+}
+
+.closed-complaint {
+    -fx-text-fill: green;
+}

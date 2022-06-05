@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PaymentDetailsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PaymentDetailsController">
    <children>
-      <VBox layoutX="81.0" layoutY="77.0" prefHeight="201.0" prefWidth="204.0" spacing="20.0">
+      <VBox prefHeight="400.0" prefWidth="300.0" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="20.0">
          <children>
             <Label text="Payment Details">
                <font>
@@ -39,15 +39,17 @@
                   </HBox>
                </children>
             </VBox>
+            <Button mnemonicParsing="false" onAction="#proceed" text="Proceed to Order Confirmation">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#goBack" text="Back to Supply Options">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
          </children>
       </VBox>
-      <Button layoutX="795.0" layoutY="678.0" mnemonicParsing="false" onAction="#proceed" text="Proceed to Order Confirmation">
-         <font>
-            <Font size="15.0" />
-         </font></Button>
-      <Button layoutX="14.0" layoutY="678.0" mnemonicParsing="false" onAction="#goBack" text="Back to Supply Options">
-         <font>
-            <Font size="15.0" />
-         </font></Button>
    </children>
 </AnchorPane>

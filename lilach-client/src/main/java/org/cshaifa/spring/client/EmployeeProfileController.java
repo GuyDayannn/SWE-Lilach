@@ -660,26 +660,26 @@ public class EmployeeProfileController {
 
     // Handle Complaints Handlers
     @FXML
-    void openComplaint(ActionEvent event) { //on view complaint click
-        //first clearing screens
-//        complaintDescription.setText("");
-//        complaintStatus.setText("");
-//        compensationAmount.setText("");
-//        complaintResponse.setText("");
+    void openComplaint(ActionEvent event) {
+
         long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
         Complaint selectedComplaint = null;
-        for(Complaint complaint: complaintList){
-            if(complaint.getId()==complaintID){
+        for (Complaint complaint: complaintList) {
+            if (complaint.getId()==complaintID) {
                 selectedComplaint = complaint;
+                if (selectedComplaint.getIsComplaintOpen()) {
+                    complaintStatus.getStyleClass().add("open-complaint");
+                    closeComplaintButton.setDisable(false);
+                }
+                else {
+                    complaintStatus.getStyleClass().add("closed-complaint");
+                    closeComplaintButton.setDisable(true);
+                }
             }
         }
         if(selectedComplaint!=null){
-            //Complaint finalComplaint = selectedComplaint;
-            System.out.println("complaint id is: " + complaintID);
             String desc ="";
-            if(!selectedComplaint.getComplaintDescription().equals(null)){
-                System.out.println("complaint description is: " + selectedComplaint.getComplaintDescription());
-               //desc = selectedComplaint.getComplaintDescription();
+            if(selectedComplaint.getComplaintDescription() != null) {
                 complaintDescription.setText(selectedComplaint.getComplaintDescription());
             }
             String complaintStatusStr = "";
@@ -693,7 +693,7 @@ public class EmployeeProfileController {
             if(selectedComplaint.getComplaintResponse()!=null){
                 complaintResponse.setText(selectedComplaint.getComplaintResponse());
             }
-        } else{
+        } else {
             System.out.println("complaint is null and id: ");
         }
     }
@@ -703,12 +703,12 @@ public class EmployeeProfileController {
     void closeComplaint(ActionEvent event) {
         long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
         Complaint updatedComplaint = null;
-        for(Complaint complaint: complaintList){
-            if(complaint.getId()==complaintID){
+        for (Complaint complaint: complaintList) {
+            if (complaint.getId()==complaintID) {
                 updatedComplaint = complaint;
             }
         }
-        if(updatedComplaint!=null){
+        if (updatedComplaint!=null) {
             updatedComplaint.setComplaintResponse(complaintResponse.getText());
             updatedComplaint.setComplaintOpen(false);
             double compensationNum  = Double.parseDouble(compensationAmount.getText());
@@ -892,6 +892,7 @@ public class EmployeeProfileController {
 
     @FXML
     public void initialize() {
+
         if (App.getCurrentUser() != null) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         } else {
