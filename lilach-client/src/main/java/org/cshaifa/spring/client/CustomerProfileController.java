@@ -10,16 +10,19 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import javafx.util.converter.DefaultStringConverter;
 import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.entities.responses.*;
 import org.cshaifa.spring.utils.Constants;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,11 +62,11 @@ public class CustomerProfileController {
     @FXML
     private TableColumn<Complaint, String> complaintResponseColumn;
     @FXML
-    private TableColumn<Complaint, Double> complaintCompensationAmountColumn;
+    private TableColumn<Complaint, String> complaintCompensationAmountColumn;
     @FXML
     private TableColumn<Complaint, String> complaintStoreColumn;
     @FXML
-    private TableColumn<Complaint, Date> complaintDateColumn;
+    private TableColumn<Complaint, String> complaintDateColumn;
 
     //Order Table
     @FXML
@@ -179,6 +182,17 @@ public class CustomerProfileController {
         });
 
         new Thread(sleeper).start();
+    }
+
+    private void setWrapCellFactory(TableColumn<Complaint, String> table) {
+        table.setCellFactory(tableCol -> {
+            TableCell<Complaint, String> cell = new TableCell<>();
+            Text text = new Text();
+            cell.setGraphic(text);
+            text.wrappingWidthProperty().bind(cell.widthProperty());
+            text.textProperty().bind(cell.itemProperty());
+            return cell;
+        });
     }
 
     private void addButtonToTable() { //adding cancel order button
@@ -305,7 +319,7 @@ public class CustomerProfileController {
             }
             ObservableList<Complaint> data = FXCollections.observableArrayList();
 
-            complaintIdColumn.setText("Complaint ID");
+            complaintIdColumn.setText("ID");
             complaintIdColumn.setCellValueFactory(cellData ->
                     new SimpleLongProperty(cellData.getValue().getId()).asObject());
 
@@ -314,27 +328,39 @@ public class CustomerProfileController {
                 if (cellData.getValue().getIsComplaintOpen()) {
                     return new SimpleStringProperty("Open");
                 }
-                return new SimpleStringProperty("Pending Response");
+                return new SimpleStringProperty("Closed");
             });
 
             complaintDescriptionColumn.setText("Description");
             complaintDescriptionColumn.setCellValueFactory(cellData ->
                     new SimpleStringProperty(cellData.getValue().getComplaintDescription()));
+            setWrapCellFactory(complaintDescriptionColumn);
 
             complaintResponseColumn.setText("Response");
             complaintResponseColumn.setCellValueFactory(cellData ->
                     new SimpleStringProperty(cellData.getValue().getComplaintResponse()));
+            setWrapCellFactory(complaintResponseColumn);
 
             complaintCompensationAmountColumn.setText("Compensation");
-            complaintCompensationAmountColumn.setCellValueFactory(cellData ->
-                    new SimpleDoubleProperty(cellData.getValue().getCompensationAmount()).asObject());
+            complaintCompensationAmountColumn.setCellValueFactory(cellData -> {
+                if (cellData.getValue().getCompensationAmount() == 0) {
+                    return new SimpleStringProperty("");
+                }
+                return new SimpleStringProperty(Double.toString(cellData.getValue().getCompensationAmount()));
+            });
 
             complaintStoreColumn.setText("Store");
             complaintStoreColumn.setCellValueFactory(cellData ->
+                    //new SimpleStringProperty(cellData.getValue().getStore().getName()));
+                    //TODO: figure out why getting store name fails????
                     new SimpleStringProperty(Long.toString(cellData.getValue().getStore().getId())));
+            setWrapCellFactory(complaintStoreColumn);
 
             complaintDateColumn.setText("Date");
-            complaintDateColumn.setCellValueFactory(new PropertyValueFactory<>("complaintTimestamp"));
+            complaintDateColumn.setCellValueFactory(celLData -> {
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                return new SimpleStringProperty(format.format(celLData.getValue().getComplaintTimestamp()));
+            });
 
             data.addAll(customerComplaintList);
             complaintTable.setItems(data);

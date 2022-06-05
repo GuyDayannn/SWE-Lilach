@@ -40,3 +40,11 @@
 .closed-complaint {
     -fx-text-fill: green;
 }
+
+.frozen-account {
+    -fx-text-fill: red;
+}
+
+.active-account {
+    -fx-text-fill: green;
+}

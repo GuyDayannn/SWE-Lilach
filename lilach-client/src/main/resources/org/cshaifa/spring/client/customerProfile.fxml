@@ -83,7 +83,7 @@
                               </TableView>
                               <Button fx:id="newComplaintButton" layoutX="600.0" layoutY="284.0" mnemonicParsing="false" onAction="#sendComplaint" text="Open New Complaint" />
                               <Text layoutX="22.0" layoutY="270.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
-                              <TextArea fx:id="complaintDescription" layoutX="22.0" layoutY="280.0" prefHeight="220.0" prefWidth="340.0" />
+                              <TextArea fx:id="complaintDescription" wrapText="true" layoutX="22.0" layoutY="280.0" prefHeight="220.0" prefWidth="340.0" />
                               <ComboBox fx:id="storesComboBox" layoutX="385.0" layoutY="290.0" prefHeight="25.0" prefWidth="123.0" promptText="Stores" />
                               <Text layoutX="385.0" layoutY="284.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" wrappingWidth="86.0" />
                               <Label fx:id="added_complaint_text" layoutX="385.0" layoutY="350.0" text="" />
