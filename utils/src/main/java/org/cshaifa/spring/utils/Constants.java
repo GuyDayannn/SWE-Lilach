@@ -20,9 +20,12 @@ public class Constants {
     public static final String GENERATE_REPORT_SUCCESS = "Report generated successfully";
     public static final String GENERATE_REPORT_FAILED = "Generating report failed";
     public static final String MISSING_REQUIREMENTS = "Insert required data";
+    public static final String EDIT_EMPLOYEE_SUCCESS = "Successfully edited employee status";
+    public static final String EDIT_EMPLOYEE_FAILED = "Failed to edit employee status";
+    public static final String EDIT_CUSTOMER_SUCCESS = "Successfully edited customer status";
+    public static final String EDIT_CUSTOMER_FAILED = "Failed to edit customer status";
 
-
-    public static final int SERVER_PORT = 8194;
+    public static final int SERVER_PORT = 8083;
     public static final long REQUEST_TIMEOUT = 15;
     public static final long LOADING_TIMEOUT = REQUEST_TIMEOUT;
     public static final long UPDATE_INTERVAL = 5;

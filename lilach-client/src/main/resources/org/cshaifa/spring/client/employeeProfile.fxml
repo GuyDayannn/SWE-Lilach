@@ -206,12 +206,12 @@
                         <Label fx:id="updated_complaint_text1" layoutX="383.0" layoutY="259.0" text="" />
                         <Text layoutX="21.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Customer Account Status:" />
                         <ComboBox fx:id="customerStatusComboBox" layoutX="277.0" layoutY="81.0" onAction="#selectAccountStatus" prefWidth="150.0">
-                         <items>
-                             <FXCollections fx:factory="observableArrayList">
-                                 <String fx:value="Active" />
-                                 <String fx:value="Frozen" />
-                             </FXCollections>
-                         </items>
+<!--                         <items>-->
+<!--                             <FXCollections fx:factory="observableArrayList">-->
+<!--                                 <String fx:value="Active" />-->
+<!--                                 <String fx:value="Frozen" />-->
+<!--                             </FXCollections>-->
+<!--                         </items>-->
                      </ComboBox>
                         <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee Type:" />
                         <ComboBox fx:id="employeesTypeComboBox" layoutX="21.0" layoutY="150.0" prefWidth="150.0">
@@ -230,7 +230,8 @@
                         <Button fx:id="editEmployeeBtn" layoutX="476.0" layoutY="176.0" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
                         <ComboBox fx:id="selectEmployeeComboBox" disable="true" layoutX="21.0" layoutY="203.0" onAction="#selectEmployee" prefWidth="150.0" />
                         <Text layoutX="281.0" layoutY="199.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store" />
-                        <ComboBox fx:id="selectStoreComboBox" disable="true" layoutX="281.0" layoutY="203.0" onAction="#editManagerStore" prefWidth="150.0" />
+                        <ComboBox fx:id="selectStoreComboBox" disable="true" layoutX="281.0" layoutY="203.0" prefWidth="150.0" />
+                        <Label fx:id="editResultLabel" layoutX="171.0" layoutY="276.0" prefHeight="17.0" prefWidth="235.0" />
                      </children>
                   </AnchorPane>
                </content>

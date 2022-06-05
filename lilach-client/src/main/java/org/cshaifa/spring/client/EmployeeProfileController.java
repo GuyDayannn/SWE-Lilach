@@ -118,6 +118,8 @@ public class EmployeeProfileController {
     private ComboBox<String> selectStoreComboBox;
     @FXML
     private ComboBox<String> employeeStatusComboBox;
+    @FXML
+    private Label editResultLabel;
 
 
     // Variables
@@ -448,13 +450,22 @@ public class EmployeeProfileController {
         editCustomerTask.setOnSucceeded(e -> {
             if (editCustomerTask.getValue() == null) {
                 System.err.println("Updating customer failed");
+                editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
+                editResultLabel.setTextFill(Color.RED);
                 return;
             }
             FreezeCustomerResponse response = editCustomerTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
                 System.err.println("Updating customer failed");
+                editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
+                editResultLabel.setTextFill(Color.RED);
                 return;
+            }
+            else{
+                System.out.println("Successfully edited customer status");
+                editResultLabel.setText(Constants.EDIT_CUSTOMER_SUCCESS);
+                editResultLabel.setTextFill(Color.GREEN);
             }
         });
 
@@ -483,13 +494,22 @@ public class EmployeeProfileController {
         editEmployeeTask.setOnSucceeded(e -> {
             if (editEmployeeTask.getValue() == null) {
                 System.err.println("Updating employee failed");
+                editResultLabel.setTextFill(Color.RED);
+                editResultLabel.setText(Constants.EDIT_EMPLOYEE_FAILED);
                 return;
             }
             EditEmployeeResponse response = editEmployeeTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
-                System.err.println("Updating employee  failed");
+                System.err.println("Updating employee failed");
+                editResultLabel.setTextFill(Color.RED);
+                editResultLabel.setText(Constants.EDIT_EMPLOYEE_FAILED);
                 return;
+            }
+            else{
+                editResultLabel.setTextFill(Color.GREEN);
+                editResultLabel.setText(Constants.EDIT_EMPLOYEE_SUCCESS);
+                System.out.println("Updating employee succeeded");
             }
         });
 
@@ -708,11 +728,11 @@ public class EmployeeProfileController {
         }
     }
 
-
     // View/Handle Users
     @FXML
     public void selectCustomer(ActionEvent event) {
         customerAccountText.clear();
+        customerStatusComboBox.getItems().clear();
         String custUsername = customerComboBox.getSelectionModel().getSelectedItem();
         //Customer selectedCustomer = new Customer();
         for(Customer customer: customerList){
@@ -722,10 +742,21 @@ public class EmployeeProfileController {
             }
         }
         boolean isFrozen = selectedCustomer.isFrozen();
-        if(isFrozen)
+        List<String> changeAccountStatus = new ArrayList<String>();
+        ObservableList<String> data = FXCollections.observableArrayList();
+        if(isFrozen){
             customerAccountText.setText("Frozen");
-        else
+            changeAccountStatus.add("Active");
+            data.addAll(changeAccountStatus);
+            customerStatusComboBox.setItems(data);
+        }
+
+        else{
+            changeAccountStatus.add("Frozen");
+            data.addAll(changeAccountStatus);
+            customerStatusComboBox.setItems(data);
             customerAccountText.setText("Active");
+        }
     }
 
     @FXML
@@ -744,7 +775,6 @@ public class EmployeeProfileController {
 
     @FXML
     public void selectAccountStatus(ActionEvent event) {
-
     }
 
     @FXML
@@ -764,6 +794,7 @@ public class EmployeeProfileController {
         String employeeName = selectEmployeeComboBox.getValue();
         Store selectedStore= null;
         if(selectStoreComboBox.getValue()!=null){
+            selectStoreComboBox.getItems().clear();
             String storeName = selectStoreComboBox.getValue();
             for(Store store : storesList){
                 if(storeName.equals(store.getName())){
@@ -808,17 +839,21 @@ public class EmployeeProfileController {
         else{//we're editing chain maneger
             createTaskEmployeeUpdate(chainManager, null, selectedStatus, "Chain Manager");
         }
+        employeesTypeComboBox.valueProperty().setValue(null); //TODO: edit to clear all
+        selectStoreComboBox.valueProperty().setValue(null);
+        employeeStatusComboBox.valueProperty().setValue(null);
+        selectEmployeeComboBox.valueProperty().setValue(null);
     }
 
-    @FXML
-    public void selectEmployeeType(ActionEvent event) {
-
-    }
-
-    @FXML
-    public void editManagerStore(ActionEvent event) {
-
-    }
+//    @FXML
+//    public void selectEmployeeType(ActionEvent event) {
+//
+//    }
+//
+//    @FXML
+//    public void editManagerStore(ActionEvent event) {
+//
+//    }
 
 
 
