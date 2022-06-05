@@ -373,10 +373,10 @@ public class EmployeeProfileController {
             //showing customer only his complaints
             if (complaintList.size() >= 1) {
                 for (int i = 0; i < complaintList.size()-1; i++) {
-                    Long id = (complaintList.get(i).getId()); //id 1 shows complaint 2
+                    Long id = (complaintList.get(i).getId());
                     if(id!=0.0) {
                         complaintListID.add(id);
-                    } //TODO: fix index id jumps in 1
+                    }
                 }
             }
 
@@ -828,10 +828,12 @@ public class EmployeeProfileController {
         if(selectStoreComboBox.getValue()!=null){
             selectStoreComboBox.getItems().clear();
             String storeName = selectStoreComboBox.getValue();
-            for(Store store : storesList){
-                if(storeName.equals(store.getName())){
-                    selectedStore = store;
-                    break;
+            if(storeName!=null) {
+                for (Store store : storesList) {
+                    if (storeName.equals(store.getName())) {
+                        selectedStore = store;
+                        break;
+                    }
                 }
             }
         }
