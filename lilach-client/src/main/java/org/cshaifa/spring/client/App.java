@@ -50,6 +50,7 @@ public class App extends Application {
     private static Stage appStage;
 
     private static CatalogItem currentItemDisplayed;
+    private static CatalogItem createdItem = null;
     private static CatalogItem itemByID;
     private static int DataBaseConnected = 0;
     private static Stage loadingStage;
@@ -387,4 +388,13 @@ public class App extends Application {
     public static boolean isImmediate() { return immediate; }
 
     public static void setImmediate(boolean immediate) { App.immediate = immediate; }
+    public static CatalogItem getCreatedItem() {
+        return createdItem;
+    }
+
+    public static void setCreatedItem(CatalogItem createdItem) {
+        App.createdItem = createdItem;
+    }
+
+
 }

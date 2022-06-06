@@ -54,7 +54,7 @@ public class LilachServer extends AbstractServer {
                         DatabaseHandler.updateItem(updatedItem);
                         client.sendToClient(new UpdateItemResponse(requestId, updatedItem));
                         sendToAllClients(new NotifyUpdateResponse(updateItemRequest.getEmployee(), updatedItem,
-                                PPRODUCT_UPDATED_NOTIFICATION));
+                                PRODUCT_UPDATED_NOTIFICATION));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
@@ -65,7 +65,7 @@ public class LilachServer extends AbstractServer {
                         DatabaseHandler.deleteItem(updatedItem);
                         client.sendToClient(new DeleteItemResponse(requestId, true, "Deletion Completed"));
                         sendToAllClients(new NotifyDeleteResponse(deleteItemRequest.getEmployee(), updatedItem,
-                                PPRODUCT_DELETED_NOTIFICATION));
+                                PRODUCT_DELETED_NOTIFICATION));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new DeleteItemResponse(requestId, false, "Deletion Failed"));

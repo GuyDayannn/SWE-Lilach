@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -118,8 +119,9 @@ public class CatalogController {
     }
 
     void refreshList() {
-        tilePane.getChildren()
-                .setAll(itemCells.filtered(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.indexOf(s)))));
+        tilePane.getChildren().setAll(
+                itemCells.filtered(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.indexOf(s)))).sorted(
+                        Comparator.comparing((cell) -> catalogItems.get(itemCells.indexOf(cell)).getFinalPrice())));
     }
 
     void listDisplay() {
@@ -362,40 +364,14 @@ public class CatalogController {
 
     @FXML
     void addItem(ActionEvent event) {
-        FileChooser chooser = new FileChooser();
-        ExtensionFilter filter = new ExtensionFilter("JPG files (*.jpg)", "*.jpeg", "*.jpg", "*.JPG");
-        chooser.getExtensionFilters().add(filter);
-        File selectedFile = chooser.showOpenDialog(null);
-        if (selectedFile == null)
-            return;
-
-        Task<CreateItemResponse> createItemTask = App.createTimedTask(
-                () -> ClientHandler.createItem((Employee) App.getCurrentUser(), "Example", 400, new HashMap<>(), false,
-                        0, "large", "flower", "white",
-                        true, ImageUtils.getByteArrayFromURI(selectedFile.toURI())),
-                Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        createItemTask.setOnSucceeded(e -> {
-            if (createItemTask.getValue() == null || !createItemTask.getValue().isSuccessful()) {
-                App.hideLoading();
-                return;
-            }
-
-            CreateItemResponse response = createItemTask.getValue();
-            catalogItems.add(response.getItem());
-
-            itemCells.add(getItemHBox(response.getItem()));
+        App.popUpLaunch(addItemButton, "createItemPopup");
+        if (App.getCreatedItem() != null) {
+            catalogItems.add(App.getCreatedItem());
+            itemCells.add(getItemHBox(App.getCreatedItem()));
             refreshList();
-            App.hideLoading();
-        });
+            App.setCreatedItem(null);
+        }
 
-        createItemTask.setOnFailed(e -> {
-            createItemTask.getException().printStackTrace();
-            App.hideLoading();
-        });
-
-        App.showLoading(rootVBox, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
-        new Thread(createItemTask).start();
     }
 
     @FXML
