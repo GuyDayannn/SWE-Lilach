@@ -149,7 +149,8 @@ public class LilachServer extends AbstractServer {
                                 createItemRequest.getItemColor(), createItemRequest.isDefault(),
                                 createItemRequest.getImage());
                         client.sendToClient(new CreateItemResponse(requestId, item != null, item));
-                        sendToAllClients(new NotifyCreateResponse(item, createItemRequest.getEmployee(), PRODUCT_CREATED_NOTIFICATION));
+                        sendToAllClients(new NotifyCreateResponse(item, createItemRequest.getEmployee(),
+                                PRODUCT_CREATED_NOTIFICATION));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new CreateItemResponse(requestId, false));
@@ -167,14 +168,18 @@ public class LilachServer extends AbstractServer {
                                 createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
                             if (order.isDelivery()) {
+                                String message = "<h2>Your order #" + order.getId() + " has arrived!</h2>";
+                                if (!order.getDeliveryDetails().getMessage().isBlank())
+                                    message += "<br>" + order.getDeliveryDetails().getMessage();
+
                                 if (order.getDeliveryDetails().isImmediate())
                                     EmailUtils.sendEmail(order.getCustomer().getEmail(),
                                             order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT,
-                                            "Your order #" + order.getId() + " has arrived!");
+                                            message);
                                 else
                                     EmailUtils.sendEmailAt(order.getCustomer().getEmail(),
                                             order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT,
-                                            "Your order #" + order.getId() + " has arrived!", order.getSupplyDate());
+                                            message, order.getSupplyDate());
                             }
                             client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
                         } else {

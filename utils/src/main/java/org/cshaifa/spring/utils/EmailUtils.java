@@ -28,7 +28,7 @@ public class EmailUtils {
             .to(recipientName, recipientMail)
             .withSubject(subject)
             .withHTMLText(content)
-            .buildEmail());
+            .buildEmail(), true);
     }
 
     public static void shutdownEmailSchedulers() {
