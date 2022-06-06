@@ -175,6 +175,7 @@ public class EmployeeProfileController {
                         employeeNames.add(employee.getFullName());
                     }
                 }
+                selectEmployeeComboBox.getItems().clear();
                 selectEmployeeComboBox.getItems().addAll(employeeNames);
                 employeeStatusComboBox.setDisable(false);
                 ObservableList<String> employeeTypes = FXCollections.observableArrayList();
@@ -214,7 +215,7 @@ public class EmployeeProfileController {
                 ObservableList<String> employeeTypes = FXCollections.observableArrayList();
                 employeeTypes.add("Store Manager");
                 employeeTypes.add("Customer Service");
-                employeeTypes.add("Customer Service");
+                employeeTypes.add("Chain Employee");
                 employeeStatusComboBox.getItems().addAll(employeeTypes);
             }
         });
@@ -289,7 +290,7 @@ public class EmployeeProfileController {
                 return;
             }
             userList = response.getUsersList();
-            //CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee();
+            selectEmployeeComboBox.getItems().clear();
             for(User user: userList){
                 if(user.getClass().isAssignableFrom(ChainEmployee.class) ){
                     chainEmployeeList.add((ChainEmployee) user);
@@ -762,12 +763,7 @@ public class EmployeeProfileController {
     public void selectCustomer(ActionEvent event) {
         customerAccountText.clear();
         customerStatusComboBox.getItems().clear();
-        if(customerComboBox.getValue().equals(null)){
-            System.out.println("Illegal selection, please select all necessary fields");
-            editResultLabel.setText(Constants.ILLEGAL_SELECTION);
-            editResultLabel.setTextFill(Color.RED);
-            return;
-        }
+
         String custUsername = customerComboBox.getValue();
         //Customer selectedCustomer = new Customer();
 
@@ -877,6 +873,7 @@ public class EmployeeProfileController {
                 if (manager.getFullName().equals(employeeName)) {
                     selectedManager = manager;
                     oldStore = manager.getStoreManged();
+                    System.out.println("old store in profiles is: "+ oldStore.getName());
                     break;
                 }
             }
@@ -889,6 +886,7 @@ public class EmployeeProfileController {
                 if (employee.getFullName().equals(employeeName)) {
                     selectedEmployee = employee;
                     oldStore = employee.getStore();
+                    System.out.println("old store in profiles is: "+ oldStore.getName());
                     break;
                 }
             }
