@@ -5,27 +5,29 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Store;
 
 import javafx.collections.FXCollections;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.responses.GetStoresResponse;
-import org.cshaifa.spring.utils.Constants;
 
 public class DeliveryDetailsController {
     @FXML
@@ -157,15 +159,23 @@ public class DeliveryDetailsController {
 
         Calendar cal = Calendar.getInstance();
         cal.set(pickedDate.getYear(), pickedDate.getMonthValue() - 1, pickedDate.getDayOfMonth());
+
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
 
+        if (sameDate && Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 20) {
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            pickedDate = LocalDateTime.ofInstant(cal.toInstant(), cal.getTimeZone().toZoneId()).toLocalDate();
+            deliveryDatePicker.setValue(pickedDate);
+        }
+
         int startDate = cal.get(Calendar.DATE);
 
         while (cal.get(Calendar.DATE) == startDate) {
-            if (cal.after(current) || cal.equals(current) || !sameDate)
+            if (cal.after(current) || cal.equals(current) || !sameDate) {
                 times.add(df.format(cal.getTime()));
+            }
             cal.add(Calendar.MINUTE, 30);
         }
 
