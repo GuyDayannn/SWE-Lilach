@@ -28,23 +28,27 @@ public class Customer extends User {
 
     private SubscriptionType subscriptionType;
 
+    private String creditCard;
+
     public Customer(String fullName, String username, String email, String password, String passwordSalt,
-            boolean frozen, SubscriptionType subscriptionType) {
+            boolean frozen, SubscriptionType subscriptionType, String creditCard) {
         super(fullName, username, email, password, passwordSalt);
         this.stores = new ArrayList<>();
         this.orders = new ArrayList<>();
         this.frozen = frozen;
         this.subscriptionType = subscriptionType;
+        this.creditCard = creditCard;
         this.complaintList = new ArrayList<>();
     }
 
     public Customer(String fullName, String username, String email, String password, String passwordSalt,
-            List<Store> stores, boolean frozen, SubscriptionType subscriptionType, List<Complaint> complaintList) {
+            List<Store> stores, boolean frozen, SubscriptionType subscriptionType, String creditCard, List<Complaint> complaintList) {
         super(fullName, username, email, password, passwordSalt);
         this.stores = stores;
         this.orders = new ArrayList<>();
         this.frozen = frozen;
         this.subscriptionType = subscriptionType;
+        this.creditCard = creditCard;
         this.complaintList = complaintList;
     }
 
@@ -93,4 +97,7 @@ public class Customer extends User {
         return complaintList;
     }
 
+    public String getCreditCard() { return creditCard; }
+
+    public void setCreditCard(String creditCard) { this.creditCard = creditCard; }
 }

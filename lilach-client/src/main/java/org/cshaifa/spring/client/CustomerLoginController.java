@@ -17,6 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 
+
 public class CustomerLoginController {
     @FXML
     private ImageView lilachLogo;
@@ -32,6 +33,9 @@ public class CustomerLoginController {
 
     @FXML
     private Label invalid_login_text;
+
+    @FXML
+    private ImageView loginImage;
 
     @FXML
     void cancelBtnOnAction(ActionEvent event) throws IOException {
@@ -87,9 +91,9 @@ public class CustomerLoginController {
 
     @FXML
     void initialize() {
-        Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
-        lilachLogo.setImage(image);
-        lilachLogo.setFitHeight(50);
-        invalid_login_text.setText("");
+        Image reg = new Image(getClass().getResource("images/login.png").toString());
+        loginImage.setImage(reg);
+        loginImage.setFitWidth(40);
+        loginImage.setFitHeight(40);
     }
 }

@@ -2,6 +2,7 @@ package org.cshaifa.spring.entities.requests;
 
 import java.util.Map;
 
+import org.cshaifa.spring.entities.Employee;
 import org.cshaifa.spring.entities.Store;
 
 public class CreateItemRequest extends Request {
@@ -26,7 +27,9 @@ public class CreateItemRequest extends Request {
 
     private byte[] image;
 
-    public CreateItemRequest(String name, double price, Map<Store, Integer> quantities, boolean onSale,
+    private Employee employee;
+
+    public CreateItemRequest(Employee employee, String name, double price, Map<Store, Integer> quantities, boolean onSale,
             double discountPercent, String size, String itemType, String itemColor, boolean isDefault, byte[] image) {
         this.name = name;
         this.price = price;
@@ -38,6 +41,7 @@ public class CreateItemRequest extends Request {
         this.itemColor = itemColor;
         this.isDefault = isDefault;
         this.image = image;
+        this.employee = employee;
     }
 
     public String getName() {
@@ -78,6 +82,10 @@ public class CreateItemRequest extends Request {
 
     public boolean isDefault() {
         return isDefault;
+    }
+
+    public Employee getEmployee() {
+        return employee;
     }
 
 }

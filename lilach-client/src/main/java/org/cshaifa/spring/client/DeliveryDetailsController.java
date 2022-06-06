@@ -72,6 +72,21 @@ public class DeliveryDetailsController {
 
     private List<Store> stores = null;
 
+    private void setImmediateCheckbox(boolean immediate) {
+        immediateCheckbox.setSelected(immediate);
+        deliveryTimeSelector.setDisable(immediate);
+        if (immediate) {
+            deliveryDatePicker.setValue(LocalDate.now());
+            initializeTimes();
+            deliveryTimeSelector.setValue(deliveryTimeSelector.getItems().get(0));
+            deliveryDatePicker.setDisable(true);
+            deliveryTimeSelector.setDisable(true);
+        } else {
+            deliveryDatePicker.setDisable(false);
+            deliveryTimeSelector.setDisable(false);
+        }
+    }
+
     private void recoverSavedData() {
         if (!App.isEnteredSupplyDetails())
             return;
@@ -95,6 +110,7 @@ public class DeliveryDetailsController {
         deliveryDatePicker.setValue(App.getSupplyDate().toLocalDateTime().toLocalDate());
         deliveryTimeSelector.setValue(new SimpleDateFormat("HH:mm").format(App.getSupplyDate()));
         deliveryTimeSelector.setDisable(false);
+        setImmediateCheckbox(App.isImmediate());
     }
 
     @FXML
@@ -215,6 +231,7 @@ public class DeliveryDetailsController {
             // TODO: add times of delivery
             String chosenTime = immediateCheckbox.isSelected() ? deliveryTimeSelector.getItems().get(0)
                     : deliveryTimeSelector.getValue();
+            App.setImmediate(immediateCheckbox.isSelected());
             App.setSupplyDate(Timestamp.valueOf(deliveryDatePicker.getValue()
                     .atTime(LocalTime.parse(chosenTime, DateTimeFormatter.ofPattern("HH:mm")))));
         } else {

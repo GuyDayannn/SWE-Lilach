@@ -1,7 +1,7 @@
 package org.cshaifa.spring.client;
 
 import org.cshaifa.spring.client.ocsf.AbstractClient;
-import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
+import org.cshaifa.spring.entities.responses.NotifyResponse;
 
 public class LilachClient extends AbstractClient {
 
@@ -11,9 +11,9 @@ public class LilachClient extends AbstractClient {
 
     @Override
     protected void handleMessageFromServer(Object msg) {
-        if (msg instanceof NotifyUpdateResponse) {
+        if (msg instanceof NotifyResponse notifyResponse) {
             try {
-                ClientHandler.updateQueue.put(msg);
+                ClientHandler.updateQueue.put(notifyResponse);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

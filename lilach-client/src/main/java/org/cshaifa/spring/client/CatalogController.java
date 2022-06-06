@@ -4,14 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Employee;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
+import org.cshaifa.spring.entities.responses.DeleteItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.NotifyCreateResponse;
+import org.cshaifa.spring.entities.responses.NotifyDeleteResponse;
+import org.cshaifa.spring.entities.responses.NotifyResponse;
 import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
@@ -46,6 +52,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class CatalogController {
@@ -112,12 +119,18 @@ public class CatalogController {
     }
 
     void refreshList() {
-        tilePane.getChildren()
-                .setAll(itemCells.filtered(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.indexOf(s)))));
+        tilePane.getChildren().setAll(
+                itemCells.filtered(s -> !filter_applied || isInFilter(catalogItems.get(itemCells.indexOf(s)))).sorted(
+                        Comparator.comparing((cell) -> catalogItems.get(itemCells.indexOf(cell)).getFinalPrice())));
     }
 
     void listDisplay() {
-        itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item -> getItemHBox(item)).toList());
+        // itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item
+        // -> getItemHBox(item)).toList());
+        itemCells = FXCollections.observableArrayList();
+        for (int i = 0; i < catalogItems.size(); i++) {
+            itemCells.add(getItemHBox(catalogItems.get(i)));
+        }
         refreshList();
     }
 
@@ -238,11 +251,40 @@ public class CatalogController {
         ivRemove.setFitHeight(15);
         ivRemove.setFitWidth(15);
         removeItemButton.setGraphic(ivRemove);
-        removeItemButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                // TODO: Handle item removal
-            }
+        removeItemButton.setOnAction(event -> {
+            Task<DeleteItemResponse> deleteItemTask = App.createTimedTask(() -> {
+                return ClientHandler.deleteItem((Employee) App.getCurrentUser(), item);
+            }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+
+            deleteItemTask.setOnSucceeded(e -> {
+                DeleteItemResponse response = deleteItemTask.getValue();
+                if (!response.isSuccessful()) {
+                    // TODO: maybe log the specific exception somewhere
+                    App.hideLoading();
+                    System.err.println("Deleting item failed");
+                    return;
+                }
+
+                // TODO: update list - delete item
+                int itemIndex = catalogItems.indexOf(item);
+                if (itemIndex != -1) {
+                    itemCells.remove(itemIndex);
+                    catalogItems.remove(item);
+                    refreshList();
+                }
+                App.hideLoading();
+            });
+
+            deleteItemTask.setOnFailed(e -> {
+                App.hideLoading();
+                // TODO: maybe properly log it somewhere
+                deleteItemTask.getException().printStackTrace();
+            });
+
+            Stage rootStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            App.showLoading(rootVBox, rootStage, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+            new Thread(deleteItemTask).start();
+
         });
         if (App.getCurrentUser() == null) {
             buttonBox.getChildren().add(viewButton);
@@ -322,39 +364,14 @@ public class CatalogController {
 
     @FXML
     void addItem(ActionEvent event) {
-        FileChooser chooser = new FileChooser();
-        ExtensionFilter filter = new ExtensionFilter("JPG files (*.jpg)", "*.jpeg", "*.jpg", "*.JPG");
-        chooser.getExtensionFilters().add(filter);
-        File selectedFile = chooser.showOpenDialog(null);
-        if (selectedFile == null)
-            return;
-
-        Task<CreateItemResponse> createItemTask = App.createTimedTask(
-                () -> ClientHandler.createItem("Example", 400, new HashMap<>(), false, 0, "large", "flower", "white",
-                        true, ImageUtils.getByteArrayFromURI(selectedFile.toURI())),
-                Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
-
-        createItemTask.setOnSucceeded(e -> {
-            if (createItemTask.getValue() == null || !createItemTask.getValue().isSuccessful()) {
-                App.hideLoading();
-                return;
-            }
-
-            CreateItemResponse response = createItemTask.getValue();
-            catalogItems.add(response.getItem());
-
-            itemCells.add(getItemHBox(response.getItem()));
+        App.popUpLaunch(addItemButton, "createItemPopup");
+        if (App.getCreatedItem() != null) {
+            catalogItems.add(App.getCreatedItem());
+            itemCells.add(getItemHBox(App.getCreatedItem()));
             refreshList();
-            App.hideLoading();
-        });
+            App.setCreatedItem(null);
+        }
 
-        createItemTask.setOnFailed(e -> {
-            createItemTask.getException().printStackTrace();
-            App.hideLoading();
-        });
-
-        App.showLoading(rootVBox, null, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
-        new Thread(createItemTask).start();
     }
 
     @FXML
@@ -504,28 +521,48 @@ public class CatalogController {
 
             App.scheduler.scheduleAtFixedRate(() -> {
                 try {
-                    Object gotObject = ClientHandler.waitForUpdateFromServer();
-                    if (gotObject == null)
+                    final NotifyResponse notifyResponse = ClientHandler.waitForUpdateFromServer();
+                    if (notifyResponse == null)
                         return;
 
-                    NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) gotObject;
-                    if (notifyUpdateResponse != null) {
-                        int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
-                                catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
-                                .findFirst().get());
-                        catalogItems.set(itemIndex, notifyUpdateResponse.getToUpdate());
-                        itemCells.set(itemIndex, getItemHBox(catalogItems.get(itemIndex)));
-                        Platform.runLater(() -> {
-                            refreshList();
-                            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
-                            updateNotification.setVisible(true);
-                            fadeTransition.setFromValue(0.0);
-                            fadeTransition.setToValue(1.0);
-                            fadeTransition.setCycleCount(3);
-                            fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
-                            fadeTransition.play();
-                        });
+                    boolean sameUser = App.getCurrentUser() instanceof Employee
+                            && notifyResponse.getSendingEmployee().getId() == App.getCurrentUser().getId();
+
+                    if (!sameUser) {
+                        if (notifyResponse instanceof NotifyUpdateResponse) {
+                            NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) notifyResponse;
+                            int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
+                                    catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
+                                    .findFirst().get());
+                            catalogItems.set(itemIndex, notifyUpdateResponse.getToUpdate());
+                            itemCells.set(itemIndex, getItemHBox(catalogItems.get(itemIndex)));
+                        } else if (notifyResponse instanceof NotifyDeleteResponse) {
+                            NotifyDeleteResponse notifyDeleteResponse = (NotifyDeleteResponse) notifyResponse;
+                            int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
+                                    catalogItem -> catalogItem.getId() == notifyDeleteResponse.getToDelete().getId())
+                                    .findFirst().get());
+                            catalogItems.remove(itemIndex);
+                            itemCells.remove(itemIndex);
+                        } else if (notifyResponse instanceof NotifyCreateResponse) {
+                            NotifyCreateResponse notifyCreateResponse = (NotifyCreateResponse) notifyResponse;
+                            catalogItems.add(notifyCreateResponse.getToCreate());
+                            itemCells.add(getItemHBox(notifyCreateResponse.getToCreate()));
+                        }
                     }
+
+                    Platform.runLater(() -> {
+                        if (!sameUser)
+                            refreshList();
+                        updateNotification.setText(notifyResponse.getMessage());
+                        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1),
+                                updateNotification);
+                        updateNotification.setVisible(true);
+                        fadeTransition.setFromValue(0.0);
+                        fadeTransition.setToValue(1.0);
+                        fadeTransition.setCycleCount(3);
+                        fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
+                        fadeTransition.play();
+                    });
 
                 } catch (Exception error) {
                     error.printStackTrace();

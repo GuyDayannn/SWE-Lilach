@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="544.0" prefWidth="725.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.CreateItemPopupController">
+   <children>
+      <Text layoutX="14.0" layoutY="14.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Create Item" textAlignment="CENTER" wrappingWidth="577.6708984375" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font size="38.0" />
+         </font>
+      </Text>
+      <Button layoutX="137.0" layoutY="450.0" mnemonicParsing="false" onAction="#createItem" prefHeight="31.0" prefWidth="157.0" text="OK" />
+      <Button layoutX="297.0" layoutY="450.0" mnemonicParsing="false" onAction="#cancel" prefHeight="31.0" prefWidth="169.0" text="Cancel" />
+      <Text layoutX="126.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Item Name:" />
+      <Text layoutX="129.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Item Price:" />
+      <Text layoutX="129.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Discount Percent (optional):" />
+      <TextField fx:id="itemNameField" layoutX="264.0" layoutY="73.0" />
+      <TextField fx:id="itemPriceField" layoutX="264.0" layoutY="121.0" />
+      <TextField fx:id="itemDiscountField" layoutX="264.0" layoutY="164.0" />
+      <Button layoutX="233.0" layoutY="362.0" mnemonicParsing="false" onAction="#chooseImage" prefHeight="32.0" prefWidth="137.0" text="Choose Image" />
+      <ImageView fx:id="selectedImageView" fitHeight="150.0" fitWidth="200.0" layoutX="478.0" layoutY="66.0" pickOnBounds="true" preserveRatio="true" />
+      <Label layoutX="550.0" layoutY="34.0" text="Image:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="errorLabel" alignment="CENTER" layoutX="152.0" layoutY="497.0" prefHeight="22.0" prefWidth="332.0" style="-fx-alignment: center;" textAlignment="CENTER">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="storeSelector" layoutX="158.0" layoutY="412.0" prefWidth="150.0" promptText="Choose Store" />
+      <TextField fx:id="itemQuantityField" layoutX="321.0" layoutY="412.0" promptText="Item Quantity" />
+      <VBox layoutX="251.0" layoutY="215.0" prefHeight="116.0" prefWidth="158.0" spacing="20.0">
+         <children>
+            <ComboBox fx:id="itemSizeSelector" prefWidth="150.0" promptText="Item Size" />
+            <ComboBox fx:id="itemColorSelector" prefWidth="150.0" promptText="Item Color" />
+            <ComboBox fx:id="itemTypeSelector" prefWidth="150.0" promptText="Item Type" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

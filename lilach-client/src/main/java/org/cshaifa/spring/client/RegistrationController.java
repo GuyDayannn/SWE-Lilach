@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
@@ -21,6 +23,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+
 
 public class RegistrationController {
     @FXML
@@ -58,10 +61,23 @@ public class RegistrationController {
     @FXML
     private ComboBox<String> storeSelector;
 
+    @FXML
+    private TextField creditCardTextField;
+
+    @FXML
+    private Label yearlyFee;
+
+    @FXML
+    private ImageView registerImage;
+
     private List<Store> stores = null;
 
     @FXML
     void initialize() {
+        Image reg = new Image(getClass().getResource("images/register.png").toString());
+        registerImage.setImage(reg);
+        registerImage.setFitWidth(40);
+        registerImage.setFitHeight(40);
         subscriptionSelector.getItems().addAll("Store Subscription", "Chain Subscription", "Yearly Subscription");
 
         Task<GetStoresResponse> getStoresTask = App.createTimedTask(ClientHandler::getStores, Constants.REQUEST_TIMEOUT,
@@ -97,6 +113,12 @@ public class RegistrationController {
         } else {
             storeSelector.setDisable(true);
         }
+
+        if(subscriptionIndex == SubscriptionType.YEARLY.ordinal())
+            yearlyFee.setVisible(true);
+        else
+            yearlyFee.setVisible(false);
+
     }
 
     @FXML
@@ -108,7 +130,12 @@ public class RegistrationController {
     @FXML
     void onRegisterButton(ActionEvent event) {
         if (!fullNameTxtField.getText().isBlank() && !usernameTxtField.getText().isBlank()
-                && !emailTxtField.getText().isBlank() && !pwdTxtField.getText().isBlank()) {
+                && !emailTxtField.getText().isBlank() && !pwdTxtField.getText().isBlank()
+                && !creditCardTextField.getText().isBlank() && creditCardTextField.getText().matches("\\d{4,}")
+                && (!subscriptionSelector.getSelectionModel().isEmpty() )
+                && (!storeSelector.getSelectionModel().isEmpty()
+                    || subscriptionSelector.getSelectionModel().getSelectedIndex() == SubscriptionType.YEARLY.ordinal()
+                    || subscriptionSelector.getSelectionModel().getSelectedIndex() == SubscriptionType.CHAIN.ordinal()) ) {
             if (!pwdTxtField.getText().equals(pwdConfTxtField.getText())) {
                 invalid_register_text.setText("Passwords Does not match");
                 invalid_register_text.setTextFill(Color.RED);
@@ -116,7 +143,16 @@ public class RegistrationController {
                 validateRegister();
             }
         } else {
-            loginMessageLabel.setText("Please enter every detail");
+            invalid_register_text.setText("Please enter every detail");
+            if(!fullNameTxtField.getText().isBlank() && !usernameTxtField.getText().isBlank()
+                    && !emailTxtField.getText().isBlank() && !pwdTxtField.getText().isBlank()
+                    && !creditCardTextField.getText().isBlank() && !creditCardTextField.getText().matches("\\d{4,}")
+                    && (!subscriptionSelector.getSelectionModel().isEmpty() )
+                    && (!storeSelector.getSelectionModel().isEmpty()
+                    || subscriptionSelector.getSelectionModel().getSelectedIndex() == SubscriptionType.YEARLY.ordinal()
+                    || subscriptionSelector.getSelectionModel().getSelectedIndex() == SubscriptionType.CHAIN.ordinal())) {
+                invalid_register_text.setText("Please enter correct credit card");
+            }
         }
     }
 
@@ -133,7 +169,7 @@ public class RegistrationController {
                 registredStores = stores;
             return ClientHandler.registerCustomer(fullNameTxtField.getText().strip(),
                     usernameTxtField.getText().strip(), emailTxtField.getText().strip(), pwdTxtField.getText().strip(),
-                    registredStores, SubscriptionType.values()[subscriptionIndex], complaintList);
+                    registredStores, SubscriptionType.values()[subscriptionIndex], creditCardTextField.getText().strip(), complaintList);
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
         registerTask.setOnSucceeded(e -> {

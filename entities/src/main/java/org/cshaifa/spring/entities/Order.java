@@ -36,6 +36,8 @@ public class Order implements Serializable {
 
     private boolean completed;
 
+    private String status;
+
     @OneToOne
     private Delivery deliveryDetails;
 
@@ -52,6 +54,7 @@ public class Order implements Serializable {
         this.supplyDate = supplyDate;
         this.delivery = delivery;
         this.completed = false;
+        this.status = "Order Accepted";
         this.deliveryDetails = deliveryDetails;
         this.total = items.entrySet().stream().mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice())
                 .sum();
@@ -152,4 +155,7 @@ public class Order implements Serializable {
         }
         else return 0;
     }
+    public String getStatus() { return status; }
+
+    public void setStatus(String status) { this.status = status; }
 }
