@@ -888,6 +888,7 @@ public class DatabaseHandler {
 
         tryFlushSession(session);
 
+
         Session session2 = DatabaseConnector.getSessionFactory().openSession();
         session2.beginTransaction();
         newChainEmployee.setStore(newStore);
