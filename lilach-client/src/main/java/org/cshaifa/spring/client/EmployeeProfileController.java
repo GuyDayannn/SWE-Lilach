@@ -138,7 +138,7 @@ public class EmployeeProfileController {
     private ReportType reportType;
     private Store reportStore;
     private Report report;
-    private Customer selectedCustomer = new Customer();
+    private Customer selectedCustomer = null;
 
 
     // Init lists from database
@@ -480,6 +480,7 @@ public class EmployeeProfileController {
             Thread t2 = new Thread(editCustomerTask);
             t2.start();
             t2.join();
+            customerList.clear();
             initUsers();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
@@ -761,8 +762,15 @@ public class EmployeeProfileController {
     public void selectCustomer(ActionEvent event) {
         customerAccountText.clear();
         customerStatusComboBox.getItems().clear();
-        String custUsername = customerComboBox.getSelectionModel().getSelectedItem();
+        if(customerComboBox.getValue().equals(null)){
+            System.out.println("Illegal selection, please select all necessary fields");
+            editResultLabel.setText(Constants.ILLEGAL_SELECTION);
+            editResultLabel.setTextFill(Color.RED);
+            return;
+        }
+        String custUsername = customerComboBox.getValue();
         //Customer selectedCustomer = new Customer();
+
         for(Customer customer: customerList){
             if(customer.getUsername().equals(custUsername)){
                 selectedCustomer = customer;
@@ -789,6 +797,12 @@ public class EmployeeProfileController {
 
     @FXML
     public void editCustomerStatus(ActionEvent event) {
+        if(customerStatusComboBox.getValue()==null || selectedCustomer==null){
+            System.out.println("Illegal selection, please select all necessary fields");
+            editResultLabel.setText(Constants.ILLEGAL_SELECTION);
+            editResultLabel.setTextFill(Color.RED);
+            return;
+        }
         String selectedStatus = customerStatusComboBox.getValue();
         boolean createTask = false;
         if(selectedStatus.equals("Active") && selectedCustomer.isFrozen()){
@@ -821,6 +835,22 @@ public class EmployeeProfileController {
 
     @FXML
     public void editEmployee(ActionEvent event) {
+        //checks tthat all necessat fields are selected
+        if(employeesTypeComboBox.getValue()==null || employeeStatusComboBox.getValue()==null
+        || selectEmployeeComboBox.getValue()==null){
+            System.out.println("Illegal selection, please select all necessary fields");
+            editResultLabel.setText(Constants.ILLEGAL_SELECTION);
+            editResultLabel.setTextFill(Color.RED);
+            return;
+        }
+        if((employeeStatusComboBox.getValue().equals("Store Manager") ||
+                employeeStatusComboBox.getValue().equals("Chain Employee")) &&
+                selectStoreComboBox.getValue()==null){
+            System.out.println("Illegal selection, please select all necessary fields");
+            editResultLabel.setText(Constants.ILLEGAL_SELECTION);
+            editResultLabel.setTextFill(Color.RED);
+            return;
+        }
         System.out.println("inserted into editEmployee");
         String selectedStatus = employeeStatusComboBox.getValue();
         String employeeName = selectEmployeeComboBox.getValue();
