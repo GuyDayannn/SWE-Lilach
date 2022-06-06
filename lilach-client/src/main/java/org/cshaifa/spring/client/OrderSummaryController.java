@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
+import javafx.scene.control.TextField;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.SubscriptionType;
@@ -50,6 +51,9 @@ public class OrderSummaryController {
 
     @FXML
     private HBox newTotalHBox;
+
+    @FXML
+    private TextField greetingTextField;
 
     Map<CatalogItem, Integer> shoppingCart;
 
@@ -174,6 +178,8 @@ public class OrderSummaryController {
                 summaryVBox.getChildren().remove(discountHBox);
                 summaryVBox.getChildren().remove(newTotalHBox);
             }
+
+            App.setTotalOrderPrice(total);
         }
     }
 
@@ -190,6 +196,7 @@ public class OrderSummaryController {
     @FXML
     private void continueOrder(ActionEvent event) {
         try {
+            App.setGreeting(greetingTextField.getText().strip());
             App.setContent("deliveryDetails");
         } catch (IOException e) {
             e.printStackTrace();
@@ -203,6 +210,8 @@ public class OrderSummaryController {
         cartImage.setFitWidth(40);
         cartImage.setFitHeight(40);
         shoppingCart = App.getCart();
+
+        if(App.getGreeting() != null) greetingTextField.setText(App.getGreeting());
 
         if (shoppingCart.size() == 0) {
             itemsVbox.getChildren().add(new Text("Shopping cart is empty"));

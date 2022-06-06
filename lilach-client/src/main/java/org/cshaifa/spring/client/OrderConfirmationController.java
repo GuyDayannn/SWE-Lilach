@@ -78,6 +78,9 @@ public class OrderConfirmationController {
     @FXML
     private AnchorPane pickupAnchorPane;
 
+    @FXML
+    private Label totalPrice;
+
     private HBox getItemHBox(CatalogItem item, int quantity) {
         HBox hBox = new HBox();
         ImageView iv = null;
@@ -117,6 +120,7 @@ public class OrderConfirmationController {
     @FXML
     void initialize() {
         App.getCart().forEach((item, quantity) -> itemsVbox.getChildren().add(getItemHBox(item, quantity)));
+        totalPrice.setText(Double.toString(App.getTotalOrderPrice() + (App.isOrderDelivery() ? Constants.DELIVERY_PRICE : 0)));
 
         addressLabel.setText(App.getRecipientAddress());
         cardNumberLabel
@@ -166,14 +170,21 @@ public class OrderConfirmationController {
         App.setCardNumber(null);
         App.setCardExpDate(null);
         App.setCardCvv(null);
+        App.setGreeting(null);
+        App.setTotalOrderPrice(-1);
     }
 
     @FXML
     private void placeOrder(ActionEvent event) {
         // TODO: add store
+        String greeting;
+        if(App.getGreeting() != null)
+            greeting = App.getGreeting();
+        else
+            greeting = "Mazal Tov";
         Task<CreateOrderResponse> createOrderTask = App.createTimedTask(() -> ClientHandler.createOrder(
                 App.isOrderDelivery() ? null : App.getPickupStore(), (Customer) App.getCurrentUser(), App.getCart(),
-                "Mazal Tov", new Timestamp(Calendar.getInstance().getTime().getTime()),
+                greeting, new Timestamp(Calendar.getInstance().getTime().getTime()),
                 App.isOrderDelivery() ? App.getSupplyDate() : null, App.isOrderDelivery(),
                 App.isOrderDelivery()
                         ? new Delivery(App.getRecipientFirstName() + " " + App.getRecipientLastName(),

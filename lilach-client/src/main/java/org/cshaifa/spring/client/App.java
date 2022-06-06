@@ -65,6 +65,10 @@ public class App extends Application {
 
     private static Map<CatalogItem, Integer> shoppingCart = new HashMap<>();
 
+    private static double totalOrderPrice = -1;
+
+    private static String greeting = null;
+
     private static String recipientFirstName = null;
 
     private static String recipientLastName = null;
@@ -396,5 +400,11 @@ public class App extends Application {
         App.createdItem = createdItem;
     }
 
+    public static String getGreeting() { return greeting; }
 
+    public static void setGreeting(String greeting) { App.greeting = greeting; }
+
+    public static double getTotalOrderPrice() { return totalOrderPrice; }
+
+    public static void setTotalOrderPrice(double totalOrderPrice) { App.totalOrderPrice = totalOrderPrice; }
 }
