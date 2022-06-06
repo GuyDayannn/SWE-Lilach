@@ -70,10 +70,11 @@ public class LilachServer extends AbstractServer {
                 } else if (request instanceof EditEmployeeRequest editEmployeeRequest) {
                     ChainEmployee chainEmployee = editEmployeeRequest.getUpdatedChainEmployee();
                     Store store = editEmployeeRequest.getStore();
+                    Store oldStore = editEmployeeRequest.getOldStore();
                     String strNewType = editEmployeeRequest.getNewType();
                     String strCurrType = editEmployeeRequest.getCurrType();
                     try {
-                        DatabaseHandler.editEmployee(chainEmployee, store, strNewType, strCurrType);
+                        DatabaseHandler.editEmployee(chainEmployee, store, oldStore,strNewType, strCurrType);
                         client.sendToClient(new EditEmployeeResponse(requestId, true,"edited" ));
                     } catch (HibernateException e) {
                         e.printStackTrace();

@@ -195,9 +195,9 @@ public class ClientHandler {
         return (FreezeCustomerResponse) waitForMsgFromServer(freezeCustomerRequest.getRequestId());
     }
 
-    public static EditEmployeeResponse editEmployee(ChainEmployee chainEmployee, Store store, String newType, String currType)
+    public static EditEmployeeResponse editEmployee(ChainEmployee chainEmployee, Store store, Store oldStore,String newType, String currType)
             throws IOException, InterruptedException {
-        EditEmployeeRequest editEmployeeRequest = new EditEmployeeRequest(chainEmployee, store, newType, currType);
+        EditEmployeeRequest editEmployeeRequest = new EditEmployeeRequest(chainEmployee, store, oldStore,newType, currType);
         client.openConnection();
         client.sendToServer(editEmployeeRequest);
         return (EditEmployeeResponse) waitForMsgFromServer(editEmployeeRequest.getRequestId());

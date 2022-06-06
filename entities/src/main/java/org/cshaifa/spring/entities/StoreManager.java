@@ -8,12 +8,12 @@ import javax.persistence.*;
 public class StoreManager extends ChainEmployee{
 
     @OneToOne
-    private Store store;
+    private Store storeManaged;
 
     public StoreManager(String fullName, String username, String email, String password, String passwordSalt,
             Store store) {
         super(fullName, username, email, password, passwordSalt);
-        this.store = store;
+        this.storeManaged = store;
     }
 
     public StoreManager(String fullName, String username, String email, String password, String passwordSalt) {
@@ -23,8 +23,8 @@ public class StoreManager extends ChainEmployee{
     public StoreManager() {
     }
 
-    public Store getStore() {return store;}
-    public void setStore(Store store) {this.store = store;}
+    public Store getStoreManged() {return storeManaged;}
+    public void setStoreManged(Store store) {this.storeManaged = store;}
 
-    public void removeStore(){this.store = null;}
+    public void removeStoreManaged(){this.storeManaged = null;}
 }

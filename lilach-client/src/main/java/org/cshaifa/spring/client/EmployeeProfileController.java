@@ -294,32 +294,32 @@ public class EmployeeProfileController {
                 if(user.getClass().isAssignableFrom(ChainEmployee.class) ){
                     chainEmployeeList.add((ChainEmployee) user);
                     employeeList.add((Employee) user);
-                    System.out.println("added chain employee");
+                    //System.out.println("added chain employee");
                 }
                 else if(user.getClass().isAssignableFrom(StoreManager.class)){
                     storeManagersList.add((StoreManager) user);
                     employeeList.add((Employee) user);
-                    System.out.println("added store manager");
+                    //System.out.println("added store manager");
                 }
                 else if(user.getClass().isAssignableFrom(CustomerServiceEmployee.class)){
                     customerServiceList.add((CustomerServiceEmployee) user);
                     employeeList.add((Employee) user);
-                    System.out.println("added customer service employee");
+                    //System.out.println("added customer service employee");
 
                 }
                 else if(user.getClass().isAssignableFrom(Customer.class)){
                     customerList.add((Customer) user);
-                    System.out.println("added customer");
+                    //System.out.println("added customer");
                 }
                 else if(user.getClass().isAssignableFrom(ChainManager.class)){
                     chainManager = (ChainManager) user;
                     employeeList.add((Employee) user);
-                    System.out.println("added chain manager");
+                    //System.out.println("added chain manager");
                 }
                 else if(user.getClass().isAssignableFrom(SystemAdmin.class)){
                     systemAdmin = (SystemAdmin) user;
                     employeeList.add((Employee) user);
-                    System.out.println("added system admin");
+                    //System.out.println("added system admin");
                 }
                 else{
                     System.out.println("Couldn't classify user");
@@ -488,11 +488,11 @@ public class EmployeeProfileController {
 
     }
 
-    public void createTaskEmployeeUpdate(ChainEmployee employee, Store store, String newType, String currType){
+    public void createTaskEmployeeUpdate(ChainEmployee employee, Store store, Store oldStore, String newType, String currType){
         System.out.println("inserted createTaskEmployeeUpdate");
 
         Task<EditEmployeeResponse> editEmployeeTask = App.createTimedTask(() -> {
-            return ClientHandler.editEmployee(employee, store, newType, currType);
+            return ClientHandler.editEmployee(employee, store, oldStore, newType, currType);
         }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
         editEmployeeTask.setOnSucceeded(e -> {
@@ -851,21 +851,24 @@ public class EmployeeProfileController {
             editResultLabel.setTextFill(Color.RED);
             return;
         }
+
         System.out.println("inserted into editEmployee");
         String selectedStatus = employeeStatusComboBox.getValue();
         String employeeName = selectEmployeeComboBox.getValue();
         Store selectedStore= null;
+        Store oldStore = null;
         if(selectStoreComboBox.getValue()!=null){
-            selectStoreComboBox.getItems().clear();
             String storeName = selectStoreComboBox.getValue();
             if(storeName!=null) {
                 for (Store store : storesList) {
                     if (storeName.equals(store.getName())) {
                         selectedStore = store;
+                        System.out.println("selected store is: "+ selectedStore.getName());
                         break;
                     }
                 }
             }
+            selectStoreComboBox.getItems().clear();
         }
         if(employeesTypeComboBox.getValue().equals("Store Manager")){
             System.out.println("inserted into editEmployee store manager");
@@ -873,10 +876,11 @@ public class EmployeeProfileController {
             for(StoreManager manager: storeManagersList) {
                 if (manager.getFullName().equals(employeeName)) {
                     selectedManager = manager;
+                    oldStore = manager.getStoreManged();
                     break;
                 }
             }
-            createTaskEmployeeUpdate(selectedManager, selectedStore, selectedStatus, "Store Manager");
+            createTaskEmployeeUpdate(selectedManager, selectedStore, oldStore,selectedStatus, "Store Manager");
         }
         else if(employeesTypeComboBox.getValue().equals("Chain Employee")){
             System.out.println("inserted into editEmployee chain employee");
@@ -884,10 +888,11 @@ public class EmployeeProfileController {
             for (ChainEmployee employee: chainEmployeeList) {
                 if (employee.getFullName().equals(employeeName)) {
                     selectedEmployee = employee;
+                    oldStore = employee.getStore();
                     break;
                 }
             }
-            createTaskEmployeeUpdate(selectedEmployee, selectedStore, selectedStatus, "Chain Employee");
+            createTaskEmployeeUpdate(selectedEmployee, selectedStore,  oldStore,selectedStatus, "Chain Employee");
         }
         else if (employeesTypeComboBox.getValue().equals("Customer Service")) {
             CustomerServiceEmployee selectedEmployee = null;
@@ -897,11 +902,11 @@ public class EmployeeProfileController {
                     break;
                 }
             }
-            createTaskEmployeeUpdate(selectedEmployee, null, selectedStatus, "Customer Service");
+            createTaskEmployeeUpdate(selectedEmployee, selectedStore, null,selectedStatus, "Customer Service");
         }
 
         else{//we're editing chain maneger
-            createTaskEmployeeUpdate(chainManager, null, selectedStatus, "Chain Manager");
+            createTaskEmployeeUpdate(chainManager, selectedStore, null,selectedStatus, "Chain Manager");
         }
         employeesTypeComboBox.valueProperty().setValue(null); //edit to clear all
         selectStoreComboBox.valueProperty().setValue(null);

@@ -427,7 +427,7 @@ public class DatabaseHandler {
             Store store = new Store("Store" + i, "Address" + i, managers.get(i), storeEmployees);
             employees.get(2*i).setStore(store);
             employees.get((2*i)+1).setStore(store);
-            managers.get(i).setStore(store);
+            managers.get(i).setStoreManged(store);
             stores.add(store);
         }
         stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere", managers.get(10), new ArrayList<>()));
@@ -696,21 +696,20 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
-    public static void editEmployee(ChainEmployee chainEmployee, Store store, String strNewType, String currType) {
+    public static void editEmployee(ChainEmployee chainEmployee, Store store, Store oldStore, String strNewType, String currType) {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
         System.out.println("inside DB handler edit employee");
 
-        Store oldStore = null;
-        if(chainEmployee.getStore()!=null){
-            oldStore = chainEmployee.getStore();
-            System.out.println("old store is: " + oldStore.getName());
-        }
+        if(oldStore!=null){
+            System.out.println("old store is: " + oldStore.getName());}
         else{
             System.out.println("old store is null ");}
-        if(store!=null)
-        {System.out.println("store is: "+ store.getName());}
+        if(store!=null) {
+            System.out.println("store is: "+ store.getName());}
+        else{
+            System.out.println("new store is NULL");}
 
         StoreManager storeManager = new StoreManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
                 chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt(), store);
@@ -739,8 +738,8 @@ public class DatabaseHandler {
             }
             case "Store Manager" -> {
                 if(oldStore != null) {
-                    chainEmployee.removeStore();
-                    //oldStore.getStoreManager().removeStore();
+                    //chainEmployee.removeStore();
+                    oldStore.getStoreManager().removeStoreManaged();
                     oldStore.removeManager();
                 }
                 System.out.println("case store manager");
@@ -832,8 +831,9 @@ public class DatabaseHandler {
     public static void editToStoreManager(Session session, ChainEmployee chainEmployee, StoreManager storeManager, Store oldStore, Store newStore){
         System.out.println("in func edit to store manager");
         if(newStore != null) {
-            newStore.getStoreManager().removeStore();
+            newStore.getStoreManager().removeStoreManaged();
             newStore.removeManager();
+            System.out.println("removed old manager from new store");
         }
         try {
             if(oldStore!=null){
@@ -845,7 +845,7 @@ public class DatabaseHandler {
             session.delete(chainEmployee);
         } catch (Exception e) {
             e.printStackTrace();
-            if(oldStore!=null){
+            if(newStore!=null){
                 session.merge(newStore);}
             if(oldStore!=null){
                 session.merge(oldStore);}
@@ -856,7 +856,7 @@ public class DatabaseHandler {
 
         Session session2 = DatabaseConnector.getSessionFactory().openSession();
         session2.beginTransaction();
-        storeManager.setStore(newStore);
+        storeManager.setStoreManged(newStore);
         session2.save(storeManager);
         if(newStore!=null){
             newStore.setStoreManager(storeManager);
