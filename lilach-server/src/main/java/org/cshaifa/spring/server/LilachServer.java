@@ -244,7 +244,7 @@ public class LilachServer extends AbstractServer {
                                 createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
                             if (order.isDelivery()) {
-                                String message = "<h2>Your order #" + order.getId() + " has arrived!</h2>";
+                                String message = "<h2>Order #" + order.getId() + " has arrived!</h2>";
                                 if (!order.getDeliveryDetails().getMessage().isBlank())
                                     message += "<br>" + order.getDeliveryDetails().getMessage();
 

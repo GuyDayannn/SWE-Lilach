@@ -117,6 +117,7 @@ public class App extends Application {
                 createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS))
                         .start();
         currentUser = null;
+        shoppingCart.clear();
     }
 
     static void setRoot(String fxml) throws IOException {
