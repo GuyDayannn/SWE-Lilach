@@ -35,9 +35,6 @@ public class CustomerLoginController {
     private Label invalid_login_text;
 
     @FXML
-    private ImageView loginImage;
-
-    @FXML
     void cancelBtnOnAction(ActionEvent event) throws IOException {
         App.setWindowTitle("Primary");
         App.setContent("primary");
@@ -91,9 +88,9 @@ public class CustomerLoginController {
 
     @FXML
     void initialize() {
-        Image reg = new Image(getClass().getResource("images/login.png").toString());
-        loginImage.setImage(reg);
-        loginImage.setFitWidth(40);
-        loginImage.setFitHeight(40);
+        Image image = new Image(getClass().getResource("images/LiLachLogo.png").toString());
+        lilachLogo.setImage(image);
+        lilachLogo.setFitHeight(50);
+        invalid_login_text.setText("");
     }
 }
