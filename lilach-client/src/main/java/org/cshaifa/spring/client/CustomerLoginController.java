@@ -3,6 +3,8 @@ package org.cshaifa.spring.client;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -14,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+
 
 public class CustomerLoginController {
     @FXML
@@ -36,6 +39,9 @@ public class CustomerLoginController {
 
     @FXML
     private Label invalid_login_text;
+
+    @FXML
+    private ImageView loginImage;
 
     @FXML
     void cancelBtnOnAction(ActionEvent event) throws IOException {
@@ -89,7 +95,11 @@ public class CustomerLoginController {
         new Thread(loginTask).start();
     }
 
+    @FXML
     void initialize() {
-        loginMessageLabel.setText("");
+        Image reg = new Image(getClass().getResource("images/login.png").toString());
+        loginImage.setImage(reg);
+        loginImage.setFitWidth(40);
+        loginImage.setFitHeight(40);
     }
 }

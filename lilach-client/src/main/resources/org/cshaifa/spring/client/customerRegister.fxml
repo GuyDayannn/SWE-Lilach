@@ -5,41 +5,45 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="497.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.RegistrationController">
-   <left>
-      <AnchorPane prefHeight="400.0" prefWidth="150.0" BorderPane.alignment="CENTER" />
-   </left>
-   <right>
-      <AnchorPane prefHeight="400.0" prefWidth="42.0" BorderPane.alignment="CENTER" />
-   </right>
+<BorderPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.RegistrationController">
    <center>
-      <AnchorPane prefHeight="400.0" prefWidth="407.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="720.0" prefWidth="1045.0" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="14.0" layoutY="62.0" text="Full name" />
-            <TextField fx:id="fullNameTxtField" layoutX="109.0" layoutY="58.0" promptText="Full name" />
-            <Label layoutX="14.0" layoutY="109.0" text="Username" />
-            <TextField fx:id="usernameTxtField" layoutX="109.0" layoutY="105.0" promptText="Username" />
-            <Label layoutX="14.0" layoutY="155.0" text="Email" />
-            <TextField fx:id="emailTxtField" layoutX="109.0" layoutY="151.0" promptText="Email" />
-            <Label layoutX="14.0" layoutY="199.0" text="Password" />
-            <PasswordField fx:id="pwdTxtField" layoutX="108.0" layoutY="195.0" promptText="Password" />
-            <Label layoutX="14.0" layoutY="242.0" text="Password Conf" />
-            <PasswordField fx:id="pwdConfTxtField" layoutX="108.0" layoutY="238.0" promptText="re-type your password" />
-            <Button fx:id="registerBtn" layoutX="109.0" layoutY="405.0" mnemonicParsing="false" onAction="#onRegisterButton" prefHeight="30.0" prefWidth="131.0" text="Register" />
-            <Button fx:id="cancelLoginBtn" layoutX="110.0" layoutY="444.0" mnemonicParsing="false" onAction="#cancelBtnOnAction" prefHeight="30.0" prefWidth="130.0" text="Cancel" />
-            <Label fx:id="invalid_register_text" layoutX="59.0" layoutY="375.0" prefHeight="18.0" prefWidth="231.0" textFill="RED" />
-            <Text layoutX="90.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Registration" wrappingWidth="187.078125">
-               <font>
-                  <Font name="System Italic" size="18.0" />
-               </font>
-            </Text>
-            <ComboBox fx:id="subscriptionSelector" layoutX="90.0" layoutY="288.0" onAction="#onSubscriptionSelect" prefHeight="25.0" prefWidth="170.0" promptText="Subscription Type" />
-            <ComboBox fx:id="storeSelector" layoutX="89.0" layoutY="336.0" prefHeight="25.0" prefWidth="170.0" promptText="Store" />
+            <Label layoutX="388.0" layoutY="173.0" text="Full name" />
+            <TextField fx:id="fullNameTxtField" layoutX="483.0" layoutY="169.0" promptText="Full name" />
+            <Label layoutX="388.0" layoutY="220.0" text="Username" />
+            <TextField fx:id="usernameTxtField" layoutX="483.0" layoutY="216.0" promptText="Username" />
+            <Label layoutX="388.0" layoutY="266.0" text="Email" />
+            <TextField fx:id="emailTxtField" layoutX="483.0" layoutY="262.0" promptText="Email" />
+            <Label layoutX="388.0" layoutY="310.0" text="Password" />
+            <PasswordField fx:id="pwdTxtField" layoutX="482.0" layoutY="306.0" promptText="Password" />
+            <Label layoutX="388.0" layoutY="353.0" text="Password Conf" />
+            <PasswordField fx:id="pwdConfTxtField" layoutX="482.0" layoutY="349.0" promptText="re-type your password" />
+            <Label layoutX="387.0" layoutY="399.0" text="Credit Card" />
+            <TextField fx:id="creditCardTextField" layoutX="482.0" layoutY="395.0" promptText="Credit Card" />
+            <Button fx:id="registerBtn" layoutX="483.0" layoutY="603.0" mnemonicParsing="false" onAction="#onRegisterButton" prefHeight="30.0" prefWidth="131.0" stylesheets="@stylesheets/shoppingcart.css" text="Register" />
+            <Button fx:id="cancelLoginBtn" layoutX="484.0" layoutY="642.0" mnemonicParsing="false" onAction="#cancelBtnOnAction" prefHeight="30.0" prefWidth="130.0" stylesheets="@stylesheets/shoppingcart.css" text="Cancel" />
+            <Label fx:id="invalid_register_text" alignment="CENTER" layoutX="432.0" layoutY="438.0" prefHeight="18.0" prefWidth="231.0" textFill="RED" />
+            <ComboBox fx:id="subscriptionSelector" layoutX="464.0" layoutY="471.0" onAction="#onSubscriptionSelect" prefHeight="25.0" prefWidth="170.0" promptText="Subscription Type" />
+            <ComboBox fx:id="storeSelector" layoutX="463.0" layoutY="519.0" prefHeight="25.0" prefWidth="170.0" promptText="Store" />
+            <HBox fx:id="titleHbox" prefHeight="53.0" prefWidth="1040.0" styleClass="titleHBox" stylesheets="@stylesheets/shoppingcart.css">
+               <children>
+                  <ImageView fx:id="registerImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="10.0" translateY="5.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleText" text="Customer Registration" translateX="20.0" translateY="10.0">
+                     <font>
+                        <Font name="Trebuchet MS" size="24.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+            <Label fx:id="yearlyFee" layoutX="468.0" layoutY="568.0" prefHeight="18.0" prefWidth="178.0" text="Yearly Subscribtion costs 100 ILS" visible="false" />
          </children>
       </AnchorPane>
    </center>

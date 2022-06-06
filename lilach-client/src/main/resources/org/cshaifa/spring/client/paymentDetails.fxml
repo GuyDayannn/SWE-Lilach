@@ -3,51 +3,56 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1040.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.PaymentDetailsController">
    <children>
-      <VBox layoutX="81.0" layoutY="77.0" prefHeight="201.0" prefWidth="204.0" spacing="20.0">
+      <VBox layoutX="81.0" layoutY="77.0" prefHeight="201.0" prefWidth="204.0" spacing="20.0" />
+      <Button layoutX="795.0" layoutY="678.0" mnemonicParsing="false" onAction="#proceed" stylesheets="@stylesheets/shoppingcart.css" text="Proceed to Order Confirmation">
+         <font>
+            <Font size="15.0" />
+         </font></Button>
+      <Button layoutX="14.0" layoutY="678.0" mnemonicParsing="false" onAction="#goBack" stylesheets="@stylesheets/shoppingcart.css" text="Back to Supply Options">
+         <font>
+            <Font size="15.0" />
+         </font></Button>
+      <HBox fx:id="titleHbox" prefHeight="53.0" prefWidth="1040.0" styleClass="titleHBox" stylesheets="@stylesheets/shoppingcart.css">
          <children>
-            <Label text="Payment Details">
+            <ImageView fx:id="paymentImage" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="10.0" translateY="5.0" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleText" text="Payment Details" translateX="20.0" translateY="10.0">
                <font>
-                  <Font size="18.0" />
+                  <Font name="Trebuchet MS" size="24.0" />
+               </font>
+            </Text>
+         </children>
+      </HBox>
+      <VBox layoutX="396.0" layoutY="260.0" prefHeight="200.0" prefWidth="248.0" spacing="5.0">
+         <children>
+            <TextField fx:id="cardNumberField" promptText="Card Number" />
+            <TextField fx:id="cvvField" maxWidth="43.0" prefHeight="25.0" prefWidth="43.0" promptText="CVV" />
+            <Label text="Exp. Date">
+               <font>
+                  <Font size="15.0" />
                </font>
             </Label>
-            <VBox prefHeight="200.0" prefWidth="248.0" spacing="5.0">
+            <HBox maxWidth="100.0" prefHeight="33.0" prefWidth="100.0" spacing="5.0">
                <children>
-                  <TextField fx:id="cardNumberField" promptText="Card Number" />
-                  <TextField fx:id="cvvField" maxWidth="43.0" prefHeight="25.0" prefWidth="43.0" promptText="CVV" />
-                  <Label text="Exp. Date">
+                  <TextField fx:id="expMonthField" promptText="06" />
+                  <Label text="/">
                      <font>
-                        <Font size="15.0" />
+                        <Font size="19.0" />
                      </font>
                   </Label>
-                  <HBox maxWidth="100.0" prefHeight="101.0" prefWidth="144.0" spacing="5.0">
-                     <children>
-                        <TextField fx:id="expMonthField" promptText="06" />
-                        <Label text="/">
-                           <font>
-                              <Font size="19.0" />
-                           </font>
-                        </Label>
-                        <TextField fx:id="expYearField" promptText="22" />
-                     </children>
-                  </HBox>
+                  <TextField fx:id="expYearField" promptText="22" />
                </children>
-            </VBox>
+            </HBox>
+            <Label fx:id="notificationLabel" alignment="CENTER" prefHeight="18.0" prefWidth="248.0" text="Label" textFill="RED" visible="false" />
          </children>
       </VBox>
-      <Button layoutX="795.0" layoutY="678.0" mnemonicParsing="false" onAction="#proceed" text="Proceed to Order Confirmation">
-         <font>
-            <Font size="15.0" />
-         </font></Button>
-      <Button layoutX="14.0" layoutY="678.0" mnemonicParsing="false" onAction="#goBack" text="Back to Supply Options">
-         <font>
-            <Font size="15.0" />
-         </font></Button>
    </children>
 </AnchorPane>

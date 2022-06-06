@@ -4,7 +4,11 @@ import java.io.IOException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 
 public class PaymentDetailsController {
 
@@ -21,7 +25,17 @@ public class PaymentDetailsController {
     private TextField expYearField;
 
     @FXML
+    private Label notificationLabel;
+
+    @FXML
+    private ImageView paymentImage;
+
+    @FXML
     void initialize() {
+        Image pay = new Image(getClass().getResource("images/credit.png").toString());
+        paymentImage.setImage(pay);
+        paymentImage.setFitWidth(40);
+        paymentImage.setFitHeight(40);
         expMonthField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isEmpty() && !newValue.matches("0[1-9]|1[0-2]") && !newValue.matches("[0-1]"))
                 expMonthField.setText(oldValue);
@@ -57,6 +71,8 @@ public class PaymentDetailsController {
         if (!cardNumberField.getText().matches("\\d{4,}") || !expYearField.getText().matches("[2-5][0-9]")
                 || !expMonthField.getText().matches("0[1-9]|1[0-2]") || !cvvField.getText().matches("\\d{3}")) {
             System.out.println("Not all fields are valid");
+            notificationLabel.setVisible(true);
+            notificationLabel.setText("Not all fields are valid");
             // TODO: flash error msg
             return;
         }

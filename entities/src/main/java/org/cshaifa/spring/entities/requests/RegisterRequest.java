@@ -20,15 +20,18 @@ public class RegisterRequest extends Request {
 
     private SubscriptionType subscriptionType;
 
+    private String creditCard;
+
     private List<Complaint> complaintList;
 
-    public RegisterRequest(String fullName, String username, String email, String password, List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) {
+    public RegisterRequest(String fullName, String username, String email, String password, List<Store> stores, SubscriptionType subscriptionType, String creditCard, List<Complaint> complaintList) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.password = password;
         this.stores = stores;
         this.subscriptionType = subscriptionType;
+        this.creditCard = creditCard;
         this.complaintList = complaintList;
     }
 
@@ -60,4 +63,5 @@ public class RegisterRequest extends Request {
         return complaintList;
     }
 
+    public String getCreditCard() { return creditCard; }
 }

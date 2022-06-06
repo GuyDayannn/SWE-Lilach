@@ -131,7 +131,7 @@ public class DatabaseHandler {
     }
 
     public static String registerCustomer(String fullName, String email, String username, String rawPassword,
-            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList) throws Exception {
+            List<Store> stores, SubscriptionType subscriptionType, String creditCard, List<Complaint> complaintList) throws Exception {
         if (getUserByEmail(email) != null) {
             return Constants.EMAIL_EXISTS;
         }
@@ -146,7 +146,7 @@ public class DatabaseHandler {
         try {
             String hexSalt = generateHexSalt();
             Customer customer = new Customer(fullName, username, email, getHashedPassword(rawPassword, hexSalt),
-                    hexSalt, stores, false, subscriptionType, complaintList);
+                    hexSalt, stores, false, subscriptionType, creditCard, complaintList);
             session.save(customer);
             for (Store store : stores) {
                 store.addCustomer(customer);
@@ -327,6 +327,7 @@ public class DatabaseHandler {
         String[] colors = { "red", "orange", "pink" };
         String[] itemTypes = { "flower", "bouquet", "plant", "orchid", "wine", "chocolate", "set" };
         int typeInd = 0;
+        int itemNum = 1;
         for (List<Path> imageList : imageLists) {
             if (imageList != null) {
                 for (Path imagePath : imageList) {
@@ -334,7 +335,7 @@ public class DatabaseHandler {
                     double randomPrice = random.nextInt(50, 500) + 0.99;
                     Map<Store, Integer> stock = stores.stream()
                             .collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
-                    randomItems.add(new CatalogItem("Random Item", imagePath.toUri().toString(), randomPrice, stock,
+                    randomItems.add(new CatalogItem("Random Item " + itemNum++, imagePath.toUri().toString(), randomPrice, stock,
                             false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
             }
@@ -384,7 +385,7 @@ public class DatabaseHandler {
                     items.subList(0, item_index).stream()
                             .collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1, 4))),
                     "Mazal Tov", orderTime, deliveryTime, true,
-                    new Delivery("Guy Dayan", "0509889939", "Address Street 1", "Hello There", false));
+                    new Delivery("Guy Dayan", "0509889939", "Address Street 1", "Hello There", false, false));
         }
     }
 
@@ -393,7 +394,7 @@ public class DatabaseHandler {
         for (int i = 1; i <= 20; i++) {
             String email = "example" + i + "@mail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE,
-                    complaintList);
+                    "12341234",complaintList);
         }
         for (int i = 1; i <= 20; i++) {
             registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i);
@@ -498,6 +499,14 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
         updateDB(session, newItem);
+        tryFlushSession(session);
+    }
+
+    public static void deleteItem(CatalogItem itemToDelete) throws HibernateException {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        itemToDelete.setDeleted(1);
+        updateDB(session, itemToDelete);
         tryFlushSession(session);
     }
 

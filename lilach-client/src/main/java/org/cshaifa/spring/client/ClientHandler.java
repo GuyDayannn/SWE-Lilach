@@ -12,6 +12,7 @@ import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Delivery;
+import org.cshaifa.spring.entities.Employee;
 import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.SubscriptionType;
@@ -19,6 +20,7 @@ import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.requests.AddComplaintRequest;
 import org.cshaifa.spring.entities.requests.CreateItemRequest;
 import org.cshaifa.spring.entities.requests.CreateOrderRequest;
+import org.cshaifa.spring.entities.requests.DeleteItemRequest;
 import org.cshaifa.spring.entities.requests.FreezeCustomerRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetComplaintsRequest;
@@ -34,6 +36,7 @@ import org.cshaifa.spring.entities.requests.UpdateOrdersRequest;
 import org.cshaifa.spring.entities.responses.AddComplaintResponse;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.CreateOrderResponse;
+import org.cshaifa.spring.entities.responses.DeleteItemResponse;
 import org.cshaifa.spring.entities.responses.FreezeCustomerResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
@@ -42,6 +45,7 @@ import org.cshaifa.spring.entities.responses.GetStoresResponse;
 import org.cshaifa.spring.entities.responses.IsAliveResponse;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.entities.responses.LogoutResponse;
+import org.cshaifa.spring.entities.responses.NotifyResponse;
 import org.cshaifa.spring.entities.responses.RegisterResponse;
 import org.cshaifa.spring.entities.responses.Response;
 import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
@@ -52,7 +56,7 @@ import org.cshaifa.spring.utils.Constants;
 public class ClientHandler {
     private static LilachClient client = new LilachClient("localhost", Constants.SERVER_PORT);
     public static BlockingQueue<Object> msgQueue = new LinkedBlockingDeque<>();
-    public static BlockingQueue<Object> updateQueue = new LinkedBlockingDeque<>();
+    public static BlockingQueue<NotifyResponse> updateQueue = new LinkedBlockingDeque<>();
     public static volatile boolean connectionClosed = false;
 
     private static Object waitForMsgFromServer(int requestId) throws InterruptedException {
@@ -63,7 +67,7 @@ public class ClientHandler {
         return msgQueue.take();
     }
 
-    public static Object waitForUpdateFromServer() throws InterruptedException {
+    public static NotifyResponse waitForUpdateFromServer() throws InterruptedException {
         if (updateQueue.isEmpty())
             return null;
 
@@ -97,9 +101,9 @@ public class ClientHandler {
      * CatalogItem item = (CatalogItem) waitForMsgFromServer(); return item; }
      */
 
-    public static UpdateItemResponse updateItem(CatalogItem updatedItem)
+    public static UpdateItemResponse updateItem(Employee employee, CatalogItem updatedItem)
             throws IOException, ConnectException, InterruptedException {
-        UpdateItemRequest updateItemRequest = new UpdateItemRequest(updatedItem);
+        UpdateItemRequest updateItemRequest = new UpdateItemRequest(employee, updatedItem);
         client.openConnection();
         client.sendToServer(updateItemRequest);
         return (UpdateItemResponse) waitForMsgFromServer(updateItemRequest.getRequestId());
@@ -113,10 +117,10 @@ public class ClientHandler {
         return (UpdateComplaintResponse) waitForMsgFromServer(updateComplaintRequest.getRequestId());
     }
 
-    public static CreateItemResponse createItem(String name, double price, Map<Store, Integer> quantities,
+    public static CreateItemResponse createItem(Employee employee, String name, double price, Map<Store, Integer> quantities,
             boolean onSale, double discountPercent, String size, String itemType, String itemColor, boolean isDefault,
             byte[] image) throws IOException, InterruptedException {
-        CreateItemRequest createItemRequest = new CreateItemRequest(name, price, quantities, onSale, discountPercent,
+        CreateItemRequest createItemRequest = new CreateItemRequest(employee, name, price, quantities, onSale, discountPercent,
                 size, itemType, itemColor, isDefault, image);
         client.openConnection();
         client.sendToServer(createItemRequest);
@@ -140,10 +144,10 @@ public class ClientHandler {
     }
 
     public static RegisterResponse registerCustomer(String fullName, String username, String email, String password,
-            List<Store> stores, SubscriptionType subscriptionType, List<Complaint> complaintList)
+            List<Store> stores, SubscriptionType subscriptionType, String creditCard, List<Complaint> complaintList)
             throws IOException, InterruptedException {
         RegisterRequest registerRequest = new RegisterRequest(fullName, username, email, password, stores,
-                subscriptionType, complaintList);
+                subscriptionType, creditCard, complaintList);
         client.openConnection();
         client.sendToServer(registerRequest);
         return (RegisterResponse) waitForMsgFromServer(registerRequest.getRequestId());
@@ -222,5 +226,12 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(freezeCustomerRequest);
         return (FreezeCustomerResponse) waitForMsgFromServer(freezeCustomerRequest.getRequestId());
+    }
+
+    public static DeleteItemResponse deleteItem(Employee employee, CatalogItem catalogItem) throws  IOException, InterruptedException{
+        DeleteItemRequest deleteItemRequest = new DeleteItemRequest(employee, catalogItem);
+        client.openConnection();
+        client.sendToServer(deleteItemRequest);
+        return (DeleteItemResponse) waitForMsgFromServer(deleteItemRequest.getRequestId());
     }
 }
