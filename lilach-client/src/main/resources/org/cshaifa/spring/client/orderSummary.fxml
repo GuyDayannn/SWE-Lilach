@@ -47,7 +47,7 @@
                                     <Font size="30.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="greetingTextField" prefHeight="26.0" prefWidth="395.0" promptText="Greeting">
+                              <TextField fx:id="greetingTextField" prefHeight="26.0" prefWidth="309.0" promptText="Greeting">
                                  <HBox.margin>
                                     <Insets left="350.0" top="10.0" />
                                  </HBox.margin>

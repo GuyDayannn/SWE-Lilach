@@ -166,14 +166,14 @@ public class OrderSummaryController {
         if (shoppingCart != null) {
             double total = shoppingCart.entrySet().stream()
                     .mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
-            orderTotalLabel.setText(Double.toString(total));
+            orderTotalLabel.setText(new BigDecimal(total).setScale(2, RoundingMode.HALF_UP).toString());
             Customer currentCustomer = (Customer) App.getCurrentUser();
             if (currentCustomer.getSubscriptionType() == SubscriptionType.YEARLY) {
                 discountHBox.setVisible(true);
                 newTotalHBox.setVisible(true);
 
-                discountLabel.setText(Double.toString(total * 0.1));
-                newTotalLabel.setText(Double.toString(total * 0.9));
+                discountLabel.setText(new BigDecimal(total * 0.1).setScale(2,RoundingMode.HALF_DOWN).toString());
+                newTotalLabel.setText(new BigDecimal(total * 0.9).setScale(2, RoundingMode.HALF_UP).toString());
             } else {
                 summaryVBox.getChildren().remove(discountHBox);
                 summaryVBox.getChildren().remove(newTotalHBox);

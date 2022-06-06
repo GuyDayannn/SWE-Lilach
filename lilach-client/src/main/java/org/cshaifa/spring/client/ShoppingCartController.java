@@ -136,11 +136,11 @@ public class ShoppingCartController {
     void displayTotal() {
         if (shoppingCart!=null) {
             double total = shoppingCart.entrySet().stream().mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
-            summaryVbox.getChildren().add(new Text("Order Total:\t\t" + Double.toString(total)));
+            summaryVbox.getChildren().add(new Text("Order Total:\t\t" + new BigDecimal(total).setScale(2, RoundingMode.HALF_UP).toString()));
             Customer currentCustomer = (Customer)App.getCurrentUser();
             if (currentCustomer.getSubscriptionType() == SubscriptionType.YEARLY) {
-                summaryVbox.getChildren().add(new Text("10% Discount:\t\t" + Double.toString(total*0.1)));
-                summaryVbox.getChildren().add(new Text("New Total:\t\t" + Double.toString(total*0.9)));
+                summaryVbox.getChildren().add(new Text("10% Discount:\t\t" + new BigDecimal(total*0.1).setScale(2, RoundingMode.HALF_UP).toString()));
+                summaryVbox.getChildren().add(new Text("New Total:\t\t" + (new BigDecimal(total*0.9).setScale(2, RoundingMode.HALF_UP).toString())));
             }
             summaryVbox.getChildren().add(new Text("\n\n"));
             HBox buttonsBox = new HBox();
