@@ -1,6 +1,7 @@
 package org.cshaifa.spring.entities.requests;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Employee;
 
 /**
  * This request updates an item with all of the new details
@@ -8,8 +9,10 @@ import org.cshaifa.spring.entities.CatalogItem;
  */
 public class UpdateItemRequest extends Request {
     CatalogItem updatedItem;
+    Employee employee;
 
-    public UpdateItemRequest(CatalogItem updatedItem) {
+    public UpdateItemRequest(Employee employee, CatalogItem updatedItem) {
+        this.employee = employee;
         this.updatedItem = updatedItem;
     }
 
@@ -17,7 +20,7 @@ public class UpdateItemRequest extends Request {
         return updatedItem;
     }
 
-    public void setUpdatedItem(CatalogItem updatedItem) {
-        this.updatedItem = updatedItem;
+    public Employee getEmployee() {
+        return employee;
     }
 }

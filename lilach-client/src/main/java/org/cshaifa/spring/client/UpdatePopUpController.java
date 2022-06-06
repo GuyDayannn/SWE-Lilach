@@ -3,6 +3,7 @@ package org.cshaifa.spring.client;
 import java.util.concurrent.TimeUnit;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Employee;
 import org.cshaifa.spring.entities.responses.UpdateItemResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -63,7 +64,7 @@ public class UpdatePopUpController {
                 }
 
 
-                return ClientHandler.updateItem(updatedItem);
+                return ClientHandler.updateItem((Employee) App.getCurrentUser(), updatedItem);
             }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
             updateItemTask.setOnSucceeded(e -> {

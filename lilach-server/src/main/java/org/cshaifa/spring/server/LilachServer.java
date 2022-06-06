@@ -50,7 +50,7 @@ public class LilachServer extends AbstractServer {
                     try {
                         DatabaseHandler.updateItem(updatedItem);
                         client.sendToClient(new UpdateItemResponse(requestId, updatedItem));
-                        sendToAllClients(new NotifyUpdateResponse(updatedItem));
+                        sendToAllClients(new NotifyUpdateResponse(updateItemRequest.getEmployee(), updatedItem));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
@@ -60,14 +60,11 @@ public class LilachServer extends AbstractServer {
                     try {
                         DatabaseHandler.deleteItem(updatedItem);
                         client.sendToClient(new DeleteItemResponse(requestId, true, "Deletion Completed"));
-                        //sendToAllClients(new NotifyUpdateResponse(updatedItem));
+                        sendToAllClients(new NotifyDeleteResponse(deleteItemRequest.getEmployee(), updatedItem));
                     } catch (HibernateException e) {
                         e.printStackTrace();
-                        client.sendToClient(new DeleteItemResponse(requestId, false,"Deletion Failed"));
+                        client.sendToClient(new DeleteItemResponse(requestId, false, "Deletion Failed"));
                     }
-
-
-
 
                 } else if (request instanceof UpdateComplaintRequest updateComplaintRequest) {
                     Complaint updatedComplaint = updateComplaintRequest.getUpdatedComplaint();
@@ -115,7 +112,8 @@ public class LilachServer extends AbstractServer {
                         String message = DatabaseHandler.registerCustomer(registerRequest.getFullName(),
                                 registerRequest.getEmail(), registerRequest.getUsername(),
                                 registerRequest.getPassword(), registerRequest.getStores(),
-                                registerRequest.getSubscriptionType(), registerRequest.getCreditCard(), registerRequest.getComplaintList());
+                                registerRequest.getSubscriptionType(), registerRequest.getCreditCard(),
+                                registerRequest.getComplaintList());
                         if (message.equals(Constants.SUCCESS_MSG)) {
                             User user = DatabaseHandler.getUserByEmail(registerRequest.getEmail());
                             // TODO: maybe catch this separately
@@ -165,9 +163,13 @@ public class LilachServer extends AbstractServer {
                         if (order != null) {
                             if (order.isDelivery()) {
                                 if (order.getDeliveryDetails().isImmediate())
-                                    EmailUtils.sendEmail(order.getCustomer().getEmail(), order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT, "Your order #" + order.getId() + " has arrived!");
+                                    EmailUtils.sendEmail(order.getCustomer().getEmail(),
+                                            order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT,
+                                            "Your order #" + order.getId() + " has arrived!");
                                 else
-                                    EmailUtils.sendEmailAt(order.getCustomer().getEmail(), order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT, "Your order #" + order.getId() + " has arrived!", order.getSupplyDate());
+                                    EmailUtils.sendEmailAt(order.getCustomer().getEmail(),
+                                            order.getCustomer().getFullName(), IMMEDIATE_ORDER_MAIL_SUBJECT,
+                                            "Your order #" + order.getId() + " has arrived!", order.getSupplyDate());
                             }
                             client.sendToClient(new CreateOrderResponse(requestId, true, order, Constants.SUCCESS_MSG));
                         } else {

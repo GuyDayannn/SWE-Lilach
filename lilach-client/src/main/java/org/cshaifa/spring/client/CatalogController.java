@@ -8,12 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javafx.stage.Stage;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.Employee;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.DeleteItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.NotifyResponse;
 import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
@@ -48,6 +49,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class CatalogController {
@@ -98,6 +100,9 @@ public class CatalogController {
     @FXML
     private Label updateNotification;
 
+    private final String PRODUCT_UPDATED_NOTIFICATION = "Product Updated";
+    private final String PRODUCT_DELETED_NOTIFICATION = "Product Deleted";
+
     // Variables
     List<CatalogItem> catalogItems = null;
     private boolean filter_applied = false;
@@ -119,7 +124,11 @@ public class CatalogController {
     }
 
     void listDisplay() {
-        itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item -> getItemHBox(item)).toList());
+        // itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item -> getItemHBox(item)).toList());
+        itemCells = FXCollections.observableArrayList();
+        for (int i = 0; i < catalogItems.size(); i++) {
+            itemCells.add(getItemHBox(catalogItems.get(i)));
+        }
         refreshList();
     }
 
@@ -240,41 +249,40 @@ public class CatalogController {
         ivRemove.setFitHeight(15);
         ivRemove.setFitWidth(15);
         removeItemButton.setGraphic(ivRemove);
-        removeItemButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Task<DeleteItemResponse> deleteItemTask = App.createTimedTask(() -> {
-                    return ClientHandler.deleteItem(item);
-                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+        removeItemButton.setOnAction(event -> {
+            Task<DeleteItemResponse> deleteItemTask = App.createTimedTask(() -> {
+                return ClientHandler.deleteItem((Employee) App.getCurrentUser(), item);
+            }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-                deleteItemTask.setOnSucceeded(e ->{
-                    DeleteItemResponse response = deleteItemTask.getValue();
-                    if(!response.isSuccessful()) {
-                        // TODO: maybe log the specific exception somewhere
-                        App.hideLoading();
-                        System.err.println("Deleting item failed");
-                        return;
-                    }
+            deleteItemTask.setOnSucceeded(e -> {
+                DeleteItemResponse response = deleteItemTask.getValue();
+                if (!response.isSuccessful()) {
+                    // TODO: maybe log the specific exception somewhere
+                    App.hideLoading();
+                    System.err.println("Deleting item failed");
+                    return;
+                }
 
-                    //TODO: update list - delete item
-                    int itemIndex = catalogItems.indexOf(item);
+                // TODO: update list - delete item
+                int itemIndex = catalogItems.indexOf(item);
+                if (itemIndex != -1) {
                     itemCells.remove(itemIndex);
                     catalogItems.remove(item);
                     refreshList();
-                    App.hideLoading();
-                });
+                }
+                App.hideLoading();
+            });
 
-                deleteItemTask.setOnFailed(e -> {
-                    App.hideLoading();
-                    // TODO: maybe properly log it somewhere
-                    deleteItemTask.getException().printStackTrace();
-                });
+            deleteItemTask.setOnFailed(e -> {
+                App.hideLoading();
+                // TODO: maybe properly log it somewhere
+                deleteItemTask.getException().printStackTrace();
+            });
 
-                Stage rootStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-                App.showLoading(rootVBox, rootStage, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
-                new Thread(deleteItemTask).start();
+            Stage rootStage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            App.showLoading(rootVBox, rootStage, Constants.LOADING_TIMEOUT, TimeUnit.SECONDS);
+            new Thread(deleteItemTask).start();
 
-            }
         });
         if (App.getCurrentUser() == null) {
             buttonBox.getChildren().add(viewButton);
@@ -536,28 +544,46 @@ public class CatalogController {
 
             App.scheduler.scheduleAtFixedRate(() -> {
                 try {
-                    Object gotObject = ClientHandler.waitForUpdateFromServer();
-                    if (gotObject == null)
+                    NotifyResponse notifyResponse = ClientHandler.waitForUpdateFromServer();
+                    if (notifyResponse == null)
                         return;
 
-                    NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) gotObject;
-                    if (notifyUpdateResponse != null) {
-                        int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
-                                catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
-                                .findFirst().get());
-                        catalogItems.set(itemIndex, notifyUpdateResponse.getToUpdate());
-                        itemCells.set(itemIndex, getItemHBox(catalogItems.get(itemIndex)));
-                        Platform.runLater(() -> {
-                            refreshList();
-                            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1), updateNotification);
-                            updateNotification.setVisible(true);
-                            fadeTransition.setFromValue(0.0);
-                            fadeTransition.setToValue(1.0);
-                            fadeTransition.setCycleCount(3);
-                            fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
-                            fadeTransition.play();
-                        });
+                    boolean sameUser = App.getCurrentUser() instanceof Employee
+                            && notifyResponse.getSendingEmployee().getId() == App.getCurrentUser().getId();
+
+                    if (!sameUser) {
+                        if (notifyResponse instanceof NotifyUpdateResponse) {
+                            NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) notifyResponse;
+
+                            for (int i = 0; i < catalogItems.size(); i++) {
+                                if (catalogItems.get(i).getId() == notifyUpdateResponse.getToUpdate().getId()) {
+                                    System.out.println("Found id at index " + i + "!");
+                                }
+                            }
+                            int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
+                                    catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
+                                    .findFirst().get());
+                            System.out.println("updating " + catalogItems.get(itemIndex).getName());
+                            catalogItems.set(itemIndex, notifyUpdateResponse.getToUpdate());
+                            System.out.println("Size before: " + itemCells.size());
+                            itemCells.set(itemIndex, getItemHBox(catalogItems.get(itemIndex)));
+                            System.out.println("Size after: " + itemCells.size());
+                        }
                     }
+
+                    Platform.runLater(() -> {
+                        if (!sameUser)
+                            refreshList();
+                        updateNotification.setText(PRODUCT_UPDATED_NOTIFICATION);
+                        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1),
+                                updateNotification);
+                        updateNotification.setVisible(true);
+                        fadeTransition.setFromValue(0.0);
+                        fadeTransition.setToValue(1.0);
+                        fadeTransition.setCycleCount(3);
+                        fadeTransition.setOnFinished(event -> updateNotification.setVisible(false));
+                        fadeTransition.play();
+                    });
 
                 } catch (Exception error) {
                     error.printStackTrace();
