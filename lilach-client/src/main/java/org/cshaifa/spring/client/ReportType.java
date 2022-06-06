@@ -1,4 +1,4 @@
-package org.cshaifa.spring.entities;
+package org.cshaifa.spring.client;
 
 public enum ReportType {
     ORDERS,
