@@ -739,7 +739,8 @@ public class DatabaseHandler {
             }
             case "Store Manager" -> {
                 if(oldStore != null) {
-                    oldStore.getStoreManager().removeStore();
+                    chainEmployee.removeStore();
+                    //oldStore.getStoreManager().removeStore();
                     oldStore.removeManager();
                 }
                 System.out.println("case store manager");
@@ -885,9 +886,8 @@ public class DatabaseHandler {
             session.merge(chainEmployee);
         }
         System.out.println("updated old store");
-
+//TODO: fix error here can't flush
         tryFlushSession(session);
-
 
         Session session2 = DatabaseConnector.getSessionFactory().openSession();
         session2.beginTransaction();

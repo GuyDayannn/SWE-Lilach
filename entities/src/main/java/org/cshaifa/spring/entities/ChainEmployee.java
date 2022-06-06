@@ -4,7 +4,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "chain_employees")
-//@Inheritance(strategy = InheritanceType.JOINED)
 public class ChainEmployee extends Employee {
 
     @ManyToOne

@@ -64,7 +64,7 @@ public class EmployeeProfileController {
     @FXML
     private CheckBox chainReport;
     @FXML
-    private Text generateMessageText;
+    private Label generateMessageText;
 
 
     // View Existing Reports Pane
@@ -624,19 +624,19 @@ public class EmployeeProfileController {
             }
             if (success) {
                 viewReportButton.setDisable(false);
-                generateMessageText.setFill(Color.GREEN);
+                generateMessageText.setTextFill(Color.GREEN);
                 generateMessageText.setText(Constants.GENERATE_REPORT_SUCCESS);
                 System.out.println("Report generated successfully.");
             }
             else {
-                generateMessageText.setFill(Color.RED);
+                generateMessageText.setTextFill(Color.RED);
                 generateMessageText.setText(Constants.GENERATE_REPORT_FAILED);
                 System.out.println("Generating report failed.");
             }
 
         }
         else {
-            generateMessageText.setFill(Color.RED);
+            generateMessageText.setTextFill(Color.RED);
             generateMessageText.setText(Constants.MISSING_REQUIREMENTS);
             System.out.println("Insert required data.");
         }
