@@ -17,6 +17,9 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.utils.Constants;
 
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -36,10 +39,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.Report;
-import org.cshaifa.spring.entities.User;
-import org.cshaifa.spring.utils.Constants;
 
 /**
  * JavaFX App

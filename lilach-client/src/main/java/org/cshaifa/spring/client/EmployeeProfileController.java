@@ -1,6 +1,29 @@
 package org.cshaifa.spring.client;
 
-import javafx.beans.property.*;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.cshaifa.spring.entities.ChainEmployee;
+import org.cshaifa.spring.entities.ChainManager;
+import org.cshaifa.spring.entities.Complaint;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.CustomerServiceEmployee;
+import org.cshaifa.spring.entities.Employee;
+import org.cshaifa.spring.entities.Store;
+import org.cshaifa.spring.entities.StoreManager;
+import org.cshaifa.spring.entities.SystemAdmin;
+import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.responses.EditEmployeeResponse;
+import org.cshaifa.spring.entities.responses.FreezeCustomerResponse;
+import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
+import org.cshaifa.spring.entities.responses.GetStoresResponse;
+import org.cshaifa.spring.entities.responses.GetUsersResponse;
+import org.cshaifa.spring.entities.responses.UpdateComplaintResponse;
+import org.cshaifa.spring.utils.Constants;
+
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,23 +31,16 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import org.cshaifa.spring.entities.*;
-import org.cshaifa.spring.entities.responses.*;
-import org.cshaifa.spring.utils.Constants;
-import org.cshaifa.spring.utils.ImageUtils;
-
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class EmployeeProfileController {
 
@@ -646,7 +662,6 @@ public class EmployeeProfileController {
 
     @FXML
     void viewReport(ActionEvent event) {
-        String path = report.getReportPath();
         App.setCurrentReportDisplayed(report);
         App.popUpLaunch(viewReportButton, "ReportPopUp");
     }
