@@ -16,6 +16,9 @@ import java.util.List;
 public class LilachServer extends AbstractServer {
 
     private static final String IMMEDIATE_ORDER_MAIL_SUBJECT = "Your order has arrived!";
+    private static final String PRODUCT_UPDATED_NOTIFICATION = "Product Updated";
+    private static final String PRODUCT_DELETED_NOTIFICATION = "Product Deleted";
+    private static final String PRODUCT_CREATED_NOTIFICATION = "Product Created";
 
     public LilachServer(int port) {
         super(port);
@@ -50,7 +53,8 @@ public class LilachServer extends AbstractServer {
                     try {
                         DatabaseHandler.updateItem(updatedItem);
                         client.sendToClient(new UpdateItemResponse(requestId, updatedItem));
-                        sendToAllClients(new NotifyUpdateResponse(updateItemRequest.getEmployee(), updatedItem));
+                        sendToAllClients(new NotifyUpdateResponse(updateItemRequest.getEmployee(), updatedItem,
+                                PPRODUCT_UPDATED_NOTIFICATION));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new UpdateItemResponse(requestId, false));
@@ -60,7 +64,8 @@ public class LilachServer extends AbstractServer {
                     try {
                         DatabaseHandler.deleteItem(updatedItem);
                         client.sendToClient(new DeleteItemResponse(requestId, true, "Deletion Completed"));
-                        sendToAllClients(new NotifyDeleteResponse(deleteItemRequest.getEmployee(), updatedItem));
+                        sendToAllClients(new NotifyDeleteResponse(deleteItemRequest.getEmployee(), updatedItem,
+                                PPRODUCT_DELETED_NOTIFICATION));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new DeleteItemResponse(requestId, false, "Deletion Failed"));
@@ -135,7 +140,6 @@ public class LilachServer extends AbstractServer {
                         return;
                     }
                     client.sendToClient(new LogoutResponse(requestId, true));
-
                 } else if (request instanceof CreateItemRequest createItemRequest) {
                     try {
                         CatalogItem item = DatabaseHandler.createItem(createItemRequest.getName(),
@@ -145,6 +149,7 @@ public class LilachServer extends AbstractServer {
                                 createItemRequest.getItemColor(), createItemRequest.isDefault(),
                                 createItemRequest.getImage());
                         client.sendToClient(new CreateItemResponse(requestId, item != null, item));
+                        sendToAllClients(new NotifyCreateResponse(item, createItemRequest.getEmployee(), PRODUCT_CREATED_NOTIFICATION));
                     } catch (HibernateException e) {
                         e.printStackTrace();
                         client.sendToClient(new CreateItemResponse(requestId, false));

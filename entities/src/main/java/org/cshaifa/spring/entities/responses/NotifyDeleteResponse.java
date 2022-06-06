@@ -7,8 +7,8 @@ public class NotifyDeleteResponse extends NotifyResponse {
 
     private CatalogItem toDelete;
 
-    public NotifyDeleteResponse(Employee sendingEmployee, CatalogItem toDelete) {
-        super(sendingEmployee);
+    public NotifyDeleteResponse(Employee sendingEmployee, CatalogItem toDelete, String message) {
+        super(sendingEmployee, message);
         this.toDelete = toDelete;
     }
 

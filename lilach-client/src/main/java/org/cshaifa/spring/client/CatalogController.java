@@ -14,6 +14,8 @@ import org.cshaifa.spring.entities.Employee;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.DeleteItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
+import org.cshaifa.spring.entities.responses.NotifyCreateResponse;
+import org.cshaifa.spring.entities.responses.NotifyDeleteResponse;
 import org.cshaifa.spring.entities.responses.NotifyResponse;
 import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
@@ -100,9 +102,6 @@ public class CatalogController {
     @FXML
     private Label updateNotification;
 
-    private final String PRODUCT_UPDATED_NOTIFICATION = "Product Updated";
-    private final String PRODUCT_DELETED_NOTIFICATION = "Product Deleted";
-
     // Variables
     List<CatalogItem> catalogItems = null;
     private boolean filter_applied = false;
@@ -124,7 +123,8 @@ public class CatalogController {
     }
 
     void listDisplay() {
-        // itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item -> getItemHBox(item)).toList());
+        // itemCells = FXCollections.observableArrayList(catalogItems.stream().map(item
+        // -> getItemHBox(item)).toList());
         itemCells = FXCollections.observableArrayList();
         for (int i = 0; i < catalogItems.size(); i++) {
             itemCells.add(getItemHBox(catalogItems.get(i)));
@@ -370,7 +370,8 @@ public class CatalogController {
             return;
 
         Task<CreateItemResponse> createItemTask = App.createTimedTask(
-                () -> ClientHandler.createItem("Example", 400, new HashMap<>(), false, 0, "large", "flower", "white",
+                () -> ClientHandler.createItem((Employee) App.getCurrentUser(), "Example", 400, new HashMap<>(), false,
+                        0, "large", "flower", "white",
                         true, ImageUtils.getByteArrayFromURI(selectedFile.toURI())),
                 Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
@@ -544,7 +545,7 @@ public class CatalogController {
 
             App.scheduler.scheduleAtFixedRate(() -> {
                 try {
-                    NotifyResponse notifyResponse = ClientHandler.waitForUpdateFromServer();
+                    final NotifyResponse notifyResponse = ClientHandler.waitForUpdateFromServer();
                     if (notifyResponse == null)
                         return;
 
@@ -554,27 +555,29 @@ public class CatalogController {
                     if (!sameUser) {
                         if (notifyResponse instanceof NotifyUpdateResponse) {
                             NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) notifyResponse;
-
-                            for (int i = 0; i < catalogItems.size(); i++) {
-                                if (catalogItems.get(i).getId() == notifyUpdateResponse.getToUpdate().getId()) {
-                                    System.out.println("Found id at index " + i + "!");
-                                }
-                            }
                             int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
                                     catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
                                     .findFirst().get());
-                            System.out.println("updating " + catalogItems.get(itemIndex).getName());
                             catalogItems.set(itemIndex, notifyUpdateResponse.getToUpdate());
-                            System.out.println("Size before: " + itemCells.size());
                             itemCells.set(itemIndex, getItemHBox(catalogItems.get(itemIndex)));
-                            System.out.println("Size after: " + itemCells.size());
+                        } else if (notifyResponse instanceof NotifyDeleteResponse) {
+                            NotifyDeleteResponse notifyDeleteResponse = (NotifyDeleteResponse) notifyResponse;
+                            int itemIndex = catalogItems.indexOf(catalogItems.stream().filter(
+                                    catalogItem -> catalogItem.getId() == notifyDeleteResponse.getToDelete().getId())
+                                    .findFirst().get());
+                            catalogItems.remove(itemIndex);
+                            itemCells.remove(itemIndex);
+                        } else if (notifyResponse instanceof NotifyCreateResponse) {
+                            NotifyCreateResponse notifyCreateResponse = (NotifyCreateResponse) notifyResponse;
+                            catalogItems.add(notifyCreateResponse.getToCreate());
+                            itemCells.add(getItemHBox(notifyCreateResponse.getToCreate()));
                         }
                     }
 
                     Platform.runLater(() -> {
                         if (!sameUser)
                             refreshList();
-                        updateNotification.setText(PRODUCT_UPDATED_NOTIFICATION);
+                        updateNotification.setText(notifyResponse.getMessage());
                         FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1),
                                 updateNotification);
                         updateNotification.setVisible(true);

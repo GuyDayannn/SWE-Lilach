@@ -7,8 +7,8 @@ public class NotifyUpdateResponse extends NotifyResponse {
 
     private CatalogItem toUpdate;
 
-    public NotifyUpdateResponse(Employee sendingEmployee, CatalogItem toUpdate) {
-        super(sendingEmployee);
+    public NotifyUpdateResponse(Employee sendingEmployee, CatalogItem toUpdate, String message) {
+        super(sendingEmployee, message);
         this.toUpdate = toUpdate;
     }
 

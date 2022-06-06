@@ -117,10 +117,10 @@ public class ClientHandler {
         return (UpdateComplaintResponse) waitForMsgFromServer(updateComplaintRequest.getRequestId());
     }
 
-    public static CreateItemResponse createItem(String name, double price, Map<Store, Integer> quantities,
+    public static CreateItemResponse createItem(Employee employee, String name, double price, Map<Store, Integer> quantities,
             boolean onSale, double discountPercent, String size, String itemType, String itemColor, boolean isDefault,
             byte[] image) throws IOException, InterruptedException {
-        CreateItemRequest createItemRequest = new CreateItemRequest(name, price, quantities, onSale, discountPercent,
+        CreateItemRequest createItemRequest = new CreateItemRequest(employee, name, price, quantities, onSale, discountPercent,
                 size, itemType, itemColor, isDefault, image);
         client.openConnection();
         client.sendToServer(createItemRequest);
