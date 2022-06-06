@@ -23,6 +23,7 @@
     -fx-border-radius: 5;
     -fx-border-insets: 5;
 }
+
 .shoppingcart:hover{
     -fx-background-color: linear-gradient(#519349, #90ce7f);
     -fx-text-fill: white;

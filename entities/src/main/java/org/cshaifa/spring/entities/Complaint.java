@@ -24,8 +24,9 @@ public class Complaint implements Serializable {
     private Timestamp complaintTimestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Customer customer;
     //@LazyCollection(LazyCollectionOption.FALSE)
+    private Customer customer;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Store store;

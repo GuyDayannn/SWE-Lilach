@@ -20,16 +20,10 @@ import javafx.scene.paint.Color;
 
 public class CustomerLoginController {
     @FXML
-    private Button cancelBtn;
-
-    @FXML
-    private Button loginBtn;
+    private ImageView lilachLogo;
 
     @FXML
     private BorderPane rootPane;
-
-    @FXML
-    private Label loginMessageLabel;
 
     @FXML
     private TextField usernameTxtField;
@@ -54,8 +48,8 @@ public class CustomerLoginController {
         if (!usernameTxtField.getText().isBlank() && !pwdTxtField.getText().isBlank()) {
             validateLogin();
         } else {
-            loginMessageLabel.setText("Please enter username and password");
-            loginMessageLabel.setVisible(true);
+            invalid_login_text.setText("Please enter username and password");
+            invalid_login_text.setVisible(true);
         }
     }
 

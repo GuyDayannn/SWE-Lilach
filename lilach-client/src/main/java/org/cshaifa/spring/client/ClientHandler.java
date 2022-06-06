@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.ChainEmployee;
 import org.cshaifa.spring.entities.Complaint;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Delivery;
@@ -21,11 +22,13 @@ import org.cshaifa.spring.entities.requests.AddComplaintRequest;
 import org.cshaifa.spring.entities.requests.CreateItemRequest;
 import org.cshaifa.spring.entities.requests.CreateOrderRequest;
 import org.cshaifa.spring.entities.requests.DeleteItemRequest;
+import org.cshaifa.spring.entities.requests.EditEmployeeRequest;
 import org.cshaifa.spring.entities.requests.FreezeCustomerRequest;
 import org.cshaifa.spring.entities.requests.GetCatalogRequest;
 import org.cshaifa.spring.entities.requests.GetComplaintsRequest;
 import org.cshaifa.spring.entities.requests.GetOrdersRequest;
 import org.cshaifa.spring.entities.requests.GetStoresRequest;
+import org.cshaifa.spring.entities.requests.GetUsersRequest;
 import org.cshaifa.spring.entities.requests.IsAliveRequest;
 import org.cshaifa.spring.entities.requests.LoginRequest;
 import org.cshaifa.spring.entities.requests.LogoutRequest;
@@ -37,11 +40,13 @@ import org.cshaifa.spring.entities.responses.AddComplaintResponse;
 import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.CreateOrderResponse;
 import org.cshaifa.spring.entities.responses.DeleteItemResponse;
+import org.cshaifa.spring.entities.responses.EditEmployeeResponse;
 import org.cshaifa.spring.entities.responses.FreezeCustomerResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.GetComplaintsResponse;
 import org.cshaifa.spring.entities.responses.GetOrdersResponse;
 import org.cshaifa.spring.entities.responses.GetStoresResponse;
+import org.cshaifa.spring.entities.responses.GetUsersResponse;
 import org.cshaifa.spring.entities.responses.IsAliveResponse;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.entities.responses.LogoutResponse;
@@ -93,6 +98,13 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(getOrdersRequest);
         return (GetOrdersResponse) waitForMsgFromServer(getOrdersRequest.getRequestId());
+    }
+
+    public static GetUsersResponse getUsers() throws IOException, ConnectException, InterruptedException {
+        GetUsersRequest getUsersRequest = new GetUsersRequest();
+        client.openConnection();
+        client.sendToServer(getUsersRequest);
+        return (GetUsersResponse) waitForMsgFromServer(getUsersRequest.getRequestId());
     }
 
     /*
@@ -226,6 +238,14 @@ public class ClientHandler {
         client.openConnection();
         client.sendToServer(freezeCustomerRequest);
         return (FreezeCustomerResponse) waitForMsgFromServer(freezeCustomerRequest.getRequestId());
+    }
+
+    public static EditEmployeeResponse editEmployee(ChainEmployee chainEmployee, Store store, Store oldStore,String newType, String currType)
+            throws IOException, InterruptedException {
+        EditEmployeeRequest editEmployeeRequest = new EditEmployeeRequest(chainEmployee, store, oldStore,newType, currType);
+        client.openConnection();
+        client.sendToServer(editEmployeeRequest);
+        return (EditEmployeeResponse) waitForMsgFromServer(editEmployeeRequest.getRequestId());
     }
 
     public static DeleteItemResponse deleteItem(Employee employee, CatalogItem catalogItem) throws  IOException, InterruptedException{

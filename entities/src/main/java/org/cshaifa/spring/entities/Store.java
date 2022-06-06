@@ -5,13 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -38,20 +32,31 @@ public class Store implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Complaint> complaints;
 
+    @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<ChainEmployee> employees;
+
+    @OneToOne//(fetch = FetchType.EAGER)
+    private StoreManager storeManager;
+
     public Store() {
         this.name = "";
         this.address = "";
         this.customers = new ArrayList<>();
         this.orders = new ArrayList<>();
         this.complaints = new ArrayList<>();
+        this.employees = new ArrayList<>();
+        this.storeManager = new StoreManager();
     }
 
-    public Store(String name, String address) {
+    public Store(String name, String address, StoreManager storeManager, List<ChainEmployee> employees) {
         this.name = name;
         this.address = address;
         this.customers = new ArrayList<>();
         this.orders = new ArrayList<>();
         this.complaints = new ArrayList<>();
+        this.employees = employees;
+        this.storeManager = storeManager;
     }
 
     public Store(String name, String address, List<Customer> customers) {
@@ -60,14 +65,19 @@ public class Store implements Serializable {
         this.customers = customers;
         this.orders = new ArrayList<>();
         this.complaints = new ArrayList<>();
+        this.employees = new ArrayList<>();
+        this.storeManager = new StoreManager();
     }
 
-    public Store(String name, String address, List<Customer> customers, List<Order> orders,List<Complaint> complaints) {
+    public Store(String name, String address, List<Customer> customers, List<Order> orders,
+                 List<Complaint> complaints, List<ChainEmployee> employees, StoreManager storeManager) {
         this.name = name;
         this.address = address;
         this.customers = customers;
         this.orders = orders;
         this.complaints = complaints;
+        this.employees = employees;
+        this.storeManager = storeManager;
     }
 
 
@@ -91,11 +101,19 @@ public class Store implements Serializable {
         this.address = address;
     }
 
+    public StoreManager getStoreManager() {return storeManager;}
+
+    public void setStoreManager(StoreManager storeManager) {
+        this.storeManager = storeManager;
+    }
+
     public void addCustomer(Customer customer) { this.customers.add(customer); }
 
     public void addOrder(Order order) {orders.add(order);}
 
     public void addComplaint(Complaint complaint) {complaints.add(complaint);}
+
+    public void setEmployees(List<ChainEmployee> employees) {this.employees = employees;}
 
     public List<Order> getOrders() {
         return orders;
@@ -109,7 +127,15 @@ public class Store implements Serializable {
         return complaints;
     }
 
+    public List<ChainEmployee> getEmployees() { return employees; }
+
     public void removeOrder(Order order) {this.orders.remove(order);}
+
+    public void removeEmployee(ChainEmployee chainEmployee) {this.employees.remove(chainEmployee);}
+
+    public void removeManager() {this.storeManager = null;}
+
+    public void addEmployee(ChainEmployee chainEmployee) {this.employees.add(chainEmployee);}
 
     @Override
     public boolean equals(Object o) {

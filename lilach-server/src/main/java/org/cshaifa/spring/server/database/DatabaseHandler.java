@@ -24,15 +24,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.ChainEmployee;
-import org.cshaifa.spring.entities.Complaint;
-import org.cshaifa.spring.entities.Customer;
-import org.cshaifa.spring.entities.Delivery;
-import org.cshaifa.spring.entities.Order;
-import org.cshaifa.spring.entities.Store;
-import org.cshaifa.spring.entities.SubscriptionType;
-import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.*;
 import org.cshaifa.spring.utils.Constants;
 import org.cshaifa.spring.utils.ImageUtils;
 import org.cshaifa.spring.utils.SecureUtils;
@@ -164,16 +156,18 @@ public class DatabaseHandler {
         return Constants.SUCCESS_MSG;
     }
 
-    public static String registerChainEmployee(String fullName, String email, String username, String rawPassword)
+    public static ChainEmployee registerChainEmployee(String fullName, String email, String username, String rawPassword)
             throws HibernateException {
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
+        ChainEmployee chainEmployee= null;
 
         try {
             String hexSalt = generateHexSalt();
-            session.save(
-                    new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt));
+            chainEmployee = new ChainEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(chainEmployee);
+
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
             e.printStackTrace();
@@ -183,7 +177,97 @@ public class DatabaseHandler {
 
         tryFlushSession(session);
 
-        return Constants.SUCCESS_MSG;
+        return chainEmployee;
+    }
+
+    public static CustomerServiceEmployee registerCustomerService(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        CustomerServiceEmployee customerServiceEmployee= null;
+
+        try {
+            String hexSalt = generateHexSalt();
+            customerServiceEmployee = new CustomerServiceEmployee(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(customerServiceEmployee);
+
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return customerServiceEmployee;
+    }
+
+    public static StoreManager registerStoreManager(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        StoreManager storeManager= null;
+        try {
+            String hexSalt = generateHexSalt();
+            storeManager = new StoreManager(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(storeManager); }
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return storeManager;
+    }
+
+    public static ChainManager registerChainManager(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        ChainManager chainManager= null;
+        try {
+            String hexSalt = generateHexSalt();
+            chainManager = new ChainManager(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(chainManager); }
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return chainManager;
+    }
+
+    public static SystemAdmin registerSystemAdmin(String fullName, String email, String username, String rawPassword)
+            throws HibernateException {
+
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+        SystemAdmin systemAdmin= null;
+        try {
+            String hexSalt = generateHexSalt();
+            systemAdmin = new SystemAdmin(fullName, username, email, getHashedPassword(rawPassword, hexSalt), hexSalt);
+            session.save(systemAdmin); }
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            // Shouldn't happen, only if we mistyped something in the algorithm name, etc.
+            e.printStackTrace();
+            session.close();
+            throw new HibernateException(Constants.FAIL_MSG);
+        }
+
+        tryFlushSession(session);
+
+        return systemAdmin;
     }
 
     public static String freezeCustomer(Customer customer, boolean toFreeze) {
@@ -225,6 +309,7 @@ public class DatabaseHandler {
             throws HibernateException {
         if (!delivery) {
             // Check stock
+            //supplyDate = orderDate;
             if (!items.entrySet().stream().allMatch(entry -> {
                 return entry.getKey().getStock().containsKey(store)
                         && entry.getValue() <= entry.getKey().getStock().get(store);
@@ -273,6 +358,8 @@ public class DatabaseHandler {
 
         customer.addComplaint(complaint);
         updateDB(session, customer);
+        store.addComplaint(complaint);
+        updateDB(session, store);
 
         tryFlushSession(session);
 
@@ -301,6 +388,27 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
+    public static void updateChainEmployees(List<ChainEmployee> employees) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        for (ChainEmployee employee : employees) {
+            updateDB(session, employee);
+        }
+        tryFlushSession(session);
+    }
+
+    public static void updateStoreManagers(List<StoreManager> managers) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        for (StoreManager manager : managers) {
+            updateDB(session, manager);
+        }
+        tryFlushSession(session);
+    }
+
+
     public static void saveItems(List<CatalogItem> items) {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
@@ -310,12 +418,20 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
-    public static List<Store> initStores() {
+    public static List<Store> initStores(List<StoreManager> managers, List<ChainEmployee> employees) {
         List<Store> stores = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            stores.add(new Store("Store" + i, "Address" + i));
+            List<ChainEmployee> storeEmployees = new ArrayList<>();;
+            storeEmployees.add(employees.get(2*i));
+            storeEmployees.add(employees.get((2*i)+1));
+            int storeIndex = i+1;
+            Store store = new Store("Store" + storeIndex, "Address" + storeIndex, managers.get(i), storeEmployees);
+            employees.get(2*i).setStore(store);
+            employees.get((2*i)+1).setStore(store);
+            managers.get(i).setStoreManged(store);
+            stores.add(store);
         }
-        stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere"));
+        stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere", managers.get(10), new ArrayList<>()));
         return stores;
     }
 
@@ -364,6 +480,7 @@ public class DatabaseHandler {
 
         Random random = new Random();
 
+
         // createOrder(stores.get(random.nextInt(stores.size())),
         // (Customer)getUserByUsername("cust"+random.nextInt(1,15)),
         // items.subList(0, random.nextInt(1,
@@ -373,7 +490,7 @@ public class DatabaseHandler {
         // new Delivery("Guy Dayan", "0509889939","Address Street 1", "Hello There",
         // false));
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             int item_index = random.nextInt(items.size());
             Calendar cal = Calendar.getInstance();
             Calendar cal2 = Calendar.getInstance();
@@ -381,7 +498,7 @@ public class DatabaseHandler {
             cal2.add(Calendar.DAY_OF_MONTH, i + 3);
             Timestamp orderTime = new Timestamp(cal.getTime().getTime());
             Timestamp deliveryTime = new Timestamp(cal2.getTime().getTime());
-            createOrder(stores.get(stores.size() - 1), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)),
+            createOrder(stores.get(random.nextInt(11)), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)),
                     items.subList(0, item_index).stream()
                             .collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1, 4))),
                     "Mazal Tov", orderTime, deliveryTime, true,
@@ -389,16 +506,52 @@ public class DatabaseHandler {
         }
     }
 
-    public static void createUsers(List<Store> stores) throws Exception {
+    public static void createCustomers(List<Store> stores) throws Exception {
         List<Complaint> complaintList = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
-            String email = "example" + i + "@mail.com";
+            String email = "customer" + i + "@gmail.com";
             registerCustomer("Customer " + i, email, "cust" + i, "pass" + i, stores, SubscriptionType.STORE,
                     "12341234",complaintList);
         }
+
+    }
+
+    public static List<ChainEmployee> createEmployees() throws Exception{
+        List<ChainEmployee> chainEmployees = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
-            registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i);
+            chainEmployees.add(registerChainEmployee("Employee" + i, "Employee" + i + "@lilach.co.il", "Employee" + i, "Employee" + i));
         }
+        return chainEmployees;
+
+    }
+
+    public static List<CustomerServiceEmployee> createCustomerService() throws Exception{
+        List<CustomerServiceEmployee> customerServiceEmployees = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            customerServiceEmployees.add(registerCustomerService("cust service Employee" + i, "custServiceEmployee" + i + "@lilach.co.il", "custServiceEmployee" + i, "custServiceEmployeeEmployee" + i));
+        }
+        return customerServiceEmployees;
+
+    }
+
+    public static List<StoreManager> createStoreManagers() throws Exception {
+        List<StoreManager> storeManagers = new ArrayList<>();
+        for (int i = 1; i <= 11; i++) {
+            storeManagers.add(registerStoreManager("Manager" + i, "Manager" + i + "@lilach.co.il", "Manager" + i, "Manager" + i));
+        }
+        return storeManagers;
+    }
+
+    public static ChainManager createChainManager() throws Exception {
+        ChainManager chainManager = registerChainManager("ChainManager" + 0, "ChainManager" + 0 + "@lilach.co.il", "ChainManager" + 0, "ChainManager" + 0);
+
+        return chainManager;
+    }
+
+    public static SystemAdmin createSystemAdmin() throws Exception {
+        SystemAdmin systemAdmin = registerSystemAdmin("SystemAdmin" + 0, "SystemAdmin" + 0 + "@lilach.co.il", "SystemAdmin" + 0, "SystemAdmin" + 0);
+
+        return systemAdmin;
     }
 
     public static void initializeDatabaseIfEmpty() throws Exception {
@@ -406,14 +559,22 @@ public class DatabaseHandler {
         if (!getAllEntities(CatalogItem.class).isEmpty())
             return;
 
-        List<Store> stores = initStores();
+        List<StoreManager> managers = createStoreManagers();
+        List<ChainEmployee> employees = createEmployees();
+        List<CustomerServiceEmployee> customerServiceEmployees = createCustomerService();
+        createChainManager();
+        createSystemAdmin();
+
+        List<Store> stores = initStores(managers, employees);
         saveStores(stores);
+        updateChainEmployees(employees);
+        updateStoreManagers(managers);
         List<Store> pickupStores = stores.stream().filter((store) -> !store.getName().equals(Constants.WAREHOUSE_NAME))
                 .toList();
         List<CatalogItem> items = initItems(pickupStores);
         saveItems(items);
 
-        createUsers(pickupStores);
+        createCustomers(pickupStores);
         createOrders(stores, items);
         System.out.println("Finished initializing");
     }
@@ -495,6 +656,11 @@ public class DatabaseHandler {
         return orderList;
     }
 
+    public static List<User> getUsers() {
+        List<User> userList = getAllEntities(User.class);
+        return userList;
+    }
+
     public static void updateItem(CatalogItem newItem) throws HibernateException {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
@@ -537,8 +703,89 @@ public class DatabaseHandler {
             session.merge(order);
             session.merge(store);
         }
-        // updateDB(session, order);
         tryFlushSession(session);
+    }
+
+    public static void editEmployee(ChainEmployee chainEmployee, Store store, Store oldStore, String strNewType, String currType) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        System.out.println("inside DB handler edit employee");
+
+        if(oldStore!=null){
+            System.out.println("old store is: " + oldStore.getName());}
+        else{
+            System.out.println("old store is null ");}
+        if(store!=null) {
+            System.out.println("store is: "+ store.getName());}
+        else{
+            System.out.println("new store is NULL");}
+
+        StoreManager storeManager = new StoreManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt(), store);
+        CustomerServiceEmployee customerServiceEmployee = new CustomerServiceEmployee(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
+        ChainManager chainManager = new ChainManager(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
+        ChainEmployee employee = new ChainEmployee(chainEmployee.getFullName(), chainEmployee.getUsername(),
+                chainEmployee.getEmail(), chainEmployee.getPassword(), chainEmployee.getPasswordSalt());
+
+        switch (currType) {
+            case "Chain Employee" -> {
+                System.out.println("case chain employee");
+                if(oldStore != null) {
+                    oldStore.removeEmployee(chainEmployee);
+                    chainEmployee.removeStore();
+                    System.out.println("removed old employee from store");
+                }
+                if (strNewType.equals("Customer Service")) {
+                    editFromChainEmployee(session, chainEmployee, customerServiceEmployee, oldStore, "Chain Employee");
+                    System.out.println("case chain employee customer service");
+                } else if (strNewType.equals("Store Manager")) {
+                    editToStoreManager(session, chainEmployee, storeManager, oldStore, store);
+                } else if (strNewType.equals("Chain Manager")) {
+                    editFromChainEmployee(session, chainEmployee, chainManager, oldStore, "Chain Employee");
+                }
+            }
+            case "Store Manager" -> {
+                if(oldStore != null) {
+                    //chainEmployee.removeStore();
+                    oldStore.getStoreManager().removeStoreManaged();
+                    oldStore.removeManager();
+                }
+                System.out.println("case store manager");
+                if (strNewType.equals("Customer Service")) {
+                    editFromChainEmployee(session, chainEmployee, customerServiceEmployee, oldStore, "Store Manager");
+                } else if (strNewType.equals("Chain Employee")) {
+                   editToChainEmployee(session, chainEmployee, employee, oldStore, store);
+                } else if (strNewType.equals("Chain Manager")) {
+                    editFromChainEmployee(session, chainEmployee, chainManager, oldStore, "Store Manager");
+                }
+            }
+            case "Customer Service" -> {
+                System.out.println("case customer service");
+                if (strNewType.equals("Chain Employee")) { //turn into chain employee
+                    editToChainEmployee(session, chainEmployee, employee, oldStore, store);
+                } else if (strNewType.equals("Store Manager")) {
+                    System.out.println("case customer service store manager");
+                    editToStoreManager(session, chainEmployee, storeManager, oldStore, store);
+                } else if (strNewType.equals("Chain Manager")) {
+                    editFromChainEmployee(session, chainEmployee, chainManager, oldStore, "Customer Service");
+                }
+            }
+            case "Chain Manager"-> {
+                if (strNewType.equals("Chain Employee")) { //turn into chain employee
+                    editToChainEmployee(session, chainEmployee, employee, oldStore, store);
+                } else if (strNewType.equals("Store Manager")) {
+                    System.out.println("case chain manager to store manager");
+                    editToStoreManager(session, chainEmployee, storeManager, oldStore, store);
+                } else if (strNewType.equals("Customer Service")) {
+                    editFromChainEmployee(session, chainEmployee, customerServiceEmployee, oldStore, "Chain Manager");
+                }
+            }
+            default -> {
+                System.out.println("default case shouldn't get here! error");}
+        }
     }
 
     private static <T> void updateDB(Session session, T toUpdate) {
@@ -562,6 +809,182 @@ public class DatabaseHandler {
             session.close();
             throw new HibernateException(Constants.DATABASE_ERROR);
         }
+    }
+
+    public static void editFromChainEmployee(Session session, ChainEmployee chainEmployee, ChainEmployee newChainEmployee,
+                                             Store oldStore, String oldType){
+        System.out.println("in func edit to customer service / chain manager");
+        //ChainEmployee tempEmployee;
+        if(oldType.equals("Chain Manager")){
+            ChainManager tempEmployee = (ChainManager) chainEmployee;
+            try {
+                if(oldStore!=null){
+                    session.update(oldStore);}
+                session.update(tempEmployee);
+                session.delete(tempEmployee);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if(oldStore!=null){
+                    session.merge(oldStore);}
+                session.merge(tempEmployee);
+            }
+
+        }
+        else if(oldType.equals("Customer Service")){
+            CustomerServiceEmployee tempEmployee = (CustomerServiceEmployee) chainEmployee;
+            try {
+                if(oldStore!=null){
+                    session.update(oldStore);}
+                session.update(tempEmployee);
+                session.delete(tempEmployee);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if(oldStore!=null){
+                    session.merge(oldStore);}
+                session.merge(tempEmployee);
+            }
+        }
+        else if(oldType.equals("Store Manager")){
+           StoreManager tempEmployee = (StoreManager) chainEmployee;
+            try {
+                if(oldStore!=null){
+                    session.update(oldStore);}
+                session.update(tempEmployee);
+                session.delete(tempEmployee);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if(oldStore!=null){
+                    session.merge(oldStore);}
+                session.merge(tempEmployee);
+            }
+        }
+
+        else if(oldType.equals("Chain Employee")){
+            ChainEmployee tempEmployee = chainEmployee;
+            try {
+                if(oldStore!=null){
+                    session.update(oldStore);}
+                session.update(tempEmployee);
+                session.delete(tempEmployee);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if(oldStore!=null){
+                    session.merge(oldStore);}
+                session.merge(tempEmployee);
+            }
+        }
+        System.out.println("updated old store");
+
+        tryFlushSession(session);
+
+        Session session2 = DatabaseConnector.getSessionFactory().openSession();
+        session2.beginTransaction();
+        session2.save(newChainEmployee);
+
+        System.out.println("id of new cust service/ chain manager: " + newChainEmployee.getId());
+
+        System.out.println("saved customer service / chain manager");
+        tryFlushSession(session2);
+    }
+
+
+    public static void editToStoreManager(Session session, ChainEmployee chainEmployee, StoreManager storeManager,
+                                          Store oldStore, Store newStore){
+        System.out.println("in func edit to store manager");
+        if(newStore!=null && oldStore!=null && newStore.getName().equals(oldStore.getName())){
+            newStore = null;
+            if(oldStore.getStoreManager()!=null) {
+                oldStore.getStoreManager().removeStoreManaged();
+                oldStore.removeManager();
+                System.out.println("removed old manager from same store");
+            }
+        }
+            if (newStore != null) {
+                if(newStore.getStoreManager()!=null){
+                    newStore.getStoreManager().removeStoreManaged();
+                    newStore.removeManager();
+                    System.out.println("removed old manager from new store");
+                }
+                else{
+                    System.out.println("new store didn't have a manager");
+                }
+            }
+            try {
+                if (oldStore != null) {
+                    session.update(oldStore);
+                }
+                if (newStore != null) {
+                    session.update(newStore);
+                }
+                session.update(chainEmployee);
+                session.delete(chainEmployee);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (newStore != null) {
+                    session.merge(newStore);
+                }
+                if (oldStore != null) {
+                    session.merge(oldStore);
+                }
+                session.merge(chainEmployee);
+            }
+            System.out.println("updated old store");
+            tryFlushSession(session);
+
+            Session session2 = DatabaseConnector.getSessionFactory().openSession();
+            session2.beginTransaction();
+            storeManager.setStoreManged(newStore);
+            session2.save(storeManager);
+            if (newStore != null) {
+                newStore.setStoreManager(storeManager);
+            }
+            try {
+                if (newStore != null) {
+                    session2.update(newStore);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                session2.merge(newStore);
+            }
+            System.out.println("saved store manager");
+            tryFlushSession(session2);
+    }
+
+    public static void editToChainEmployee(Session session, ChainEmployee chainEmployee, ChainEmployee newChainEmployee, Store oldStore, Store newStore){
+        System.out.println("in func edit to chain employee");
+        if(newStore!=null && oldStore!=null && newStore.getName().equals(oldStore.getName())){
+            newStore = null;
+            System.out.println("removed old manager from same store");
+        }
+        try {
+            if(oldStore!=null){
+                session.update(oldStore);}
+            session.update(chainEmployee);
+            session.delete(chainEmployee);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if(oldStore!=null){
+                session.merge(oldStore);}
+            session.merge(chainEmployee);
+        }
+        System.out.println("updated old store");
+        tryFlushSession(session);
+
+        Session session2 = DatabaseConnector.getSessionFactory().openSession();
+        session2.beginTransaction();
+        newChainEmployee.setStore(newStore);
+        newStore.addEmployee(newChainEmployee);
+        session2.save(newChainEmployee);
+        try {
+            session2.update(newStore);
+        } catch (Exception e) {
+            e.printStackTrace();
+            session2.merge(newStore);
+        }
+
+        System.out.println("id of new employee: " + newChainEmployee.getId());
+        System.out.println("saved chain employee");
+        tryFlushSession(session2);
     }
 
 }

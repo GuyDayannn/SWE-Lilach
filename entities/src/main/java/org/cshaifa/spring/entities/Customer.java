@@ -18,11 +18,11 @@ public class Customer extends User {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Store> stores;
 
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Order> orders;
 
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Complaint> complaintList;
 

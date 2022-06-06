@@ -5,7 +5,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "customer_service_employees")
-public class CustomerServiceEmployee extends Employee{
+public class CustomerServiceEmployee extends ChainEmployee{
 
     public CustomerServiceEmployee(String fullName, String username, String email, String password,
             String passwordSalt) {

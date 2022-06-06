@@ -2,129 +2,321 @@
 
 <?import java.lang.String?>
 <?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
-   <children>
-      <Text fx:id="welcomeText" layoutY="26.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, ___________" wrappingWidth="203.48004150390625">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Text>
-      <Button fx:id="exitButton" layoutX="548.0" layoutY="6.0" mnemonicParsing="false" onAction="#exitProfile" prefHeight="27.0" prefWidth="51.0" text="Exit" />
-      <Button fx:id="catalogButton" layoutX="437.0" layoutY="6.0" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="110.0" text="Edit Catalog" />
-      <Accordion layoutY="32.0" prefHeight="368.0" prefWidth="600.0">
-        <panes>
-          <TitledPane fx:id="paneStoreReport" animated="false" text="View Store Report" visible="true">
-            <content>
-              <AnchorPane fx:id="viewStoreReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" visible="true">
-                     <children>
-                        <Text layoutX="28.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
+<AnchorPane prefHeight="500.0" prefWidth="600.0" stylesheets="@stylesheets/employee-profile.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.EmployeeProfileController">
+    <children>
+        <HBox prefHeight="40.0" prefWidth="600.0">
+            <children>
+                <HBox alignment="BOTTOM_LEFT" prefHeight="40.0" prefWidth="300.0">
+                    <children>
+                        <Text fx:id="welcomeText" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome, _____________">
+                            <font>
+                                <Font name="Trebuchet MS Italic" size="24.0" />
+                            </font>
                         </Text>
-                        <ComboBox fx:id="storeComboBox" layoutX="28.0" layoutY="45.0" onAction="#selectStore" prefWidth="202.0" />
-                        <Text layoutX="28.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Text>
-                        <ComboBox fx:id="reportTypeComboBox" layoutX="28.0" layoutY="122.0" onAction="#selectReportType" prefWidth="202.0">
-                            <items>
-                                <FXCollections fx:factory="observableArrayList">
-                                    <String fx:value="Orders" />
-                                    <String fx:value="Revenue" />
-                                    <String fx:value="Complaints" />
-                                </FXCollections>
-                            </items>
-                        </ComboBox>
-                        <Text layoutX="332.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Text>
-                        <DatePicker fx:id="startDatePicker" layoutX="332.0" layoutY="45.0" onAction="#setStartDate" />
-                        <Text layoutX="332.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Text>
-                        <DatePicker fx:id="endDatePicker" layoutX="332.0" layoutY="122.0" onAction="#setEndDate" />
-                        <Button fx:id="generateReportButton" layoutX="28.0" layoutY="187.0" mnemonicParsing="false" onAction="#generateReport" prefWidth="110.0" text="Generate Report" />
-                        <Button fx:id="viewReportButton" disable="true" layoutX="149.0" layoutY="187.0" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
-                     </children>
-                  </AnchorPane>
-            </content>
-          </TitledPane>
-          <TitledPane fx:id="paneChainReport" animated="false" text="View Chain Report">
-            <content>
-              <AnchorPane fx:id="viewChainReport" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-<!--                     <children>-->
-<!--                        <Label fx:id="updated_complaint_text" layoutX="54.0" layoutY="247.0" prefHeight="18.0" prefWidth="231.0" />-->
-<!--                     </children>-->
-                  </AnchorPane>
-            </content>
-          </TitledPane>
-          <TitledPane animated="false" text="View/Handle Complaints">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ComboBox fx:id="complaintComboBox" layoutX="14.0" layoutY="29.0" prefWidth="150.0" />
-                        <Text layoutX="14.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
-                        <TextArea fx:id="complaintdescription" layoutX="14.0" layoutY="90.0" prefHeight="186.0" prefWidth="262.0" />
-                        <TextField fx:id="complaintresponse" layoutX="299.0" layoutY="90.0" prefHeight="92.0" prefWidth="262.0" text="" />
-                        <Text layoutX="15.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
-                        <Text layoutX="299.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Response:" />
-                        <Button fx:id="viewComplaint" layoutX="175.0" layoutY="29.0" mnemonicParsing="false" onAction="#openComplaint" text="View" />
-                        <Text layoutX="299.0" layoutY="208.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Compensation Amount:" />
-                        <TextField fx:id="compensationamount" layoutX="299.0" layoutY="219.0" text="" />
-                        <Button fx:id="closeComplaintButton" layoutX="457.0" layoutY="218.0" mnemonicParsing="false" onAction="#closeComplaint" text="Close Complaint" />
-                        <Text layoutX="298.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Status:" />
-                        <TextField fx:id="complaintStatus" layoutX="298.0" layoutY="29.0" text="" />
-                        <Label fx:id="updated_complaint_text" layoutX="383.0" layoutY="259.0" text="" />
-                     </children></AnchorPane>
-            </content>
-          </TitledPane>
-            <TitledPane fx:id="handleUsersPane" animated="false" text="View/Handle Users">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ComboBox fx:id="customerComboBox" layoutX="14.0" layoutY="29.0" onAction="#selectCustomer" prefWidth="150.0" />
-                        <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Customer" />
-                        <Button fx:id="editCustomerBtn" layoutX="475.0" layoutY="81.0" mnemonicParsing="false" onAction="#editCustomerStatus" text="Edit Customer" />
-                        <Text layoutX="277.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Account  Status" />
-                        <TextField fx:id="customerAccountText" layoutX="277.0" layoutY="29.0" text="" />
-                        <Label fx:id="updated_complaint_text1" layoutX="383.0" layoutY="259.0" text="" />
-                        <Text layoutX="21.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Customer Account Status:" />
-                        <ComboBox fx:id="accountStatusComboBox" layoutX="277.0" layoutY="81.0" onAction="#selectAccpuntStatus" prefWidth="150.0" />
-                        <Text layoutX="21.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee" />
-                        <ComboBox fx:id="employeesComboBox" layoutX="25.0" layoutY="165.0" onAction="#selectEmployee" prefWidth="150.0" />
-                        <Text layoutX="277.0" layoutY="147.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Employee Status" />
-                        <TextField fx:id="employeeStatusText" layoutX="277.0" layoutY="165.0" />
-                        <Text layoutX="25.0" layoutY="234.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status: " />
-                        <ComboBox fx:id="employeeStatusComboBox" layoutX="277.0" layoutY="217.0" onAction="#selectEmployeeStatus" prefWidth="150.0" />
-                        <Button fx:id="editEmployeeBtn" layoutX="475.0" layoutY="217.0" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </TitledPane>
-            <TitledPane prefHeight="200.0" prefWidth="200.0" text="View Two Reports">
-               <content>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" />
-               </content>
-            </TitledPane>
-        </panes>
-      </Accordion>
-   </children>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="300.0" spacing="5.0">
+                    <children>
+                        <Button fx:id="catalogButton" mnemonicParsing="false" onAction="#goCatalog" prefHeight="26.0" prefWidth="110.0" text="Edit Catalog" />
+                        <Button fx:id="exitButton" mnemonicParsing="false" onAction="#exitProfile" prefHeight="27.0" prefWidth="51.0" text="Exit" />
+                    </children>
+                    <HBox.margin>
+                        <Insets right="5.0" />
+                    </HBox.margin>
+                </HBox>
+            </children>
+        </HBox>
+        <Accordion fx:id="employeeControls" layoutY="40.0" prefHeight="460.0" prefWidth="600.0">
+            <panes>
+                <TitledPane fx:id="generateReportsPane" animated="false" text="Generate Store Reports" visible="true">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="325.0" prefWidth="600.0" styleClass="anchor-pane" visible="true">
+                            <children>
+                                <VBox prefHeight="325.0" prefWidth="600.0">
+                                    <children>
+                                        <HBox prefHeight="200.0" prefWidth="600.0">
+                                            <children>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" translateX="-28.0">
+                                                            <font>
+                                                                <Font size="14.0" />
+                                                            </font>
+                                                        </Text>
+                                                        <HBox alignment="CENTER" spacing="5.0">
+                                                            <children>
+                                                                <ComboBox fx:id="storeComboBox" onAction="#selectStore" prefWidth="175.0" />
+                                                                <CheckBox fx:id="chainReport" mnemonicParsing="false" onAction="#selectChain" text="Chain" />
+                                                            </children>
+                                                        </HBox>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:" translateX="-28.0">
+                                                            <font>
+                                                                <Font size="14.0" />
+                                                            </font>
+                                                        </Text>
+                                                        <ComboBox fx:id="reportTypeComboBox" onAction="#selectReportType" prefWidth="175.0" translateX="-28.0">
+                                                            <items>
+                                                                <FXCollections fx:factory="observableArrayList">
+                                                                    <String fx:value="Orders" />
+                                                                    <String fx:value="Revenue" />
+                                                                    <String fx:value="Complaints" />
+                                                                </FXCollections>
+                                                            </items>
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
+                                                            <font>
+                                                                <Font size="14.0" />
+                                                            </font>
+                                                        </Text>
+                                                        <DatePicker fx:id="startDatePicker" onAction="#setStartDate" />
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
+                                                            <font>
+                                                                <Font size="14.0" />
+                                                            </font>
+                                                        </Text>
+                                                        <DatePicker fx:id="endDatePicker" onAction="#setEndDate" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="25.0">
+                                            <children>
+                                                <Button fx:id="generateReportButton" mnemonicParsing="false" onAction="#generateReport" prefWidth="110.0" text="Generate Report" />
+                                                <Button fx:id="viewReportButton" disable="true" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="600.0">
+                                            <children>
+                                                <Label fx:id="generateMessageText" text="">
+                                                    <font>
+                                                        <Font name="System Italic" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                            </children></HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </TitledPane>
+                <TitledPane fx:id="viewReportsPane" animated="false" text="View Existing Reports">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="anchor-pane">
+                            <children>
+                                <HBox alignment="CENTER" prefHeight="200.0" prefWidth="600.0">
+                                    <children>
+                                        <VBox prefHeight="200.0" prefWidth="400.0">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="400.0">
+                                                    <children>
+                                                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
+                                                            <children>
+                                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report 1:" />
+                                                                <ComboBox fx:id="selectReport1CB" prefWidth="150.0" />
+                                                            </children>
+                                                        </VBox>
+                                                        <Button fx:id="addReportViewButton" mnemonicParsing="false" text="Add Report" translateY="8.0">
+                                                            <graphic>
+                                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                    <image>
+                                                                        <Image url="@images/plus.png" />
+                                                                    </image>
+                                                                </ImageView>
+                                                            </graphic></Button>
+                                                    </children>
+                                                </HBox>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="400.0">
+                                                    <children>
+                                                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
+                                                            <children>
+                                                                <Text fx:id="selectReport2CBText" strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report 2:" visible="false" />
+                                                                <ComboBox fx:id="selectReport2CB" prefWidth="150.0" visible="false" />
+                                                            </children>
+                                                        </VBox>
+                                                        <Button fx:id="removeReportViewButton" mnemonicParsing="false" text="Remove" translateY="8.0" visible="false">
+                                                            <graphic>
+                                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                    <image>
+                                                                        <Image url="@images/remove.png" />
+                                                                    </image>
+                                                                </ImageView>
+                                                            </graphic>
+                                                        </Button>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                        <Button fx:id="viewExistingReportsButton" disable="true" mnemonicParsing="false" onAction="#viewExistingReports" text="View Report" />
+                                    </children>
+                                </HBox>
+                            </children></AnchorPane>
+                    </content>
+                </TitledPane>
+                <TitledPane fx:id="handleComplaintsPane" animated="false" text="View/Handle Complaints">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" styleClass="anchor-pane">
+                            <children>
+                                <VBox prefHeight="300.0" prefWidth="600.0" spacing="10.0">
+                                    <children>
+                                        <HBox prefHeight="75.0" prefWidth="600.0">
+                                            <children>
+                                                <VBox prefHeight="75.0" prefWidth="300.0">
+                                                    <children>
+                                                        <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="300.0" spacing="5.0">
+                                                            <children>
+                                                                <VBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="200.0" spacing="5.0">
+                                                                    <children>
+                                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Complaint:" />
+                                                                        <ComboBox fx:id="complaintComboBox" prefWidth="150.0" />
+                                                                    </children>
+                                                                </VBox>
+                                                                <Button fx:id="viewComplaint" mnemonicParsing="false" onAction="#openComplaint" text="View" translateY="8.0" />
+                                                            </children>
+                                                        </HBox>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="300.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Status:" />
+                                                        <TextField fx:id="complaintStatus" editable="false" maxWidth="150.0" styleClass="uneditable" text="" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                        <HBox prefHeight="225.0" prefWidth="600.0">
+                                            <children>
+                                                <VBox prefHeight="225.0" prefWidth="300.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Complaint Description:" />
+                                                        <TextField fx:id="complaintDescription" alignment="TOP_LEFT" editable="false" maxHeight="175.0" maxWidth="275.0" prefHeight="175.0" prefWidth="275.0" styleClass="uneditable" text="" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox prefHeight="225.0" prefWidth="300.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Response:" />
+                                                        <TextField fx:id="complaintResponse" alignment="TOP_LEFT" maxHeight="100.0" maxWidth="275.0" prefHeight="100.0" prefWidth="275.0" text="" />
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Compensation Amount:" />
+                                                        <TextField fx:id="compensationAmount" maxWidth="275.0" prefWidth="275.0" text="" />
+                                                        <Button fx:id="closeComplaintButton" mnemonicParsing="false" onAction="#closeComplaint" text="Close Complaint" />
+                                                        <Label fx:id="updated_complaint_text" text="" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
+                                </VBox>
+                            </children></AnchorPane>
+                    </content>
+                </TitledPane>
+                <TitledPane fx:id="handleUsersPane" animated="false" text="View/Handle Users">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="600.0" styleClass="anchor-pane">
+                            <children>
+                                <VBox prefHeight="325.0" prefWidth="600.0" spacing="10.0">
+                                    <children>
+                                        <HBox prefHeight="100.0" prefWidth="600.0">
+                                            <children>
+                                                <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Customer" />
+                                                        <ComboBox fx:id="customerComboBox" onAction="#selectCustomer" prefWidth="150.0" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Account Status:" />
+                                                        <TextField fx:id="customerAccountText" editable="false" maxWidth="100.0" styleClass="uneditable" text="" />
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Change Customer Account Status:" />
+                                                        <ComboBox fx:id="customerStatusComboBox" onAction="#selectAccountStatus" prefWidth="150.0">
+                                                            <!--                         <items>-->
+                                                            <!--                             <FXCollections fx:factory="observableArrayList">-->
+                                                            <!--                                 <String fx:value="Active" />-->
+                                                            <!--                                 <String fx:value="Frozen" />-->
+                                                            <!--                             </FXCollections>-->
+                                                            <!--                         </items>-->
+                                                        </ComboBox>
+                                                    </children>
+                                                </VBox>
+                                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="100.0" spacing="5.0">
+                                                    <children>
+                                                        <Button fx:id="editCustomerBtn" mnemonicParsing="false" onAction="#editCustomerStatus" text="Edit Customer" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </HBox>
+                                        <HBox prefHeight="100.0" prefWidth="600.0">
+                                            <children>
+                                                <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee Type:" />
+                                                        <ComboBox fx:id="employeesTypeComboBox" prefWidth="150.0">
+                                                            <items>
+                                                                <FXCollections fx:factory="observableArrayList">
+                                                                    <String fx:value="Chain Employee" />
+                                                                    <String fx:value="Customer Service" />
+                                                                    <String fx:value="Store Manager" />
+                                                                    <String fx:value="Chain Manager" />
+                                                                </FXCollections>
+                                                            </items>
+                                                        </ComboBox>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Employee:" />
+                                                        <ComboBox fx:id="selectEmployeeComboBox" disable="true" onAction="#selectEmployee" prefWidth="150.0" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox prefHeight="200.0" prefWidth="225.0" spacing="5.0">
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Change Employee Status" />
+                                                        <ComboBox fx:id="employeeStatusComboBox" disable="true" onAction="#editEmployeeStatus" prefWidth="150.0" />
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store" />
+                                                        <ComboBox fx:id="selectStoreComboBox" disable="true" prefWidth="150.0" />
+                                                    </children>
+                                                </VBox>
+                                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="100.0" spacing="5.0">
+                                                    <children>
+                                                        <Button fx:id="editEmployeeBtn" mnemonicParsing="false" onAction="#editEmployee" text="Edit Employee" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER" prefHeight="25.0" prefWidth="600.0">
+                                            <children>
+                                                <Label fx:id="editResultLabel" prefHeight="17.0" prefWidth="235.0" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </TitledPane>
+            </panes>
+        </Accordion>
+    </children>
 </AnchorPane>
