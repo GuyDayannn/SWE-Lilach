@@ -947,7 +947,11 @@ public class EmployeeProfileController {
         }
 
         else{//we're editing chain manager
-            createTaskEmployeeUpdate(chainManager, selectedStore, null,selectedStatus, "Chain Manager");
+            if (chainManager.getFullName().equals(employeeName)) {
+                oldStore = chainManager.getStoreManged();
+                System.out.println("old store in profiles is: " + oldStore.getName());
+            }
+            createTaskEmployeeUpdate(chainManager, selectedStore, oldStore,selectedStatus, "Chain Manager");
         }
         employeesTypeComboBox.valueProperty().setValue(null); //edit to clear all
         selectStoreComboBox.valueProperty().setValue(null);

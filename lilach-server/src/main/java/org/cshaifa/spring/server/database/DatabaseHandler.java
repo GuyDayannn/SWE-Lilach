@@ -408,6 +408,16 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
+    public static void updateChainManager(ChainManager chainManager) {
+        Session session = DatabaseConnector.getSessionFactory().openSession();
+        session.beginTransaction();
+
+
+        updateDB(session, chainManager);
+
+        tryFlushSession(session);
+    }
+
 
     public static void saveItems(List<CatalogItem> items) {
         Session session = DatabaseConnector.getSessionFactory().openSession();
@@ -418,7 +428,7 @@ public class DatabaseHandler {
         tryFlushSession(session);
     }
 
-    public static List<Store> initStores(List<StoreManager> managers, List<ChainEmployee> employees) {
+    public static List<Store> initStores(List<StoreManager> managers, List<ChainEmployee> employees, ChainManager chainManager) {
         List<Store> stores = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             List<ChainEmployee> storeEmployees = new ArrayList<>();;
@@ -431,7 +441,9 @@ public class DatabaseHandler {
             managers.get(i).setStoreManged(store);
             stores.add(store);
         }
-        stores.add(new Store(Constants.WAREHOUSE_NAME, "Everywhere", managers.get(10), new ArrayList<>()));
+        Store store = (new Store(Constants.WAREHOUSE_NAME, "Everywhere", chainManager, new ArrayList<>()));
+        chainManager.setStoreManged(store);
+        stores.add(store);
         return stores;
     }
 
@@ -536,7 +548,7 @@ public class DatabaseHandler {
 
     public static List<StoreManager> createStoreManagers() throws Exception {
         List<StoreManager> storeManagers = new ArrayList<>();
-        for (int i = 1; i <= 11; i++) {
+        for (int i = 1; i <= 10; i++) {
             storeManagers.add(registerStoreManager("Manager" + i, "Manager" + i + "@lilach.co.il", "Manager" + i, "Manager" + i));
         }
         return storeManagers;
@@ -562,13 +574,15 @@ public class DatabaseHandler {
         List<StoreManager> managers = createStoreManagers();
         List<ChainEmployee> employees = createEmployees();
         List<CustomerServiceEmployee> customerServiceEmployees = createCustomerService();
-        createChainManager();
+        ChainManager chainManager = createChainManager();
         createSystemAdmin();
 
-        List<Store> stores = initStores(managers, employees);
+        List<Store> stores = initStores(managers, employees, chainManager);
         saveStores(stores);
         updateChainEmployees(employees);
         updateStoreManagers(managers);
+        updateChainManager(chainManager);
+
         List<Store> pickupStores = stores.stream().filter((store) -> !store.getName().equals(Constants.WAREHOUSE_NAME))
                 .toList();
         List<CatalogItem> items = initItems(pickupStores);
@@ -744,7 +758,7 @@ public class DatabaseHandler {
                 } else if (strNewType.equals("Store Manager")) {
                     editToStoreManager(session, chainEmployee, storeManager, oldStore, store);
                 } else if (strNewType.equals("Chain Manager")) {
-                    editFromChainEmployee(session, chainEmployee, chainManager, oldStore, "Chain Employee");
+                    editToStoreManager(session, chainEmployee, chainManager, oldStore, store);
                 }
             }
             case "Store Manager" -> {
@@ -759,7 +773,7 @@ public class DatabaseHandler {
                 } else if (strNewType.equals("Chain Employee")) {
                    editToChainEmployee(session, chainEmployee, employee, oldStore, store);
                 } else if (strNewType.equals("Chain Manager")) {
-                    editFromChainEmployee(session, chainEmployee, chainManager, oldStore, "Store Manager");
+                    editToStoreManager(session, chainEmployee, chainManager, oldStore,store);
                 }
             }
             case "Customer Service" -> {
@@ -770,10 +784,14 @@ public class DatabaseHandler {
                     System.out.println("case customer service store manager");
                     editToStoreManager(session, chainEmployee, storeManager, oldStore, store);
                 } else if (strNewType.equals("Chain Manager")) {
-                    editFromChainEmployee(session, chainEmployee, chainManager, oldStore, "Customer Service");
+                    editToStoreManager(session, chainEmployee, chainManager, oldStore, store);
                 }
             }
             case "Chain Manager"-> {
+                if(oldStore != null) {
+                    oldStore.getStoreManager().removeStoreManaged();
+                    oldStore.removeManager();
+                }
                 if (strNewType.equals("Chain Employee")) { //turn into chain employee
                     editToChainEmployee(session, chainEmployee, employee, oldStore, store);
                 } else if (strNewType.equals("Store Manager")) {
@@ -814,7 +832,16 @@ public class DatabaseHandler {
     public static void editFromChainEmployee(Session session, ChainEmployee chainEmployee, ChainEmployee newChainEmployee,
                                              Store oldStore, String oldType){
         System.out.println("in func edit to customer service / chain manager");
-//        if(newType.equals("Chain Manager")){
+//        if(chainEmployee.getClass().isAssignableFrom("Chain Manager".getClass())){
+//            if (newStore != null) {
+//                if(newStore.getStoreManager()!=null){
+//                    newStore.getStoreManager().removeStoreManaged();
+//                    newStore.removeManager();
+//                    System.out.println("removed old manager from new store");
+//                }
+//                else{
+//                    System.out.println("new store didn't have a manager");
+//                }
 //
 //        }
 
@@ -910,12 +937,18 @@ public class DatabaseHandler {
     public static void editToStoreManager(Session session, ChainEmployee chainEmployee, StoreManager storeManager,
                                           Store oldStore, Store newStore){
         System.out.println("in func edit to store manager");
+        ChainManager chainManager =null;
         if(newStore!=null && oldStore!=null && newStore.getName().equals(oldStore.getName())){
             newStore = null;
             if(oldStore.getStoreManager()!=null) {
                 oldStore.getStoreManager().removeStoreManaged();
                 oldStore.removeManager();
                 System.out.println("removed old manager from same store");
+            }
+        }
+        if(storeManager.getClass().isAssignableFrom(ChainManager.class)){
+            if (newStore != null) {
+              chainManager=  (ChainManager) newStore.getStoreManager();
             }
         }
             if (newStore != null) {
@@ -928,12 +961,17 @@ public class DatabaseHandler {
                     System.out.println("new store didn't have a manager");
                 }
             }
+
             try {
                 if (oldStore != null) {
                     session.update(oldStore);
                 }
                 if (newStore != null) {
                     session.update(newStore);
+                }
+                if(chainManager!=null){
+                    session.delete(chainManager);
+                    System.out.println("deleted old chain manager");
                 }
                 session.update(chainEmployee);
                 session.delete(chainEmployee);
@@ -945,6 +983,9 @@ public class DatabaseHandler {
                 if (oldStore != null) {
                     session.merge(oldStore);
                 }
+//                if(chainManager!=null){
+//                    session.merge(chainManager);
+//                }
                 session.merge(chainEmployee);
             }
             System.out.println("updated old store");
