@@ -31,7 +31,7 @@
                   </ScrollPane>
                </children>
             </VBox>
-            <VBox prefHeight="100.0" prefWidth="400.0">
+            <VBox fx:id="orderDetailsVbox" prefHeight="100.0" prefWidth="400.0">
                <children>
                   <Label text="Payment Details">
                      <font>

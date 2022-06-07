@@ -29,62 +29,47 @@ public class OrderDetailsPopUpController {
 
     @FXML
     private Label addressLabel;
-
     @FXML
     private AnchorPane anchorPane;
-
     @FXML
     private Label cardNumberLabel;
-
     @FXML
     private Label deliveryTimeLabel;
-
     @FXML
     private VBox deliveryVbox;
-
     @FXML
     private Label expDateLabel;
-
     @FXML
     private Label firstNameDeliveryLabel;
-
     @FXML
     private Label firstNamePaymentLabel;
-
     @FXML
     private VBox itemsVbox;
-
+    @FXML
+    private VBox orderDetailsVbox;
     @FXML
     private Label lastNameDeliveryLabel;
-
     @FXML
     private Label lastNamePaymentLabel;
-
     @FXML
     private Label messageLabel;
-
     @FXML
     private Label phoneNumberLabel;
-
     @FXML
     private VBox selfpickupVbox;
-
     @FXML
     private Label storeAddressLabel;
-
     @FXML
     private Label storeNameLabel;
-
     @FXML
     private HBox titleHbox;
-
     @FXML
     private Button goBackButton;
 
-    private HBox getItemHBox(CatalogItem item, int quantity) {
+    @FXML
+    HBox getItemHBox(CatalogItem item, int quantity) {
         HBox hBox = new HBox();
         ImageView iv = null;
-
         if (item.getImage() != null) {
             try {
                 iv = new ImageView(App.getImageFromByteArray(item.getImage()));
@@ -92,6 +77,7 @@ public class OrderDetailsPopUpController {
                 iv.setFitHeight(50);
             } catch (IOException e1) {
                 // TODO: maybe log the exception somewhere
+                System.out.println("Failed to get item image.");
                 e1.printStackTrace();
             }
         }
@@ -110,7 +96,12 @@ public class OrderDetailsPopUpController {
         HBox.setMargin(itemPrice, new Insets(0, 60, 0, 60));
         HBox.setMargin(itemQuantity, new Insets(0, 0, 0, 0));
         HBox.setMargin(itemFinalPrice, new Insets(0, 0, 0, 0));
-        hBox.getChildren().addAll(iv, itemName, itemPrice, itemQuantity, itemFinalPrice);
+        if (iv!=null) {
+            hBox.getChildren().addAll(iv, itemName, itemPrice, itemQuantity, itemFinalPrice);
+        }
+        else {
+            hBox.getChildren().addAll(itemName, itemPrice, itemQuantity, itemFinalPrice);
+        }
         hBox.setSpacing(5);
         hBox.getStyleClass().add("item");
         hBox.setAlignment(Pos.CENTER_LEFT);
@@ -118,7 +109,27 @@ public class OrderDetailsPopUpController {
     }
 
     @FXML
+    void displayOrderDetails() {
+        if (App.getSelectedOrder().isDelivery()) {
+            orderDetailsVbox.getChildren().remove(selfpickupVbox);
+        }
+        else {
+            orderDetailsVbox.getChildren().removeAll(deliveryVbox);
+        }
+    }
+
+    @FXML
     void initialize() {
+        for (Map.Entry<CatalogItem, Integer> entry : App.getSelectedOrder().getItems().entrySet()) {
+            CatalogItem item = entry.getKey();
+            Integer integer = entry.getValue();
+            HBox itemHBox = getItemHBox(item, integer);
+
+            itemsVbox.getChildren().add(itemHBox);
+        }
+
+        displayOrderDetails();
+
         goBackButton.setOnAction(event -> {
             goBackButton.getScene().getWindow().hide();
         });
