@@ -814,65 +814,84 @@ public class DatabaseHandler {
     public static void editFromChainEmployee(Session session, ChainEmployee chainEmployee, ChainEmployee newChainEmployee,
                                              Store oldStore, String oldType){
         System.out.println("in func edit to customer service / chain manager");
-        //ChainEmployee tempEmployee;
-        if(oldType.equals("Chain Manager")){
-            ChainManager tempEmployee = (ChainManager) chainEmployee;
-            try {
-                if(oldStore!=null){
-                    session.update(oldStore);}
-                session.update(tempEmployee);
-                session.delete(tempEmployee);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if(oldStore!=null){
-                    session.merge(oldStore);}
-                session.merge(tempEmployee);
-            }
+//        if(newType.equals("Chain Manager")){
+//
+//        }
 
-        }
-        else if(oldType.equals("Customer Service")){
-            CustomerServiceEmployee tempEmployee = (CustomerServiceEmployee) chainEmployee;
-            try {
-                if(oldStore!=null){
-                    session.update(oldStore);}
-                session.update(tempEmployee);
-                session.delete(tempEmployee);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if(oldStore!=null){
-                    session.merge(oldStore);}
-                session.merge(tempEmployee);
+        try {
+            if(oldStore!=null){
+                session.update(oldStore);
             }
-        }
-        else if(oldType.equals("Store Manager")){
-           StoreManager tempEmployee = (StoreManager) chainEmployee;
-            try {
-                if(oldStore!=null){
-                    session.update(oldStore);}
-                session.update(tempEmployee);
-                session.delete(tempEmployee);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if(oldStore!=null){
-                    session.merge(oldStore);}
-                session.merge(tempEmployee);
-            }
+            session.update(chainEmployee);
+            session.delete(chainEmployee);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if(oldStore!=null){
+                session.merge(oldStore);}
+            session.merge(chainEmployee);
         }
 
-        else if(oldType.equals("Chain Employee")){
-            ChainEmployee tempEmployee = chainEmployee;
-            try {
-                if(oldStore!=null){
-                    session.update(oldStore);}
-                session.update(tempEmployee);
-                session.delete(tempEmployee);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if(oldStore!=null){
-                    session.merge(oldStore);}
-                session.merge(tempEmployee);
-            }
-        }
+
+//        if(oldType.equals("Chain Manager")){
+//            System.out.println("case old type is / chain manager");
+//            ChainManager tempEmployee = (ChainManager) chainEmployee;
+//            try {
+//                if(oldStore!=null){
+//                    session.update(oldStore);
+//                }
+//                session.update(tempEmployee);
+//                session.delete(tempEmployee);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                if(oldStore!=null){
+//                    session.merge(oldStore);}
+//                session.merge(tempEmployee);
+//            }
+//
+//        }
+//        else if(oldType.equals("Customer Service")){
+//            CustomerServiceEmployee tempEmployee = (CustomerServiceEmployee) chainEmployee;
+//            try {
+//                if(oldStore!=null){
+//                    session.update(oldStore);}
+//                session.update(tempEmployee);
+//                session.delete(tempEmployee);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                if(oldStore!=null){
+//                    session.merge(oldStore);}
+//                session.merge(tempEmployee);
+//            }
+//        }
+//        else if(oldType.equals("Store Manager")){
+//           StoreManager tempEmployee = (StoreManager) chainEmployee;
+//            try {
+//                if(oldStore!=null){
+//                    session.update(oldStore);}
+//                session.update(tempEmployee);
+//                session.delete(tempEmployee);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                if(oldStore!=null){
+//                    session.merge(oldStore);}
+//                session.merge(tempEmployee);
+//            }
+//        }
+//
+//        else if(oldType.equals("Chain Employee")){
+//            ChainEmployee tempEmployee = chainEmployee;
+//            try {
+//                if(oldStore!=null){
+//                    session.update(oldStore);}
+//                session.update(tempEmployee);
+//                session.delete(tempEmployee);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                if(oldStore!=null){
+//                    session.merge(oldStore);}
+//                session.merge(tempEmployee);
+//            }
+//        }
         System.out.println("updated old store");
 
         tryFlushSession(session);

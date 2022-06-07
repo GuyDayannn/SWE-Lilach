@@ -307,6 +307,10 @@ public class EmployeeProfileController {
             }
             userList = response.getUsersList();
             selectEmployeeComboBox.getItems().clear();
+            employeeList.clear();
+            chainEmployeeList.clear();
+            storeManagersList.clear();
+            customerServiceList.clear();
             for(User user: userList){
                 if(user.getClass().isAssignableFrom(ChainEmployee.class) ){
                     chainEmployeeList.add((ChainEmployee) user);
@@ -556,6 +560,7 @@ public class EmployeeProfileController {
             t2.start();
             t2.join();
             initUsers();
+            initEditEmployees();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
         }
@@ -941,13 +946,14 @@ public class EmployeeProfileController {
             createTaskEmployeeUpdate(selectedEmployee, selectedStore, null,selectedStatus, "Customer Service");
         }
 
-        else{//we're editing chain maneger
+        else{//we're editing chain manager
             createTaskEmployeeUpdate(chainManager, selectedStore, null,selectedStatus, "Chain Manager");
         }
         employeesTypeComboBox.valueProperty().setValue(null); //edit to clear all
         selectStoreComboBox.valueProperty().setValue(null);
         employeeStatusComboBox.valueProperty().setValue(null);
         selectEmployeeComboBox.valueProperty().setValue(null);
+        selectEmployeeComboBox.getItems().clear();
     }
 
 //    @FXML
@@ -993,7 +999,9 @@ public class EmployeeProfileController {
 
         //TODO: edit to show only to authorized users
         if (App.getCurrentUser() != null) {
-            if(App.getCurrentUser().getClass() == ChainEmployee.class) {
+            if(App.getCurrentUser().getClass()==ChainEmployee.class) {
+                System.out.println("chain employee profile");
+                chainReport.setVisible(false);
                 employeeControls.getPanes().removeAll();
             }
             if (App.getCurrentUser().getClass() == StoreManager.class) {
