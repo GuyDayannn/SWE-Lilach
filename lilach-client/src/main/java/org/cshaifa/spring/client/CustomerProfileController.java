@@ -453,7 +453,7 @@ public class CustomerProfileController {
                     if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
                             && event.getClickCount() == 2) {
                         // TODO: Maybe add order details pop-up
-                        App.popUpLaunch(null, "orderDetailsPopUp");
+                        // App.popUpLaunch(null, "orderDetailsPopUp");
                     }
                 });
                 return row ;
