@@ -391,14 +391,14 @@ public class CustomerProfileController {
         getOrdersTask.setOnSucceeded(e -> {
             if (getOrdersTask.getValue() == null) {
                 App.hideLoading();
-                System.err.println("Getting catalog failed");
+                System.err.println("Getting orders failed");
                 return;
             }
             GetOrdersResponse response = getOrdersTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
                 App.hideLoading();
-                System.err.println("Getting catalog failed");
+                System.err.println("Getting orders failed");
                 return;
             }
             orderTable.setEditable(true);
@@ -453,6 +453,7 @@ public class CustomerProfileController {
                     if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
                             && event.getClickCount() == 2) {
                         // TODO: Maybe add order details pop-up
+                        App.popUpLaunch(null, "orderDetailsPopUp");
                     }
                 });
                 return row ;

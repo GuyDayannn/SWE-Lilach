@@ -469,27 +469,38 @@ public class EmployeeProfileController {
         editCustomerTask.setOnSucceeded(e -> {
             if (editCustomerTask.getValue() == null) {
                 System.err.println("Updating customer failed");
+                editResultLabel.setVisible(true);
                 editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
                 editResultLabel.setTextFill(Color.RED);
+                messageDisappearanceTask(4000, editResultLabel);
                 return;
             }
             FreezeCustomerResponse response = editCustomerTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
                 System.err.println("Updating customer failed");
+                editResultLabel.setVisible(true);
                 editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
                 editResultLabel.setTextFill(Color.RED);
+                messageDisappearanceTask(4000, editResultLabel);
                 return;
             }
             else{
                 System.out.println("Successfully edited customer status");
+                editResultLabel.setVisible(true);
                 editResultLabel.setText(Constants.EDIT_CUSTOMER_SUCCESS);
                 editResultLabel.setTextFill(Color.GREEN);
+                messageDisappearanceTask(4000, editResultLabel);
             }
         });
 
         editCustomerTask.setOnFailed(e -> {
             // TODO: maybe log somewhere else...
+            System.err.println("Updating customer failed");
+            editResultLabel.setVisible(true);
+            editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
+            editResultLabel.setTextFill(Color.RED);
+            messageDisappearanceTask(4000, editResultLabel);
             editCustomerTask.getException().printStackTrace();
         });
         //new Thread(editCustomerTask).start();
@@ -641,20 +652,26 @@ public class EmployeeProfileController {
             }
             if (success) {
                 viewReportButton.setDisable(false);
+                generateMessageText.setVisible(true);
                 generateMessageText.setTextFill(Color.GREEN);
                 generateMessageText.setText(Constants.GENERATE_REPORT_SUCCESS);
+                messageDisappearanceTask(4000, generateMessageText);
                 System.out.println("Report generated successfully.");
             }
             else {
+                generateMessageText.setVisible(true);
                 generateMessageText.setTextFill(Color.RED);
                 generateMessageText.setText(Constants.GENERATE_REPORT_FAILED);
+                messageDisappearanceTask(4000, generateMessageText);
                 System.out.println("Generating report failed.");
             }
 
         }
         else {
+            generateMessageText.setVisible(true);
             generateMessageText.setTextFill(Color.RED);
             generateMessageText.setText(Constants.MISSING_REQUIREMENTS);
+            messageDisappearanceTask(4000, generateMessageText);
             System.out.println("Insert required data.");
         }
 
@@ -747,19 +764,25 @@ public class EmployeeProfileController {
                 if (!response.isSuccessful()) {
                     // TODO: maybe log the specific exception somewhere
                     System.err.println("Updating Complaint failed");
+                    updated_complaint_text.setVisible(true);
                     updated_complaint_text.setText("Failed to close complaint");
                     updated_complaint_text.setTextFill(Color.RED);
+                    messageDisappearanceTask(4000, updated_complaint_text);
                     return;
                 }
+                updated_complaint_text.setVisible(true);
                 updated_complaint_text.setText("You have successfully closed the complaint");
                 updated_complaint_text.setTextFill(Color.GREEN);
+                messageDisappearanceTask(4000, updated_complaint_text);
             });
 
             updateComplaintTask.setOnFailed(e -> {
                 // TODO: maybe properly log it somewhere
                 updateComplaintTask.getException().printStackTrace();
+                updated_complaint_text.setVisible(true);
                 updated_complaint_text.setText("Failed to close complaint");
                 updated_complaint_text.setTextFill(Color.RED);
+                messageDisappearanceTask(4000, updated_complaint_text);
             });
             //new Thread(updateComplaintTask).start();
             try {
@@ -970,22 +993,24 @@ public class EmployeeProfileController {
 
         //TODO: edit to show only to authorized users
         if (App.getCurrentUser() != null) {
-            /*
-            if(App.getCurrentUser().getClass() == ChainEmployee.class){
-                paneStoreReport.setVisible(false);
-                paneChainReport.setVisible(false);
-                handleUsersPane.setVisible(false);
-                viewTwoReportsPane.setVisible(false);
-            }*/
+            if(App.getCurrentUser().getClass() == ChainEmployee.class) {
+                employeeControls.getPanes().removeAll();
+            }
             if (App.getCurrentUser().getClass() == StoreManager.class) {
                 chainReport.setVisible(false);
+                storeComboBox.setDisable(true);
+                StoreManager manager = (StoreManager)App.getCurrentUser();
+                reportStore = manager.getStoreManged();
                 employeeControls.getPanes().remove(handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
+            }
+            if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
                 employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == ChainManager.class) {
+            }
+            if (App.getCurrentUser().getClass() == ChainManager.class) {
                 employeeControls.getPanes().remove(handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == SystemAdmin.class) {
-                employeeControls.getPanes().remove(handleComplaintsPane);
+            }
+            if (App.getCurrentUser().getClass() == SystemAdmin.class) {
+                employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleComplaintsPane);
             }
         }
 
