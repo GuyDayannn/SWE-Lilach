@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.utils.Constants;
@@ -91,6 +92,8 @@ public class App extends Application {
     private static boolean enteredSupplyDetails = false;
 
     private static Report report;
+
+    private static Order selectedOrder = null;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -387,6 +390,7 @@ public class App extends Application {
     public static boolean isImmediate() { return immediate; }
 
     public static void setImmediate(boolean immediate) { App.immediate = immediate; }
+
     public static CatalogItem getCreatedItem() {
         return createdItem;
     }
@@ -395,5 +399,7 @@ public class App extends Application {
         App.createdItem = createdItem;
     }
 
+    public static Order getSelectedOrder() { return selectedOrder; }
 
+    public static void setSelectedOrder(Order order) { selectedOrder = order; }
 }

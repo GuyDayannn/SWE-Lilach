@@ -436,7 +436,7 @@ public class CustomerProfileController {
 
             isCompletedColumn.setText("Completed");
             isCompletedColumn.setCellValueFactory(cellData -> {
-                if (cellData.getValue().isCompleted() == true) {
+                if (cellData.getValue().isCompleted()) {
                     return new SimpleStringProperty("Yes");
                 }
                 return new SimpleStringProperty("No");
@@ -453,7 +453,8 @@ public class CustomerProfileController {
                     if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
                             && event.getClickCount() == 2) {
                         // TODO: Maybe add order details pop-up
-                        // App.popUpLaunch(null, "orderDetailsPopUp");
+                        App.setSelectedOrder(customerOrderList.get(0));
+                        App.popUpLaunch(null, "orderDetailsPopUp");
                     }
                 });
                 return row ;

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.cshaifa.spring.entities.ChainEmployee;
 import org.cshaifa.spring.entities.ChainManager;
 import org.cshaifa.spring.entities.Complaint;
@@ -57,8 +59,6 @@ public class EmployeeProfileController {
     @FXML
     private Accordion employeeControls;
     @FXML
-    private TitledPane viewReportsPane;
-    @FXML
     private TitledPane generateReportsPane;
     @FXML
     private TitledPane handleComplaintsPane;
@@ -66,7 +66,17 @@ public class EmployeeProfileController {
     private TitledPane handleUsersPane;
 
 
-    // Generate Store Reports Pane
+    // View Reports Pane
+    @FXML
+    private VBox reportsVBox;
+    @FXML
+    private HBox report1box;
+    @FXML
+    private HBox report2box;
+    @FXML
+    private HBox report2title;
+    @FXML
+    private HBox report2remove;
     @FXML
     private ComboBox<String> storeComboBox;
     @FXML
@@ -81,21 +91,10 @@ public class EmployeeProfileController {
     private CheckBox chainReport;
     @FXML
     private Label generateMessageText;
-
-
-    // View Existing Reports Pane
     @FXML
     private Button addReportViewButton;
     @FXML
     private Button removeReportViewButton;
-    @FXML
-    private Button viewExistingReportsButton;
-    @FXML
-    private ComboBox<String> selectReport1CB;
-    @FXML
-    private ComboBox<String> selectReport2CB;
-    @FXML
-    private Text selectReport2CBText;
 
 
     // View/Handle Complaints  Pane
@@ -602,7 +601,7 @@ public class EmployeeProfileController {
     }
 
 
-    // Generate Reports Handlers
+    // View Reports Handlers
     @FXML
     void selectStore(ActionEvent event) {
         String storeName = storeComboBox.getValue();
@@ -689,14 +688,6 @@ public class EmployeeProfileController {
     void viewReport(ActionEvent event) {
         App.setCurrentReportDisplayed(report);
         App.popUpLaunch(viewReportButton, "ReportPopUp");
-    }
-
-
-    // View Existing Reports Handlers
-    @FXML
-    void viewExistingReports(ActionEvent event) {
-        // TODO: Get report images
-        App.popUpLaunch(viewExistingReportsButton, "TwoReportsPopUp");
     }
 
 
@@ -990,7 +981,9 @@ public class EmployeeProfileController {
 
     @FXML
     public void initialize() {
-
+        reportsVBox.getChildren().remove(report2title);
+        reportsVBox.getChildren().remove(report2box);
+        reportsVBox.getChildren().remove(report2remove);
         if (App.getCurrentUser() != null) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         } else {
@@ -1000,8 +993,9 @@ public class EmployeeProfileController {
         addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                selectReport2CB.setVisible(true);
-                selectReport2CBText.setVisible(true);
+                reportsVBox.getChildren().add(3, report2title);
+                reportsVBox.getChildren().add(4, report2box);
+                reportsVBox.getChildren().add(5, report2remove);
                 removeReportViewButton.setVisible(true);
                 addReportViewButton.setVisible(false);
             }
@@ -1009,8 +1003,9 @@ public class EmployeeProfileController {
         removeReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                selectReport2CB.setVisible(false);
-                selectReport2CBText.setVisible(false);
+                reportsVBox.getChildren().remove(report2title);
+                reportsVBox.getChildren().remove(report2box);
+                reportsVBox.getChildren().remove(report2remove);
                 removeReportViewButton.setVisible(false);
                 addReportViewButton.setVisible(true);
             }
@@ -1019,9 +1014,7 @@ public class EmployeeProfileController {
         //TODO: edit to show only to authorized users
         if (App.getCurrentUser() != null) {
             if(App.getCurrentUser().getClass()==ChainEmployee.class) {
-                System.out.println("chain employee profile");
-                chainReport.setVisible(false);
-                employeeControls.getPanes().removeAll();
+                employeeControls.getPanes().removeAll(generateReportsPane, handleUsersPane, handleComplaintsPane);
             }
             if (App.getCurrentUser().getClass() == StoreManager.class) {
                 chainReport.setVisible(false);
@@ -1031,13 +1024,13 @@ public class EmployeeProfileController {
                 employeeControls.getPanes().remove(handleUsersPane);
             }
             if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
-                employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleUsersPane);
+                employeeControls.getPanes().removeAll(generateReportsPane, handleUsersPane);
             }
             if (App.getCurrentUser().getClass() == ChainManager.class) {
                 employeeControls.getPanes().remove(handleUsersPane);
             }
             if (App.getCurrentUser().getClass() == SystemAdmin.class) {
-                employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleComplaintsPane);
+                employeeControls.getPanes().removeAll(generateReportsPane, handleComplaintsPane);
             }
         }
 
