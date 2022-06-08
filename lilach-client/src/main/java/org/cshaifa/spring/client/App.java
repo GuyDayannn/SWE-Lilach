@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Report;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.responses.NotifyDeleteResponse;
