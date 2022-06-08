@@ -43,6 +43,9 @@ public class Order implements Serializable {
 
     private double total;
 
+    @Transient
+    private final double DELIVERY_PRICE = 30;
+
     public Order(Map<CatalogItem, Integer> items, Store store, Customer customer, String greeting, Timestamp orderDate,
             Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) {
         super();
@@ -57,7 +60,7 @@ public class Order implements Serializable {
         this.status = "Order Accepted";
         this.deliveryDetails = deliveryDetails;
         this.total = items.entrySet().stream().mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice())
-                .sum();
+                .sum() + (delivery ? DELIVERY_PRICE : 0);
     }
 
     public Order() {
