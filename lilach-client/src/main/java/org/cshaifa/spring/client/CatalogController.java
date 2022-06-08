@@ -459,6 +459,7 @@ public class CatalogController {
     @FXML
     void openCart(ActionEvent event) {
         App.popUpLaunch(shoppingCart, "shoppingCart");
+        App.resetUpdateScheduler();
     }
 
     @FXML

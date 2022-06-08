@@ -28,6 +28,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import org.cshaifa.spring.utils.Constants;
 
 public class DeliveryDetailsController {
     @FXML
@@ -121,7 +122,7 @@ public class DeliveryDetailsController {
         deliveryImage.setImage(cart);
         deliveryImage.setFitWidth(40);
         deliveryImage.setFitHeight(40);
-        supplyMethodSelector.setItems(FXCollections.observableArrayList("Self Pickup - 0$", "Delivery - 30$"));
+        supplyMethodSelector.setItems(FXCollections.observableArrayList("Self Pickup - 0$", "Delivery - " + Constants.DELIVERY_PRICE + "$"));
         supplyMethodSelector.getSelectionModel().selectFirst();
         deliveryDetailsVBox.setVisible(false);
         // function printing all hours in day intervals of 30 minutes from 'current'
@@ -245,6 +246,12 @@ public class DeliveryDetailsController {
             App.setSupplyDate(Timestamp.valueOf(deliveryDatePicker.getValue()
                     .atTime(LocalTime.parse(chosenTime, DateTimeFormatter.ofPattern("HH:mm")))));
         } else {
+            if(storeSelector.getSelectionModel().isEmpty())
+            {
+                notificationLabel.setTextFill(Color.RED);
+                notificationLabel.setText("Please select a store");
+                return;
+            }
             App.setPickupStore(stores.get(storeSelector.getSelectionModel().getSelectedIndex()));
         }
 

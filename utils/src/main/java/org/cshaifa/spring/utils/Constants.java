@@ -25,6 +25,7 @@ public class Constants {
     public static final String EDIT_CUSTOMER_SUCCESS = "Successfully edited customer status";
     public static final String EDIT_CUSTOMER_FAILED = "Failed to edit customer status";
     public static final String ILLEGAL_SELECTION = "Illegal selection, not all fields are set. Please try again.";
+    public static final double DELIVERY_PRICE = 30;
 
 
     public static final int SERVER_PORT = 8104;

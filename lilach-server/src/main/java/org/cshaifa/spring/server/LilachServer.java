@@ -59,7 +59,7 @@ import org.hibernate.HibernateException;
 
 public class LilachServer extends AbstractServer {
 
-    private static final String IMMEDIATE_ORDER_MAIL_SUBJECT = "Your order has arrived!";
+    private static final String IMMEDIATE_ORDER_MAIL_SUBJECT = "Congratulation, Order has arrived!";
     private static final String PRODUCT_UPDATED_NOTIFICATION = "Product Updated";
     private static final String PRODUCT_DELETED_NOTIFICATION = "Product Deleted";
     private static final String PRODUCT_CREATED_NOTIFICATION = "Product Created";
@@ -244,7 +244,7 @@ public class LilachServer extends AbstractServer {
                                 createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());
                         if (order != null) {
                             if (order.isDelivery()) {
-                                String message = "<h2>Your order #" + order.getId() + " has arrived!</h2>";
+                                String message = "<h2>Order #" + order.getId() + " has arrived!</h2>";
                                 if (!order.getDeliveryDetails().getMessage().isBlank())
                                     message += "<br>" + order.getDeliveryDetails().getMessage();
 

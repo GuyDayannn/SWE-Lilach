@@ -20,6 +20,9 @@ import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
+import org.cshaifa.spring.entities.responses.NotifyDeleteResponse;
+import org.cshaifa.spring.entities.responses.NotifyResponse;
+import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
 
 import javafx.application.Application;
@@ -64,6 +67,8 @@ public class App extends Application {
     private static User currentUser = null;
 
     private static Map<CatalogItem, Integer> shoppingCart = new HashMap<>();
+
+    private static String greeting = null;
 
     private static String recipientFirstName = null;
 
@@ -115,8 +120,9 @@ public class App extends Application {
         final User toLogout = currentUser;
         new Thread(
                 createTimedTask(() -> ClientHandler.logoutUser(toLogout), Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS))
-                        .start();
+                .start();
         currentUser = null;
+        shoppingCart.clear();
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -136,10 +142,44 @@ public class App extends Application {
         appStage.setTitle(title);
     }
 
-    static void setContent(String pageName) throws IOException {
+    public static void resetUpdateScheduler() {
         scheduler.shutdown();
         scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
 
+    public static double getCartTotal() {
+        return shoppingCart.entrySet().stream()
+                .mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
+    }
+
+    public static boolean updateCart(NotifyResponse notifyResponse) {
+        if (notifyResponse instanceof NotifyUpdateResponse) {
+            NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) notifyResponse;
+            CatalogItem oldItem = App.getCart().keySet().stream().filter(
+                    catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
+                    .findFirst().orElse(null);
+            if (oldItem != null) {
+                App.getCart().put(notifyUpdateResponse.getToUpdate(), App.getCart().get(oldItem));
+                App.getCart().remove(oldItem);
+                return true;
+            }
+        } else if (notifyResponse instanceof NotifyDeleteResponse) {
+            NotifyDeleteResponse notifyDeleteResponse = (NotifyDeleteResponse) notifyResponse;
+            CatalogItem toDelete = App.getCart().keySet().stream().filter(
+                    catalogItem -> catalogItem.getId() == notifyDeleteResponse.getToDelete().getId())
+                    .findFirst().orElse(null);
+
+            if (toDelete != null) {
+                App.getCart().remove(toDelete);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static void setContent(String pageName) throws IOException {
+        resetUpdateScheduler();
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         if (pageName == "catalog") {
@@ -393,9 +433,13 @@ public class App extends Application {
         App.pickupStore = pickupStore;
     }
 
-    public static boolean isImmediate() { return immediate; }
+    public static boolean isImmediate() {
+        return immediate;
+    }
 
-    public static void setImmediate(boolean immediate) { App.immediate = immediate; }
+    public static void setImmediate(boolean immediate) {
+        App.immediate = immediate;
+    }
 
     public static CatalogItem getCreatedItem() {
         return createdItem;
@@ -408,4 +452,12 @@ public class App extends Application {
     public static Order getSelectedOrder() { return selectedOrder; }
 
     public static void setSelectedOrder(Order order) { selectedOrder = order; }
+
+    public static String getGreeting() {
+        return greeting;
+    }
+
+    public static void setGreeting(String greeting) {
+        App.greeting = greeting;
+    }
 }

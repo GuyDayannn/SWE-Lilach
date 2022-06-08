@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
+import javafx.scene.control.TextField;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.SubscriptionType;
@@ -50,6 +51,9 @@ public class OrderSummaryController {
 
     @FXML
     private HBox newTotalHBox;
+
+    @FXML
+    private TextField greetingTextField;
 
     Map<CatalogItem, Integer> shoppingCart;
 
@@ -160,16 +164,15 @@ public class OrderSummaryController {
     @FXML
     void displayTotal() {
         if (shoppingCart != null) {
-            double total = shoppingCart.entrySet().stream()
-                    .mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
-            orderTotalLabel.setText(Double.toString(total));
+            double total = App.getCartTotal();
+            orderTotalLabel.setText(new BigDecimal(total).setScale(2, RoundingMode.HALF_UP).toString());
             Customer currentCustomer = (Customer) App.getCurrentUser();
             if (currentCustomer.getSubscriptionType() == SubscriptionType.YEARLY) {
                 discountHBox.setVisible(true);
                 newTotalHBox.setVisible(true);
 
-                discountLabel.setText(Double.toString(total * 0.1));
-                newTotalLabel.setText(Double.toString(total * 0.9));
+                discountLabel.setText(new BigDecimal(total * 0.1).setScale(2,RoundingMode.HALF_DOWN).toString());
+                newTotalLabel.setText(new BigDecimal(total * 0.9).setScale(2, RoundingMode.HALF_UP).toString());
             } else {
                 summaryVBox.getChildren().remove(discountHBox);
                 summaryVBox.getChildren().remove(newTotalHBox);
@@ -190,6 +193,7 @@ public class OrderSummaryController {
     @FXML
     private void continueOrder(ActionEvent event) {
         try {
+            App.setGreeting(greetingTextField.getText().strip());
             App.setContent("deliveryDetails");
         } catch (IOException e) {
             e.printStackTrace();
@@ -203,6 +207,8 @@ public class OrderSummaryController {
         cartImage.setFitWidth(40);
         cartImage.setFitHeight(40);
         shoppingCart = App.getCart();
+
+        if(App.getGreeting() != null) greetingTextField.setText(App.getGreeting());
 
         if (shoppingCart.size() == 0) {
             itemsVbox.getChildren().add(new Text("Shopping cart is empty"));

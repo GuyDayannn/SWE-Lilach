@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -39,7 +40,29 @@
                         <VBox fx:id="itemsVbox" prefHeight="621.0" prefWidth="502.0" />
                      </content>
                   </ScrollPane>
-                  <VBox fx:id="summaryVbox" prefHeight="173.0" prefWidth="518.0" styleClass="summaryVbox" />
+                  <VBox fx:id="summaryVbox" prefHeight="173.0" prefWidth="518.0" styleClass="summaryVbox">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Total Price">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="10.0" top="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label fx:id="totalPrice" textFill="#2cae00">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="30.0" top="10.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                        </HBox>
+                     </children></VBox>
                </children>
             </VBox>
             <GridPane gridLinesVisible="true" prefHeight="585.0" prefWidth="457.0" GridPane.columnIndex="1">
