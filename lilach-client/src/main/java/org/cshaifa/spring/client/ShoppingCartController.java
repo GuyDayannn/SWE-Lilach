@@ -97,7 +97,12 @@ public class ShoppingCartController {
                 displayTotal();
             }
         });
-        Button removeButton = new Button("Remove");
+        Button removeButton = new Button("");
+        Image removeImage = new Image(getClass().getResource("images/remove.png").toString());
+        ImageView ivRemove = new ImageView(removeImage);
+        ivRemove.setFitHeight(15);
+        ivRemove.setFitWidth(15);
+        removeButton.setGraphic(ivRemove);
         removeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -171,6 +176,12 @@ public class ShoppingCartController {
             });
             buttonsBox.getChildren().addAll(clearButton, finishButton);
             summaryVbox.getChildren().add(buttonsBox);
+            if (shoppingCart.size()==0) {
+                shoppingCart.clear();
+                itemsVbox.getChildren().clear();
+                itemsVbox.getChildren().add(new Text("Shopping cart is empty"));
+                summaryVbox.getChildren().clear();
+            }
         }
     }
 

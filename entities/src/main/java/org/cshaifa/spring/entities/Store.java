@@ -39,6 +39,9 @@ public class Store implements Serializable {
     @OneToOne//(fetch = FetchType.EAGER)
     private StoreManager storeManager;
 
+    @OneToOne//(fetch = FetchType.EAGER)
+    private ChainManager chainManager;
+
     public Store() {
         this.name = "";
         this.address = "";
@@ -103,8 +106,14 @@ public class Store implements Serializable {
 
     public StoreManager getStoreManager() {return storeManager;}
 
+    public ChainManager getChainManager() {return chainManager;}
+
     public void setStoreManager(StoreManager storeManager) {
         this.storeManager = storeManager;
+    }
+
+    public void setChainManager(ChainManager chainManager) {
+        this.chainManager = chainManager;
     }
 
     public void addCustomer(Customer customer) { this.customers.add(customer); }
@@ -134,6 +143,8 @@ public class Store implements Serializable {
     public void removeEmployee(ChainEmployee chainEmployee) {this.employees.remove(chainEmployee);}
 
     public void removeManager() {this.storeManager = null;}
+
+    public void removeChainManger() {this.chainManager = null;}
 
     public void addEmployee(ChainEmployee chainEmployee) {this.employees.add(chainEmployee);}
 

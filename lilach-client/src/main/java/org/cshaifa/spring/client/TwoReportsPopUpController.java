@@ -23,6 +23,13 @@ public class TwoReportsPopUpController {
 
     @FXML
     void initialize()  {
+        try{
+            //Setting the image view
+            reportImage1.setImage(App.getImageFromByteArray(App.getCurrentReportDisplayed().getReportImage()));
+            reportImage2.setImage(App.getImageFromByteArray(App.getCurrentReport1Displayed().getReportImage()));
+        } catch(IOException fileNotFoundException){
+            fileNotFoundException.printStackTrace();
+        }
         closePopupBtn.setOnAction(event -> {
             closePopupBtn.getScene().getWindow().hide();
         });

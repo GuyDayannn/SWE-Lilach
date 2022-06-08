@@ -24,6 +24,7 @@ public class StoreManager extends ChainEmployee{
     }
 
     public Store getStoreManged() {return storeManaged;}
+
     public void setStoreManged(Store store) {this.storeManaged = store;}
 
     public void removeStoreManaged(){this.storeManaged = null;}
