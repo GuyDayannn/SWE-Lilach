@@ -4,35 +4,52 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="popupPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.ItemPopUpController">
+<AnchorPane fx:id="popupPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.ItemPopUpController">
    <children>
-      <Text fx:id="popUpMessageText" layoutX="14.0" layoutY="14.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Message Goes Here" textAlignment="CENTER" wrappingWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <font>
-            <Font size="38.0" />
-         </font>
-      </Text>
-      <Text fx:id="popupPriceText" layoutX="11.0" layoutY="76.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Message Goes Here" textAlignment="CENTER" wrappingWidth="577.6708984375" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.3291015625" AnchorPane.topAnchor="50.1015625">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Text>
-      <Text fx:id="popupNewPriceText" layoutX="300.0" layoutY="75.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Message Goes Here" visible="false" wrappingWidth="239.2708740234375">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Text>
-      <Text fx:id="popupPriceText1" layoutX="60.0" layoutY="75.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Message Goes Here" textAlignment="RIGHT" visible="false" wrappingWidth="239.2708740234375">
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Text>
-      <HBox fx:id="buttonsHbox" alignment="CENTER" layoutY="250.0" prefWidth="600">
-         <Button fx:id="btnPopUpUpdate" layoutX="135.0" layoutY="251.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="Update Item" />
-         <Button fx:id="btnPopUpCancel" layoutX="295.0" layoutY="251.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="169.0" text="Cancel" />
-      </HBox>
-      <ImageView fx:id="itemImage" fitHeight="150.0" fitWidth="200.0" layoutX="194.0" layoutY="90.0" pickOnBounds="true" preserveRatio="true" />
+      <VBox prefHeight="400.0" prefWidth="500.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="500.0">
+               <children>
+                  <Text fx:id="popUpMessageText" stroke="BLACK" strokeType="OUTSIDE" strokeWidth="0.0" text="Message Goes Here" textAlignment="CENTER">
+                     <font>
+                        <Font name="Trebuchet MS" size="38.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="500.0">
+               <children>
+                  <HBox fx:id="priceBox" alignment="CENTER" prefHeight="100.0" prefWidth="500.0">
+                     <children>
+                        <Text fx:id="popupPriceText" strokeType="OUTSIDE" strokeWidth="0.0" text="Price" textAlignment="RIGHT" wrappingWidth="239.2708740234375">
+                           <font>
+                              <Font name="Trebuchet MS" size="24.0" />
+                           </font>
+                        </Text>
+                        <Text fx:id="popupNewPriceText" strokeType="OUTSIDE" strokeWidth="0.0" text="New Price" wrappingWidth="239.2708740234375">
+                           <font>
+                              <Font name="Trebuchet MS" size="24.0" />
+                           </font>
+                        </Text>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+            <HBox fx:id="itemDetailsBox" alignment="CENTER" prefHeight="25.0" prefWidth="500.0" />
+            <HBox alignment="CENTER" prefHeight="225.0" prefWidth="500.0">
+               <children>
+                  <ImageView fx:id="itemImage" fitHeight="225.0" fitWidth="275.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </HBox>
+            <HBox fx:id="buttonsHbox" alignment="CENTER" prefHeight="50.0" prefWidth="500.0">
+               <Button fx:id="btnPopUpUpdate" layoutX="135.0" layoutY="251.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="157.0" text="Update Item" />
+               <Button fx:id="btnPopUpCancel" layoutX="295.0" layoutY="251.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="169.0" text="Cancel" />
+            </HBox>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

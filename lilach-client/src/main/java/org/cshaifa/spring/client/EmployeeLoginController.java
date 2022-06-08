@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import org.cshaifa.spring.entities.ChainEmployee;
 import org.cshaifa.spring.entities.responses.LoginResponse;
 import org.cshaifa.spring.utils.Constants;
 
@@ -83,11 +84,21 @@ public class EmployeeLoginController {
             invalid_login_text.setTextFill(Color.GREEN);
             App.hideLoading();
             App.setCurrentUser(loginResponse.getUser());
-            try {
-                App.setWindowTitle("Employee Profile");
-                App.setContent("employeeProfile");
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            if (App.getCurrentUser().getClass() == ChainEmployee.class) {
+                try {
+                    App.setWindowTitle("Catalog");
+                    App.setContent("catalog");
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            }
+            else {
+                try {
+                    App.setWindowTitle("Employee Profile");
+                    App.setContent("employeeProfile");
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         });
 
