@@ -120,7 +120,7 @@ public class OrderConfirmationController {
     @FXML
     void initialize() {
         App.getCart().forEach((item, quantity) -> itemsVbox.getChildren().add(getItemHBox(item, quantity)));
-        totalPrice.setText(Double.toString(App.getTotalOrderPrice() + (App.isOrderDelivery() ? Constants.DELIVERY_PRICE : 0)));
+        totalPrice.setText(new BigDecimal(App.getTotalOrderPrice() + (App.isOrderDelivery() ? Constants.DELIVERY_PRICE : 0)).setScale(2, RoundingMode.HALF_UP).toString());
 
         addressLabel.setText(App.getRecipientAddress());
         cardNumberLabel
@@ -212,7 +212,7 @@ public class OrderConfirmationController {
 
             App.hideLoading();
             try {
-                App.setContent("catalog");
+                App.setContent("orderAccepted");
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
