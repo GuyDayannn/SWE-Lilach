@@ -260,47 +260,53 @@ public class EmployeeProfileController {
             if (t1!=null && (t1.equals("Store Manager") || t1.equals("Chain Employee"))) {
                 System.out.println("chosen store manager / chain employee");
                 selectStoreComboBox.setDisable(false);
+                if(selectStoreComboBox.getItems().isEmpty()==true) {
+                    Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
+                        return ClientHandler.getStores();
+                    }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-                Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
-                    return ClientHandler.getStores();
-                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+                    getStoresTask.setOnSucceeded(e -> {
+                        if (getStoresTask.getValue() == null) {
+                            App.hideLoading();
+                            System.err.println("Getting stores failed");
+                            return;
+                        }
+                        GetStoresResponse response = getStoresTask.getValue();
+                        if (!response.isSuccessful()) {
+                            // TODO: maybe log the specific exception somewhere
+                            App.hideLoading();
+                            System.err.println("Getting stores failed");
+                            return;
+                        }
+                        storesList = response.getStores();
 
-                getStoresTask.setOnSucceeded(e -> {
-                    if (getStoresTask.getValue() == null) {
-                        App.hideLoading();
-                        System.err.println("Getting stores failed");
-                        return;
+                        for (Store store : storesList) {
+                            //System.out.println(store.getName());
+                            selectStoreComboBox.getItems().add(store.getName());
+                        }
+
+                    });
+
+                    getStoresTask.setOnFailed(e -> {
+                        // TODO: maybe log somewhere else...
+                        getStoresTask.getException().printStackTrace();
+                    });
+
+                    try {
+                        Thread t2 = new Thread(getStoresTask);
+                        t2.start();
+                        t2.join();
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+
                     }
-                    GetStoresResponse response = getStoresTask.getValue();
-                    if (!response.isSuccessful()) {
-                        // TODO: maybe log the specific exception somewhere
-                        App.hideLoading();
-                        System.err.println("Getting stores failed");
-                        return;
-                    }
-                    storesList = response.getStores();
-
-                    for (Store store : storesList) {
-                        //System.out.println(store.getName());
-                        selectStoreComboBox.getItems().add(store.getName());
-                    }
-                });
-
-                getStoresTask.setOnFailed(e -> {
-                    // TODO: maybe log somewhere else...
-                    getStoresTask.getException().printStackTrace();
-                });
-
-                try {
-                    Thread t2 = new Thread(getStoresTask);
-                    t2.start();
-                    t2.join();
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-
                 }
-
                 //new Thread(getStoresTask).start();
+            }
+
+            if (t1!=null && (t1.equals("Customer Service") || t1.equals("Chain Manager"))) {
+                System.out.println("chosen Customer service / chain manager");
+                selectStoreComboBox.setDisable(true);
             }
         });
     }
@@ -337,7 +343,7 @@ public class EmployeeProfileController {
                     //System.out.println("added chain employee");
                 }
                 else if(user.getClass().isAssignableFrom(StoreManager.class)) {
-                    if (!user.getClass().isAssignableFrom(ChainManager.class)) {
+                    if (user.getClass()!=(ChainManager.class)) {
                         storeManagersList.add((StoreManager) user);
                         employeeList.add((Employee) user);
                         //System.out.println("added store manager");
