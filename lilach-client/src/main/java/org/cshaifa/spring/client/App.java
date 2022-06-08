@@ -137,10 +137,13 @@ public class App extends Application {
         appStage.setTitle(title);
     }
 
-    static void setContent(String pageName) throws IOException {
+    public static void resetUpdateScheduler() {
         scheduler.shutdown();
         scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
 
+    static void setContent(String pageName) throws IOException {
+        resetUpdateScheduler();
         Parent root = loadFXML(pageName);
         scene = new Scene(root);
         if (pageName == "catalog") {
