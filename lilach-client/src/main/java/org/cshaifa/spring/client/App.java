@@ -93,6 +93,8 @@ public class App extends Application {
 
     private static Report report;
 
+    private static Report report1;
+
     private static Order selectedOrder = null;
 
     @Override
@@ -252,6 +254,8 @@ public class App extends Application {
         report = report1;
     }
 
+    static void setCurrentReport1Displayed(Report report2) { report1 = report2; }
+
     public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
         if (updatedItem.getDiscount() != 0) {
             double price = updatedItem.getPrice() * (1 - updatedItem.getDiscount() / 100);
@@ -270,6 +274,8 @@ public class App extends Application {
     static Report getCurrentReportDisplayed() {
         return report;
     }
+
+    static Report getCurrentReport1Displayed() { return report1; }
 
     static CatalogItem getItemByID(long itemID) {
         return itemByID;

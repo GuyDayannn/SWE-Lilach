@@ -51,162 +51,174 @@
                             <children>
                                 <VBox fx:id="reportsVBox" prefHeight="325.0" prefWidth="600.0">
                                     <children>
-                                      <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" styleClass="report-num-label">
-                                         <children>
-                                            <Label text="Report 1">
-                                               <font>
-                                                  <Font name="Trebuchet MS Italic" size="16.0" />
-                                               </font>
-                                            </Label>
-                                         </children>
-                                      </HBox>
-                                        <HBox fx:id="report1box" prefHeight="150.0" prefWidth="600.0">
-                                            <children>
-                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
-                                                    <children>
-                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" translateX="-28.0">
-                                                            <font>
-                                                                <Font size="14.0" />
-                                                            </font>
-                                                        </Text>
-                                                        <HBox alignment="CENTER" spacing="5.0">
-                                                            <children>
-                                                                <ComboBox fx:id="storeComboBox" onAction="#selectStore" prefWidth="175.0" />
-                                                                <CheckBox fx:id="chainReport" mnemonicParsing="false" onAction="#selectChain" text="Chain" />
-                                                            </children>
-                                                        </HBox>
-                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:" translateX="-28.0">
-                                                            <font>
-                                                                <Font size="14.0" />
-                                                            </font>
-                                                        </Text>
-                                                        <ComboBox fx:id="reportTypeComboBox" onAction="#selectReportType" prefWidth="175.0" translateX="-28.0">
-                                                            <items>
-                                                                <FXCollections fx:factory="observableArrayList">
-                                                                    <String fx:value="Orders" />
-                                                                    <String fx:value="Revenue" />
-                                                                    <String fx:value="Complaints" />
-                                                                </FXCollections>
-                                                            </items>
-                                                        </ComboBox>
-                                                    </children>
-                                                </VBox>
-                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
-                                                    <children>
-                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
-                                                            <font>
-                                                                <Font size="14.0" />
-                                                            </font>
-                                                        </Text>
-                                                        <DatePicker fx:id="startDatePicker" onAction="#setStartDate" />
-                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
-                                                            <font>
-                                                                <Font size="14.0" />
-                                                            </font>
-                                                        </Text>
-                                                        <DatePicker fx:id="endDatePicker" onAction="#setEndDate" />
-                                                    </children>
-                                                </VBox>
-                                            </children>
-                                        </HBox>
-                              <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0">
+                              <VBox fx:id="report1Vbox" prefHeight="200.0" prefWidth="600.0">
                                  <children>
-                                                  <Button fx:id="addReportViewButton" mnemonicParsing="false" text="Add Report">
-                                                      <graphic>
-                                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                              <image>
-                                                                  <Image url="@images/plus.png" />
-                                                              </image>
-                                                          </ImageView>
-                                                      </graphic>
-                                    </Button>
-                                 </children>
-                              </HBox>
-                              <HBox fx:id="report2title" alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" styleClass="report-num-label">
-                                 <children>
-                                    <Label text="Report 2">
-                                       <font>
-                                          <Font name="Trebuchet MS Italic" size="16.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                              <HBox fx:id="report2box" prefHeight="150.0" prefWidth="600.0">
-                                 <children>
-                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
+                                            <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" styleClass="report-num-label">
+                                               <children>
+                                                  <Label text="Report 1">
+                                                     <font>
+                                                        <Font name="Trebuchet MS Italic" size="16.0" />
+                                                     </font>
+                                                  </Label>
+                                               </children>
+                                            </HBox>
+                                              <HBox fx:id="report1box" prefHeight="100.0" prefWidth="600.0">
+                                                  <children>
+                                                      <VBox alignment="CENTER" prefHeight="100.0" prefWidth="300.0" spacing="5.0">
+                                                          <children>
+                                                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" translateX="-28.0">
+                                                                  <font>
+                                                                      <Font size="14.0" />
+                                                                  </font>
+                                                              </Text>
+                                                              <HBox alignment="CENTER" spacing="5.0">
+                                                                  <children>
+                                                                      <ComboBox fx:id="storeComboBox" onAction="#selectStore" prefWidth="175.0" />
+                                                                      <CheckBox fx:id="chainReport" mnemonicParsing="false" onAction="#selectChain" text="Chain" />
+                                                                  </children>
+                                                              </HBox>
+                                                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:" translateX="-28.0">
+                                                                  <font>
+                                                                      <Font size="14.0" />
+                                                                  </font>
+                                                              </Text>
+                                                              <ComboBox fx:id="reportTypeComboBox" onAction="#selectReportType" prefWidth="175.0" translateX="-28.0">
+                                                                  <items>
+                                                                      <FXCollections fx:factory="observableArrayList">
+                                                                          <String fx:value="Orders" />
+                                                                          <String fx:value="Revenue" />
+                                                                          <String fx:value="Complaints" />
+                                                                      </FXCollections>
+                                                                  </items>
+                                                              </ComboBox>
+                                                          </children>
+                                                      </VBox>
+                                                      <VBox alignment="CENTER" prefHeight="100.0" prefWidth="300.0" spacing="5.0">
+                                                          <children>
+                                                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
+                                                                  <font>
+                                                                      <Font size="14.0" />
+                                                                  </font>
+                                                              </Text>
+                                                              <DatePicker fx:id="startDatePicker" onAction="#setStartDate" />
+                                                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
+                                                                  <font>
+                                                                      <Font size="14.0" />
+                                                                  </font>
+                                                              </Text>
+                                                              <DatePicker fx:id="endDatePicker" onAction="#setEndDate" />
+                                                          </children>
+                                                      </VBox>
+                                                  </children>
+                                              </HBox>
+                                    <HBox fx:id="addReportViewButtonBox" alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0">
                                        <children>
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" translateX="-28.0">
+                                                        <Button fx:id="addReportViewButton" mnemonicParsing="false" text="Add Report">
+                                                            <graphic>
+                                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                    <image>
+                                                                        <Image url="@images/plus.png" />
+                                                                    </image>
+                                                                </ImageView>
+                                                            </graphic>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <VBox fx:id="report2Vbox" prefHeight="200.0" prefWidth="600.0">
+                                 <children>
+                                    <HBox fx:id="report2title" alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0" styleClass="report-num-label">
+                                       <children>
+                                          <Label text="Report 2">
                                              <font>
-                                                <Font size="14.0" />
+                                                <Font name="Trebuchet MS Italic" size="16.0" />
                                              </font>
-                                          </Text>
-                                          <HBox alignment="CENTER" spacing="5.0">
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <HBox fx:id="report2box" prefHeight="100.0" prefWidth="600.0">
+                                       <children>
+                                          <VBox alignment="CENTER" prefHeight="100.0" prefWidth="300.0" spacing="5.0">
                                              <children>
-                                                <ComboBox fx:id="storeComboBox1" onAction="#selectStore" prefWidth="175.0" />
-                                                <CheckBox fx:id="chainReport1" mnemonicParsing="false" onAction="#selectChain" text="Chain" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Store:" translateX="-28.0">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Text>
+                                                <HBox alignment="CENTER" spacing="5.0">
+                                                   <children>
+                                                      <ComboBox fx:id="storeComboBox1" onAction="#selectStore1" prefWidth="175.0" />
+                                                      <CheckBox fx:id="chainReport1" mnemonicParsing="false" onAction="#selectChain" text="Chain" />
+                                                   </children>
+                                                </HBox>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:" translateX="-28.0">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Text>
+                                                <ComboBox fx:id="reportTypeComboBox1" onAction="#selectReportType" prefWidth="175.0" translateX="-28.0">
+                                                   <items>
+                                                      <FXCollections fx:factory="observableArrayList">
+                                                         <String fx:value="Orders" />
+                                                         <String fx:value="Revenue" />
+                                                         <String fx:value="Complaints" />
+                                                      </FXCollections>
+                                                   </items>
+                                                </ComboBox>
                                              </children>
-                                          </HBox>
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Report:" translateX="-28.0">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Text>
-                                          <ComboBox fx:id="reportTypeComboBox1" onAction="#selectReportType" prefWidth="175.0" translateX="-28.0">
-                                             <items>
-                                                <FXCollections fx:factory="observableArrayList">
-                                                   <String fx:value="Orders" />
-                                                   <String fx:value="Revenue" />
-                                                   <String fx:value="Complaints" />
-                                                </FXCollections>
-                                             </items>
-                                          </ComboBox>
+                                          </VBox>
+                                          <VBox alignment="CENTER" prefHeight="100.0" prefWidth="300.0" spacing="5.0">
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Text>
+                                                <DatePicker fx:id="startDatePicker1" onAction="#setStartDate" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
+                                                   <font>
+                                                      <Font size="14.0" />
+                                                   </font>
+                                                </Text>
+                                                <DatePicker fx:id="endDatePicker1" onAction="#setEndDate" />
+                                             </children>
+                                          </VBox>
                                        </children>
-                                    </VBox>
-                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="5.0">
+                                    </HBox>
+                                    <HBox fx:id="report2remove" alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0">
                                        <children>
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select Start Date:">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Text>
-                                          <DatePicker fx:id="startDatePicker1" onAction="#setStartDate" />
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Select End Date:">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                          </Text>
-                                          <DatePicker fx:id="endDatePicker1" onAction="#setEndDate" />
+                                                        <Button fx:id="removeReportViewButton" mnemonicParsing="false" text="Remove">
+                                                            <graphic>
+                                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                                    <image>
+                                                                        <Image url="@images/remove.png" />
+                                                                    </image>
+                                                                </ImageView>
+                                                            </graphic>
+                                                        </Button>
                                        </children>
-                                    </VBox>
+                                    </HBox>
                                  </children>
-                              </HBox>
-                              <HBox fx:id="report2remove" alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0">
+                              </VBox>
+                              <VBox prefHeight="75.0" prefWidth="600.0">
                                  <children>
-                                                  <Button fx:id="removeReportViewButton" mnemonicParsing="false" text="Remove">
-                                                      <graphic>
-                                                          <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                                              <image>
-                                                                  <Image url="@images/remove.png" />
-                                                              </image>
-                                                          </ImageView>
-                                                      </graphic>
-                                                  </Button>
+                                              <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="25.0">
+                                                  <children>
+                                                      <Button fx:id="generateReportButton" mnemonicParsing="false" onAction="#generateReport" prefWidth="125.0" text="View Report" />
+                                                  </children>
+                                              </HBox>
+                                              <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0">
+                                                  <children>
+                                                      <Label fx:id="generateMessageText" text="">
+                                                          <font>
+                                                              <Font name="System Italic" size="12.0" />
+                                                          </font>
+                                                      </Label>
+                                                  </children>
+                                    </HBox>
                                  </children>
-                              </HBox>
-                                        <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="25.0">
-                                            <children>
-                                                <Button fx:id="generateReportButton" mnemonicParsing="false" onAction="#generateReport" prefWidth="110.0" text="Generate Report" />
-                                                <Button fx:id="viewReportButton" disable="true" mnemonicParsing="false" onAction="#viewReport" prefWidth="110.0" text="View Report" />
-                                            </children>
-                                        </HBox>
-                                        <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="600.0">
-                                            <children>
-                                                <Label fx:id="generateMessageText" text="">
-                                                    <font>
-                                                        <Font name="System Italic" size="12.0" />
-                                                    </font>
-                                                </Label>
-                                            </children></HBox>
+                              </VBox>
                                     </children>
                                 </VBox>
                             </children>

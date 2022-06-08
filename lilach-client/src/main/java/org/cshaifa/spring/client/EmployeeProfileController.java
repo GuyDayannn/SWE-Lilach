@@ -70,13 +70,9 @@ public class EmployeeProfileController {
     @FXML
     private VBox reportsVBox;
     @FXML
-    private HBox report1box;
+    private VBox report1Vbox;
     @FXML
-    private HBox report2box;
-    @FXML
-    private HBox report2title;
-    @FXML
-    private HBox report2remove;
+    private VBox report2Vbox;
     @FXML
     private ComboBox<String> storeComboBox;
     @FXML
@@ -86,13 +82,25 @@ public class EmployeeProfileController {
     @FXML
     private DatePicker endDatePicker;
     @FXML
-    private Button viewReportButton;
+    private Button generateReportButton;
     @FXML
     private CheckBox chainReport;
+    @FXML
+    private ComboBox<String> storeComboBox1;
+    @FXML
+    private ComboBox<String> reportTypeComboBox1;
+    @FXML
+    private DatePicker startDatePicker1;
+    @FXML
+    private DatePicker endDatePicker1;
+    @FXML
+    private CheckBox chainReport1;
     @FXML
     private Label generateMessageText;
     @FXML
     private Button addReportViewButton;
+    @FXML
+    private HBox addReportViewButtonBox;
     @FXML
     private Button removeReportViewButton;
 
@@ -148,11 +156,22 @@ public class EmployeeProfileController {
     private List<Employee> employeeList= new ArrayList<>();
     private ChainManager chainManager;
     private SystemAdmin systemAdmin;
+
+    // Report1
     private LocalDate reportStartDate;
     private LocalDate reportEndDate;
     private ReportType reportType;
     private Store reportStore;
-    private Report report;
+    private Report report = null;
+
+    //Report2
+    private LocalDate reportStartDate1;
+    private LocalDate reportEndDate1;
+    private ReportType reportType1;
+    private Store reportStore1;
+    private Report report1 = null;
+
+    private boolean two_reports = false;
     private Customer selectedCustomer = null;
 
 
@@ -310,7 +329,7 @@ public class EmployeeProfileController {
             chainEmployeeList.clear();
             storeManagersList.clear();
             customerServiceList.clear();
-            storesList.clear();
+
             for(User user: userList){
                 if(user.getClass().isAssignableFrom(ChainEmployee.class) ){
                     chainEmployeeList.add((ChainEmployee) user);
@@ -441,11 +460,16 @@ public class EmployeeProfileController {
                 System.err.println("Getting stores failed");
                 return;
             }
+
+            if (storesList!=null) {
+                storesList.clear();
+            }
             storesList = response.getStores();
 
             for (Store store : storesList) {
                 //System.out.println(store.getName());
                 storeComboBox.getItems().add(store.getName());
+                storeComboBox1.getItems().add(store.getName());
             }
 
         });
@@ -606,8 +630,20 @@ public class EmployeeProfileController {
     void selectStore(ActionEvent event) {
         String storeName = storeComboBox.getValue();
         for (Store store: storesList) {
-            if(store.getName().equals(storeName)){
+            if (store.getName().equals(storeName)){
                 reportStore = store;
+                System.out.println(store.getName());
+                break;
+            }
+        }
+    }
+
+    @FXML
+    void selectStore1(ActionEvent event) {
+        String storeName = storeComboBox1.getValue();
+        for (Store store: storesList) {
+            if(store.getName().equals(storeName)){
+                reportStore1 = store;
                 break;
             }
         }
@@ -623,33 +659,62 @@ public class EmployeeProfileController {
             selectStore(event);
             storeComboBox.setDisable(false);
         }
+
+
+        if (chainReport1.isSelected()) {
+            reportStore1 = null;
+            storeComboBox1.setDisable(true);
+        }
+        else {
+            selectStore1(event);
+            storeComboBox1.setDisable(false);
+        }
     }
 
     @FXML
     void selectReportType(ActionEvent event) {
-        String report = reportTypeComboBox.getValue();
-        switch (report) {
-            case "Orders" -> reportType = ReportType.ORDERS;
-            case "Revenue" -> reportType = ReportType.REVENUE;
-            case "Complaints" -> reportType = ReportType.COMPLAINTS;
+        if (event.getSource() == reportTypeComboBox) {
+            String report = reportTypeComboBox.getValue();
+            switch (report) {
+                case "Orders" -> reportType = ReportType.ORDERS;
+                case "Revenue" -> reportType = ReportType.REVENUE;
+                case "Complaints" -> reportType = ReportType.COMPLAINTS;
+            }
+        }
+        else {
+            String report = reportTypeComboBox1.getValue();
+            switch (report) {
+                case "Orders" -> reportType1 = ReportType.ORDERS;
+                case "Revenue" -> reportType1 = ReportType.REVENUE;
+                case "Complaints" -> reportType1 = ReportType.COMPLAINTS;
+            }
         }
     }
 
     @FXML
     void setStartDate(ActionEvent event) {
-        reportStartDate = startDatePicker.getValue();
+        if (event.getSource() == startDatePicker) {
+            reportStartDate = startDatePicker.getValue();
+        }
+        else {
+            reportStartDate1 = startDatePicker1.getValue();
+        }
     }
 
     @FXML
     void setEndDate(ActionEvent event) {
-        reportEndDate = endDatePicker.getValue();
+        if (event.getSource() == endDatePicker) {
+            reportEndDate = endDatePicker.getValue();
+        }
+        else {
+            reportEndDate1 = endDatePicker1.getValue();
+        }
     }
 
     @FXML
     void generateReport(ActionEvent event) {
         if (reportType!=null && reportStartDate!=null && reportEndDate!=null) {
             report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
-
             boolean success = false;
             if (chainReport.isSelected()) {
                 success = report.generateChainHistogram(storesList);
@@ -658,7 +723,6 @@ public class EmployeeProfileController {
                 success = report.generateHistogram();
             }
             if (success) {
-                viewReportButton.setDisable(false);
                 generateMessageText.setVisible(true);
                 generateMessageText.setTextFill(Color.GREEN);
                 generateMessageText.setText(Constants.GENERATE_REPORT_SUCCESS);
@@ -671,8 +735,9 @@ public class EmployeeProfileController {
                 generateMessageText.setText(Constants.GENERATE_REPORT_FAILED);
                 messageDisappearanceTask(4000, generateMessageText);
                 System.out.println("Generating report failed.");
+                return;
             }
-
+            App.setCurrentReportDisplayed(report);
         }
         else {
             generateMessageText.setVisible(true);
@@ -680,14 +745,58 @@ public class EmployeeProfileController {
             generateMessageText.setText(Constants.MISSING_REQUIREMENTS);
             messageDisappearanceTask(4000, generateMessageText);
             System.out.println("Insert required data.");
+            return;
         }
 
+        if (two_reports) {
+            if (reportType1!=null && reportStartDate1!=null && reportEndDate1!=null) {
+                report1 = new Report(reportType1, reportStore1, reportStartDate1, reportEndDate1);
+
+                boolean success = false;
+                if (chainReport1.isSelected()) {
+                    success = report1.generateChainHistogram(storesList);
+                }
+                else {
+                    success = report1.generateHistogram();
+                }
+                if (success) {
+                    generateMessageText.setVisible(true);
+                    generateMessageText.setTextFill(Color.GREEN);
+                    generateMessageText.setText(Constants.GENERATE_REPORT_SUCCESS);
+                    messageDisappearanceTask(4000, generateMessageText);
+                    System.out.println("Report generated successfully.");
+                }
+                else {
+                    generateMessageText.setVisible(true);
+                    generateMessageText.setTextFill(Color.RED);
+                    generateMessageText.setText(Constants.GENERATE_REPORT_FAILED);
+                    messageDisappearanceTask(4000, generateMessageText);
+                    System.out.println("Generating report failed.");
+                    return;
+                }
+
+            }
+            else {
+                generateMessageText.setVisible(true);
+                generateMessageText.setTextFill(Color.RED);
+                generateMessageText.setText(Constants.MISSING_REQUIREMENTS);
+                messageDisappearanceTask(4000, generateMessageText);
+                System.out.println("Insert required data.");
+                return;
+            }
+            App.setCurrentReport1Displayed(report1);
+        }
+        viewReport(event);
     }
 
     @FXML
     void viewReport(ActionEvent event) {
-        App.setCurrentReportDisplayed(report);
-        App.popUpLaunch(viewReportButton, "ReportPopUp");
+        if (two_reports) {
+            App.popUpLaunch(generateReportButton, "TwoReportsPopUp");
+        }
+        else {
+            App.popUpLaunch(generateReportButton, "ReportPopUp");
+        }
     }
 
 
@@ -981,9 +1090,7 @@ public class EmployeeProfileController {
 
     @FXML
     public void initialize() {
-        reportsVBox.getChildren().remove(report2title);
-        reportsVBox.getChildren().remove(report2box);
-        reportsVBox.getChildren().remove(report2remove);
+        reportsVBox.getChildren().remove(report2Vbox);
         if (App.getCurrentUser() != null) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         } else {
@@ -993,21 +1100,19 @@ public class EmployeeProfileController {
         addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                reportsVBox.getChildren().add(3, report2title);
-                reportsVBox.getChildren().add(4, report2box);
-                reportsVBox.getChildren().add(5, report2remove);
+                reportsVBox.getChildren().add(1, report2Vbox);
                 removeReportViewButton.setVisible(true);
                 addReportViewButton.setVisible(false);
+                two_reports = true;
             }
         });
         removeReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                reportsVBox.getChildren().remove(report2title);
-                reportsVBox.getChildren().remove(report2box);
-                reportsVBox.getChildren().remove(report2remove);
+                reportsVBox.getChildren().remove(report2Vbox);
                 removeReportViewButton.setVisible(false);
                 addReportViewButton.setVisible(true);
+                two_reports = false;
             }
         });
 
@@ -1021,6 +1126,8 @@ public class EmployeeProfileController {
                 storeComboBox.setDisable(true);
                 StoreManager manager = (StoreManager)App.getCurrentUser();
                 reportStore = manager.getStoreManged();
+                report1Vbox.getChildren().remove(addReportViewButtonBox);
+                reportsVBox.getChildren().remove(report2Vbox);
                 employeeControls.getPanes().remove(handleUsersPane);
             }
             if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
