@@ -96,7 +96,7 @@ public class OrderSummaryController {
                         price = new BigDecimal((price * 0.01 * (100 - item.getDiscount())))
                                 .setScale(2, RoundingMode.HALF_UP).doubleValue();
                     }
-                    itemFinalPrice.setText(Double.toString(price * shoppingCart.get(item)));
+                    itemFinalPrice.setText(String.format("%.2f", price * shoppingCart.get(item)));
                     displayTotal();
                 } else if (shoppingCart.get(item) == 1) {
                     shoppingCart.remove(item);
@@ -119,7 +119,7 @@ public class OrderSummaryController {
                     price = new BigDecimal((price * 0.01 * (100 - item.getDiscount())))
                             .setScale(2, RoundingMode.HALF_UP).doubleValue();
                 }
-                itemFinalPrice.setText(Double.toString(price * shoppingCart.get(item)));
+                itemFinalPrice.setText(String.format("%.2f", price * shoppingCart.get(item)));
                 displayTotal();
             }
         });

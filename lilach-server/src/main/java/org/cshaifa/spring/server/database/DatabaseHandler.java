@@ -304,7 +304,7 @@ public class DatabaseHandler {
         return store;
     }
 
-    public static Order createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting,
+    public static Order createOrder(Store store, Customer customer, String cardNumber, Map<CatalogItem, Integer> items, String greeting,
             Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails)
             throws HibernateException {
         if (!delivery) {
@@ -324,7 +324,7 @@ public class DatabaseHandler {
         if (deliveryDetails != null)
             session.save(deliveryDetails);
 
-        Order order = new Order(items, store, customer, greeting, orderDate, supplyDate, delivery, deliveryDetails);
+        Order order = new Order(items, store, customer, cardNumber, greeting, orderDate, supplyDate, delivery, deliveryDetails);
         session.save(order);
 
         store.addOrder(order);
@@ -511,7 +511,7 @@ public class DatabaseHandler {
             cal2.add(Calendar.DAY_OF_MONTH, i + 3);
             Timestamp orderTime = new Timestamp(cal.getTime().getTime());
             Timestamp deliveryTime = new Timestamp(cal2.getTime().getTime());
-            createOrder(stores.get(random.nextInt(11)), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)),
+            createOrder(stores.get(random.nextInt(11)), (Customer) getUserByUsername("cust" + random.nextInt(1, 15)), "1234",
                     items.subList(0, item_index).stream()
                             .collect(Collectors.toMap(Function.identity(), item -> random.nextInt(1, 4))),
                     "Mazal Tov", orderTime, deliveryTime, true,

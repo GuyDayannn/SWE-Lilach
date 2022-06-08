@@ -14,6 +14,8 @@ public class CreateOrderRequest extends Request {
 
     private Customer customer;
 
+    private String cardNumber;
+
     private Map<CatalogItem, Integer> items;
 
     private String greeting;
@@ -26,10 +28,11 @@ public class CreateOrderRequest extends Request {
 
     private Delivery deliveryDetails;
 
-    public CreateOrderRequest(Store store, Customer customer, Map<CatalogItem, Integer> items, String greeting, Timestamp orderDate,
+    public CreateOrderRequest(Store store, Customer customer, String cardNumber, Map<CatalogItem, Integer> items, String greeting, Timestamp orderDate,
             Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) {
         this.store = store;
         this.customer = customer;
+        this.cardNumber = cardNumber;
         this.items = items;
         this.greeting = greeting;
         this.orderDate = orderDate;
@@ -68,4 +71,5 @@ public class CreateOrderRequest extends Request {
 
     public Delivery getDeliveryDetails() { return deliveryDetails; }
 
+    public String getCardNumber() { return cardNumber; }
 }

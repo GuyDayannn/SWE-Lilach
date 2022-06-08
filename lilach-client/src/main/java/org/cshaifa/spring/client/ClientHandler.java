@@ -214,10 +214,10 @@ public class ClientHandler {
         return checkServerAlive();
     }
 
-    public static CreateOrderResponse createOrder(Store store, Customer customer, Map<CatalogItem, Integer> items,
+    public static CreateOrderResponse createOrder(Store store, Customer customer, String cardNumber, Map<CatalogItem, Integer> items,
             String greeting, Timestamp orderDate, Timestamp supplyDate, boolean delivery, Delivery deliveryDetails)
             throws IOException, InterruptedException {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, items, greeting, orderDate,
+        CreateOrderRequest createOrderRequest = new CreateOrderRequest(store, customer, cardNumber, items, greeting, orderDate,
                 supplyDate, delivery, deliveryDetails);
         client.openConnection();
         client.sendToServer(createOrderRequest);
