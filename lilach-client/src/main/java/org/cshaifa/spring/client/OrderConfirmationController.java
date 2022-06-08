@@ -12,8 +12,12 @@ import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Delivery;
 import org.cshaifa.spring.entities.responses.CreateOrderResponse;
+import org.cshaifa.spring.entities.responses.NotifyDeleteResponse;
+import org.cshaifa.spring.entities.responses.NotifyResponse;
+import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -117,23 +121,31 @@ public class OrderConfirmationController {
         return hBox;
     }
 
+    private void showCartDetails() {
+        App.getCart().forEach((item, quantity) -> itemsVbox.getChildren().add(getItemHBox(item, quantity)));
+        totalPrice.setText(
+                new BigDecimal(App.getCartTotal() + (App.isOrderDelivery() ? Constants.DELIVERY_PRICE : 0))
+                        .setScale(2, RoundingMode.HALF_UP).toString());
+    }
+
     @FXML
     void initialize() {
-        App.getCart().forEach((item, quantity) -> itemsVbox.getChildren().add(getItemHBox(item, quantity)));
-        totalPrice.setText(new BigDecimal(App.getTotalOrderPrice() + (App.isOrderDelivery() ? Constants.DELIVERY_PRICE : 0)).setScale(2, RoundingMode.HALF_UP).toString());
-
+        showCartDetails();
         addressLabel.setText(App.getRecipientAddress());
         cardNumberLabel
                 .setText(App.getCardNumber().substring(App.getCardNumber().length() - 4, App.getCardNumber().length()));
         expDateLabel.setText(App.getCardExpDate());
-        // TODO: change to actual first name
-        firstNamePaymentLabel.setText("Yaakov");
-        lastNamePaymentLabel.setText("Levi");
+        String[] splitName = App.getCurrentUser().getFullName().split(" ", 2);
+        firstNamePaymentLabel.setText(splitName[0]);
+        if (splitName.length > 1) {
+            lastNamePaymentLabel.setVisible(true);
+            lastNamePaymentLabel.setText(splitName[1]);
+        } else
+            lastNamePaymentLabel.setVisible(false);
 
         if (!App.isOrderDelivery()) {
-            // TODO: change to actual store name
-            storeNameLabel.setText("Temp Store");
-            storeAddressLabel.setText("Tel Aviv");
+            storeNameLabel.setText(App.getPickupStore().getName());
+            storeAddressLabel.setText(App.getPickupStore().getAddress());
             return;
         } else {
             pickupAnchorPane.setVisible(false);
@@ -145,6 +157,26 @@ public class OrderConfirmationController {
         messageLabel.setText(App.getMessage());
         phoneNumberLabel.setText(App.getCustomerPhoneNumber());
         deliveryTimeLabel.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(App.getSupplyDate()));
+
+        App.scheduler.scheduleAtFixedRate(() -> {
+            try {
+                final NotifyResponse notifyResponse = ClientHandler.waitForUpdateFromServer();
+                if (notifyResponse == null)
+                    return;
+
+                if (App.updateCart(notifyResponse)) {
+                    Platform.runLater(() -> {
+                        itemsVbox.getChildren().clear();
+                        showCartDetails();
+                    });
+                }
+
+            } catch (Exception error) {
+                error.printStackTrace();
+                return;
+            }
+        }, 0, Constants.UPDATE_INTERVAL, TimeUnit.SECONDS);
+
     }
 
     @FXML
@@ -171,14 +203,13 @@ public class OrderConfirmationController {
         App.setCardExpDate(null);
         App.setCardCvv(null);
         App.setGreeting(null);
-        App.setTotalOrderPrice(-1);
     }
 
     @FXML
     private void placeOrder(ActionEvent event) {
         // TODO: add store
         String greeting;
-        if(App.getGreeting() != null)
+        if (App.getGreeting() != null)
             greeting = App.getGreeting();
         else
             greeting = "Mazal Tov";
@@ -188,7 +219,8 @@ public class OrderConfirmationController {
                 App.isOrderDelivery() ? App.getSupplyDate() : null, App.isOrderDelivery(),
                 App.isOrderDelivery()
                         ? new Delivery(App.getRecipientFirstName() + " " + App.getRecipientLastName(),
-                                App.getCustomerPhoneNumber(), App.getRecipientAddress(), App.getMessage(), App.isImmediate(), false)
+                                App.getCustomerPhoneNumber(), App.getRecipientAddress(), App.getMessage(),
+                                App.isImmediate(), false)
                         : null),
                 Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 

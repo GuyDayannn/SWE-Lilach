@@ -164,8 +164,7 @@ public class OrderSummaryController {
     @FXML
     void displayTotal() {
         if (shoppingCart != null) {
-            double total = shoppingCart.entrySet().stream()
-                    .mapToDouble(entry -> entry.getValue() * entry.getKey().getFinalPrice()).sum();
+            double total = App.getCartTotal();
             orderTotalLabel.setText(new BigDecimal(total).setScale(2, RoundingMode.HALF_UP).toString());
             Customer currentCustomer = (Customer) App.getCurrentUser();
             if (currentCustomer.getSubscriptionType() == SubscriptionType.YEARLY) {
@@ -178,8 +177,6 @@ public class OrderSummaryController {
                 summaryVBox.getChildren().remove(discountHBox);
                 summaryVBox.getChildren().remove(newTotalHBox);
             }
-
-            App.setTotalOrderPrice(total);
         }
     }
 

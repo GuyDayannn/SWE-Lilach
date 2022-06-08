@@ -197,31 +197,7 @@ public class ShoppingCartController {
                 if (notifyResponse == null)
                     return;
 
-                boolean inCart = false;
-
-                if (notifyResponse instanceof NotifyUpdateResponse) {
-                    NotifyUpdateResponse notifyUpdateResponse = (NotifyUpdateResponse) notifyResponse;
-                    CatalogItem oldItem = shoppingCart.keySet().stream().filter(
-                            catalogItem -> catalogItem.getId() == notifyUpdateResponse.getToUpdate().getId())
-                            .findFirst().orElse(null);
-                    if (oldItem != null) {
-                        inCart = true;
-                        shoppingCart.put(notifyUpdateResponse.getToUpdate(), shoppingCart.get(oldItem));
-                        shoppingCart.remove(oldItem);
-                    }
-                } else if (notifyResponse instanceof NotifyDeleteResponse) {
-                    NotifyDeleteResponse notifyDeleteResponse = (NotifyDeleteResponse) notifyResponse;
-                    CatalogItem toDelete = shoppingCart.keySet().stream().filter(
-                            catalogItem -> catalogItem.getId() == notifyDeleteResponse.getToDelete().getId())
-                            .findFirst().orElse(null);
-
-                    if (toDelete != null) {
-                        inCart = true;
-                        shoppingCart.remove(toDelete);
-                    }
-                }
-
-                if (inCart) {
+                if (App.updateCart(notifyResponse)) {
                     Platform.runLater(() -> {
                         itemsVbox.getChildren().clear();
                         summaryVbox.getChildren().clear();
