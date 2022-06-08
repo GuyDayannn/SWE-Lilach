@@ -59,7 +59,7 @@ import org.hibernate.HibernateException;
 
 public class LilachServer extends AbstractServer {
 
-    private static final String IMMEDIATE_ORDER_MAIL_SUBJECT = "Your order has arrived!";
+    private static final String IMMEDIATE_ORDER_MAIL_SUBJECT = "Congratulation, Order has arrived!";
     private static final String PRODUCT_UPDATED_NOTIFICATION = "Product Updated";
     private static final String PRODUCT_DELETED_NOTIFICATION = "Product Deleted";
     private static final String PRODUCT_CREATED_NOTIFICATION = "Product Created";
