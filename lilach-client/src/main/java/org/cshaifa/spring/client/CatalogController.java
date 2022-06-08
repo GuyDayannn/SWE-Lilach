@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.control.*;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Employee;
@@ -32,12 +33,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -171,6 +166,8 @@ public class CatalogController {
     @FXML
     private void contact(ActionEvent event) {
         // TODO: do something here?
+        Alert contactMessage = new Alert(Alert.AlertType.INFORMATION, "You can contact us at: customerservce@lilach.com", ButtonType.CLOSE);
+        contactMessage.showAndWait();
     }
 
     @FXML
@@ -437,11 +434,6 @@ public class CatalogController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    private void refresh(ActionEvent event) {
-
     }
 
     @FXML
