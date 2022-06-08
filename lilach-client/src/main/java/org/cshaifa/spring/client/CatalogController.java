@@ -101,12 +101,15 @@ public class CatalogController {
     @FXML
     private TilePane tilePane;
     @FXML
+    private TilePane salesPane;
+    @FXML
     private Label updateNotification;
 
     // Variables
     List<CatalogItem> catalogItems = null;
     private boolean filter_applied = false;
     private ObservableList<HBox> itemCells = null;
+    private ObservableList<VBox> saleItemCells = null;
 
     @FXML
     void displayType(MouseEvent event) {
@@ -158,7 +161,10 @@ public class CatalogController {
     @FXML
     private void refreshCatalog(ActionEvent event) {
         clearFilters();
-        salesVBox.getChildren().clear();
+        salesPane.getChildren().clear();
+        mainHBox.getChildren().remove(salesVBox);
+        catalogVBox.setFillWidth(true);
+        tilePane.setPrefWidth(1040);
         initialize();
     }
 
@@ -306,6 +312,82 @@ public class CatalogController {
     }
 
     @FXML
+    VBox getSaleItemVBox(CatalogItem item) {
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        ImageView iv = null;
+
+        if (item.getImage() != null) {
+            try {
+                iv = new ImageView(App.getImageFromByteArray(item.getImage()));
+                iv.setFitWidth(120);
+                iv.setFitHeight(120);
+            } catch (IOException e1) {
+                // TODO: maybe log the exception somewhere
+                e1.printStackTrace();
+            }
+        }
+
+        Text itemName = new Text(item.getName());
+        Text itemPrice = new Text(Double.toString(item.getPrice()));
+        VBox textBox = new VBox();
+        itemPrice.strikethroughProperty().setValue(true);
+
+        double newPrice = new BigDecimal(item.getPrice() * 0.01 * (100 - item.getDiscount()))
+                .setScale(2, RoundingMode.HALF_UP).doubleValue();
+        Text newItemPrice = new Text(String.format("%.2f", (newPrice)));
+        newItemPrice.setFill(Color.RED);
+        newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        textBox.getChildren().addAll(itemPrice, newItemPrice);
+        textBox.setAlignment(Pos.CENTER);
+
+        HBox buttonBox = new HBox();
+        buttonBox.setAlignment(Pos.CENTER);
+        Button viewButton = new Button("View Item");
+        viewButton.getStyleClass().add("sale-button");
+        viewButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                App.setCurrentItemDisplayed(item, itemPrice, itemName);
+                App.popUpLaunch(viewButton, "PopUp");
+            }
+        });
+
+        Button addCartButton = new Button();
+        addCartButton.getStyleClass().add("sale-button");
+        Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
+        ImageView ivCart = new ImageView(cartImage);
+        ivCart.setFitHeight(15);
+        ivCart.setFitWidth(15);
+        addCartButton.setGraphic(ivCart);
+        addCartButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (App.getCart().containsKey(item)) {
+                    Integer quantity = App.getCart().get(item);
+                    App.getCart().put(item, ++quantity);
+                } else {
+                    App.getCart().put(item, 1);
+                }
+            }
+        });
+        if (App.getCurrentUser() == null) {
+            buttonBox.getChildren().add(viewButton);
+        } else if (App.getCurrentUser() instanceof Customer) {
+            buttonBox.getChildren().addAll(viewButton, addCartButton);
+        } else {
+            buttonBox.getChildren().add(viewButton);
+        }
+
+        vBox.getChildren().addAll(itemName, iv, textBox, buttonBox);
+        vBox.setSpacing(5);
+        vBox.getStyleClass().add("saleitem");
+        vBox.setPrefWidth(180);
+
+        return vBox;
+    }
+
+    @FXML
     boolean isInFilter(CatalogItem item) {
         String filterType = null;
         if (selectedTypeComboBox.valueProperty().getValue() != null) {
@@ -389,88 +471,23 @@ public class CatalogController {
         if (catalogItems == null) {
             System.out.println("Catalog is empty :(");
         } else {
+            saleItemCells = FXCollections.observableArrayList();
             for (CatalogItem item : catalogItems) {
                 if (item.isOnSale()) {
                     total_items_on_sale++;
-                    VBox vBox = new VBox();
-                    vBox.setAlignment(Pos.CENTER);
-                    ImageView iv = null;
-
-                    if (item.getImage() != null) {
-                        try {
-                            iv = new ImageView(App.getImageFromByteArray(item.getImage()));
-                            iv.setFitWidth(120);
-                            iv.setFitHeight(120);
-                        } catch (IOException e1) {
-                            // TODO: maybe log the exception somewhere
-                            e1.printStackTrace();
-                        }
-                    }
-
-                    Text itemName = new Text(item.getName());
-                    Text itemPrice = new Text(Double.toString(item.getPrice()));
-                    VBox textBox = new VBox();
-                    itemPrice.strikethroughProperty().setValue(true);
-
-                    double newPrice = new BigDecimal(item.getPrice() * 0.01 * (100 - item.getDiscount()))
-                            .setScale(2, RoundingMode.HALF_UP).doubleValue();
-                    Text newItemPrice = new Text(String.format("%.2f", (newPrice)));
-                    newItemPrice.setFill(Color.RED);
-                    newItemPrice.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-                    textBox.getChildren().addAll(itemPrice, newItemPrice);
-                    textBox.setAlignment(Pos.CENTER);
-
-                    HBox buttonBox = new HBox();
-                    buttonBox.setAlignment(Pos.CENTER);
-                    Button viewButton = new Button("View Item");
-                    viewButton.getStyleClass().add("sale-button");
-                    viewButton.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            App.setCurrentItemDisplayed(item, itemPrice, itemName);
-                            App.popUpLaunch(viewButton, "PopUp");
-                        }
-                    });
-
-                    Button addCartButton = new Button();
-                    addCartButton.getStyleClass().add("sale-button");
-                    Image cartImage = new Image(getClass().getResource("images/cart.png").toString());
-                    ImageView ivCart = new ImageView(cartImage);
-                    ivCart.setFitHeight(15);
-                    ivCart.setFitWidth(15);
-                    addCartButton.setGraphic(ivCart);
-                    addCartButton.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            if (App.getCart().containsKey(item)) {
-                                Integer quantity = App.getCart().get(item);
-                                App.getCart().put(item, ++quantity);
-                            } else {
-                                App.getCart().put(item, 1);
-                            }
-                        }
-                    });
-                    if (App.getCurrentUser() == null) {
-                        buttonBox.getChildren().add(viewButton);
-                    } else if (App.getCurrentUser() instanceof Customer) {
-                        buttonBox.getChildren().addAll(viewButton, addCartButton);
-                    } else {
-                        buttonBox.getChildren().add(viewButton);
-                    }
-
-                    vBox.getChildren().addAll(itemName, iv, textBox, buttonBox);
-                    vBox.setSpacing(5);
-                    vBox.getStyleClass().add("saleitem");
-                    salesVBox.getChildren().add(vBox);
+                    saleItemCells.add(getSaleItemVBox(item));
                 }
             }
         }
 
         if (total_items_on_sale == 0) {
+            saleItemCells = null;
+            salesPane.getChildren().removeAll();
             mainHBox.getChildren().remove(salesVBox);
             catalogVBox.setFillWidth(true);
             tilePane.setPrefWidth(1040);
         } else {
+            salesPane.getChildren().setAll(saleItemCells);
             catalogVBox.setFillWidth(false);
             tilePane.setPrefWidth(840);
         }
@@ -478,6 +495,10 @@ public class CatalogController {
 
     @FXML
     void initialize() {
+        mainHBox.getChildren().remove(salesVBox);
+        catalogVBox.setFillWidth(true);
+        tilePane.setPrefWidth(1040);
+
         if (App.getCurrentUser() == null) {
             welcomeText.setText("");
             toolbar.getItems().remove(viewProfileButton);
@@ -517,7 +538,6 @@ public class CatalogController {
 
             salesDisplay();
 
-            // catalogDisplay();
             listDisplay();
 
             App.scheduler.scheduleAtFixedRate(() -> {

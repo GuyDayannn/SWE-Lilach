@@ -1,5 +1,8 @@
 package org.cshaifa.spring.entities;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import java.io.Serializable;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -15,6 +18,7 @@ public class Order implements Serializable {
     private long id;
 
     @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
     @CollectionTable(name = "orders_items", joinColumns = @JoinColumn(name = "order_id"))
     @MapKeyJoinColumn(name = "item_id")
     @Column(name = "quantity")

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.cshaifa.spring.entities.ChainEmployee;
 import org.cshaifa.spring.entities.ChainManager;
 import org.cshaifa.spring.entities.Complaint;
@@ -57,8 +59,6 @@ public class EmployeeProfileController {
     @FXML
     private Accordion employeeControls;
     @FXML
-    private TitledPane viewReportsPane;
-    @FXML
     private TitledPane generateReportsPane;
     @FXML
     private TitledPane handleComplaintsPane;
@@ -66,7 +66,13 @@ public class EmployeeProfileController {
     private TitledPane handleUsersPane;
 
 
-    // Generate Store Reports Pane
+    // View Reports Pane
+    @FXML
+    private VBox reportsVBox;
+    @FXML
+    private VBox report1Vbox;
+    @FXML
+    private VBox report2Vbox;
     @FXML
     private ComboBox<String> storeComboBox;
     @FXML
@@ -76,26 +82,27 @@ public class EmployeeProfileController {
     @FXML
     private DatePicker endDatePicker;
     @FXML
-    private Button viewReportButton;
+    private Button generateReportButton;
     @FXML
     private CheckBox chainReport;
     @FXML
+    private ComboBox<String> storeComboBox1;
+    @FXML
+    private ComboBox<String> reportTypeComboBox1;
+    @FXML
+    private DatePicker startDatePicker1;
+    @FXML
+    private DatePicker endDatePicker1;
+    @FXML
+    private CheckBox chainReport1;
+    @FXML
     private Label generateMessageText;
-
-
-    // View Existing Reports Pane
     @FXML
     private Button addReportViewButton;
     @FXML
+    private HBox addReportViewButtonBox;
+    @FXML
     private Button removeReportViewButton;
-    @FXML
-    private Button viewExistingReportsButton;
-    @FXML
-    private ComboBox<String> selectReport1CB;
-    @FXML
-    private ComboBox<String> selectReport2CB;
-    @FXML
-    private Text selectReport2CBText;
 
 
     // View/Handle Complaints  Pane
@@ -149,11 +156,22 @@ public class EmployeeProfileController {
     private List<Employee> employeeList= new ArrayList<>();
     private ChainManager chainManager;
     private SystemAdmin systemAdmin;
+
+    // Report1
     private LocalDate reportStartDate;
     private LocalDate reportEndDate;
     private ReportType reportType;
     private Store reportStore;
-    private Report report;
+    private Report report = null;
+
+    //Report2
+    private LocalDate reportStartDate1;
+    private LocalDate reportEndDate1;
+    private ReportType reportType1;
+    private Store reportStore1;
+    private Report report1 = null;
+
+    private boolean two_reports = false;
     private Customer selectedCustomer = null;
 
 
@@ -242,47 +260,53 @@ public class EmployeeProfileController {
             if (t1!=null && (t1.equals("Store Manager") || t1.equals("Chain Employee"))) {
                 System.out.println("chosen store manager / chain employee");
                 selectStoreComboBox.setDisable(false);
+                if(selectStoreComboBox.getItems().isEmpty()==true) {
+                    Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
+                        return ClientHandler.getStores();
+                    }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
 
-                Task<GetStoresResponse> getStoresTask = App.createTimedTask(() -> {
-                    return ClientHandler.getStores();
-                }, Constants.REQUEST_TIMEOUT, TimeUnit.SECONDS);
+                    getStoresTask.setOnSucceeded(e -> {
+                        if (getStoresTask.getValue() == null) {
+                            App.hideLoading();
+                            System.err.println("Getting stores failed");
+                            return;
+                        }
+                        GetStoresResponse response = getStoresTask.getValue();
+                        if (!response.isSuccessful()) {
+                            // TODO: maybe log the specific exception somewhere
+                            App.hideLoading();
+                            System.err.println("Getting stores failed");
+                            return;
+                        }
+                        storesList = response.getStores();
 
-                getStoresTask.setOnSucceeded(e -> {
-                    if (getStoresTask.getValue() == null) {
-                        App.hideLoading();
-                        System.err.println("Getting stores failed");
-                        return;
+                        for (Store store : storesList) {
+                            //System.out.println(store.getName());
+                            selectStoreComboBox.getItems().add(store.getName());
+                        }
+
+                    });
+
+                    getStoresTask.setOnFailed(e -> {
+                        // TODO: maybe log somewhere else...
+                        getStoresTask.getException().printStackTrace();
+                    });
+
+                    try {
+                        Thread t2 = new Thread(getStoresTask);
+                        t2.start();
+                        t2.join();
+                    } catch (InterruptedException interruptedException) {
+                        interruptedException.printStackTrace();
+
                     }
-                    GetStoresResponse response = getStoresTask.getValue();
-                    if (!response.isSuccessful()) {
-                        // TODO: maybe log the specific exception somewhere
-                        App.hideLoading();
-                        System.err.println("Getting stores failed");
-                        return;
-                    }
-                    storesList = response.getStores();
-
-                    for (Store store : storesList) {
-                        //System.out.println(store.getName());
-                        selectStoreComboBox.getItems().add(store.getName());
-                    }
-                });
-
-                getStoresTask.setOnFailed(e -> {
-                    // TODO: maybe log somewhere else...
-                    getStoresTask.getException().printStackTrace();
-                });
-
-                try {
-                    Thread t2 = new Thread(getStoresTask);
-                    t2.start();
-                    t2.join();
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-
                 }
-
                 //new Thread(getStoresTask).start();
+            }
+
+            if (t1!=null && (t1.equals("Customer Service") || t1.equals("Chain Manager"))) {
+                System.out.println("chosen Customer service / chain manager");
+                selectStoreComboBox.setDisable(true);
             }
         });
     }
@@ -307,16 +331,23 @@ public class EmployeeProfileController {
             }
             userList = response.getUsersList();
             selectEmployeeComboBox.getItems().clear();
+            employeeList.clear();
+            chainEmployeeList.clear();
+            storeManagersList.clear();
+            customerServiceList.clear();
+
             for(User user: userList){
                 if(user.getClass().isAssignableFrom(ChainEmployee.class) ){
                     chainEmployeeList.add((ChainEmployee) user);
                     employeeList.add((Employee) user);
                     //System.out.println("added chain employee");
                 }
-                else if(user.getClass().isAssignableFrom(StoreManager.class)){
-                    storeManagersList.add((StoreManager) user);
-                    employeeList.add((Employee) user);
-                    //System.out.println("added store manager");
+                else if(user.getClass().isAssignableFrom(StoreManager.class)) {
+                    if (user.getClass()!=(ChainManager.class)) {
+                        storeManagersList.add((StoreManager) user);
+                        employeeList.add((Employee) user);
+                        //System.out.println("added store manager");
+                    }
                 }
                 else if(user.getClass().isAssignableFrom(CustomerServiceEmployee.class)){
                     customerServiceList.add((CustomerServiceEmployee) user);
@@ -435,11 +466,16 @@ public class EmployeeProfileController {
                 System.err.println("Getting stores failed");
                 return;
             }
+
+            if (storesList!=null) {
+                storesList.clear();
+            }
             storesList = response.getStores();
 
             for (Store store : storesList) {
                 //System.out.println(store.getName());
                 storeComboBox.getItems().add(store.getName());
+                storeComboBox1.getItems().add(store.getName());
             }
 
         });
@@ -469,27 +505,38 @@ public class EmployeeProfileController {
         editCustomerTask.setOnSucceeded(e -> {
             if (editCustomerTask.getValue() == null) {
                 System.err.println("Updating customer failed");
+                editResultLabel.setVisible(true);
                 editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
                 editResultLabel.setTextFill(Color.RED);
+                messageDisappearanceTask(4000, editResultLabel);
                 return;
             }
             FreezeCustomerResponse response = editCustomerTask.getValue();
             if (!response.isSuccessful()) {
                 // TODO: maybe log the specific exception somewhere
                 System.err.println("Updating customer failed");
+                editResultLabel.setVisible(true);
                 editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
                 editResultLabel.setTextFill(Color.RED);
+                messageDisappearanceTask(4000, editResultLabel);
                 return;
             }
             else{
                 System.out.println("Successfully edited customer status");
+                editResultLabel.setVisible(true);
                 editResultLabel.setText(Constants.EDIT_CUSTOMER_SUCCESS);
                 editResultLabel.setTextFill(Color.GREEN);
+                messageDisappearanceTask(4000, editResultLabel);
             }
         });
 
         editCustomerTask.setOnFailed(e -> {
             // TODO: maybe log somewhere else...
+            System.err.println("Updating customer failed");
+            editResultLabel.setVisible(true);
+            editResultLabel.setText(Constants.EDIT_CUSTOMER_FAILED);
+            editResultLabel.setTextFill(Color.RED);
+            messageDisappearanceTask(4000, editResultLabel);
             editCustomerTask.getException().printStackTrace();
         });
         //new Thread(editCustomerTask).start();
@@ -545,6 +592,7 @@ public class EmployeeProfileController {
             t2.start();
             t2.join();
             initUsers();
+            initEditEmployees();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
         }
@@ -583,13 +631,25 @@ public class EmployeeProfileController {
     }
 
 
-    // Generate Reports Handlers
+    // View Reports Handlers
     @FXML
     void selectStore(ActionEvent event) {
         String storeName = storeComboBox.getValue();
         for (Store store: storesList) {
-            if(store.getName().equals(storeName)){
+            if (store.getName().equals(storeName)){
                 reportStore = store;
+                System.out.println(store.getName());
+                break;
+            }
+        }
+    }
+
+    @FXML
+    void selectStore1(ActionEvent event) {
+        String storeName = storeComboBox1.getValue();
+        for (Store store: storesList) {
+            if(store.getName().equals(storeName)){
+                reportStore1 = store;
                 break;
             }
         }
@@ -605,33 +665,62 @@ public class EmployeeProfileController {
             selectStore(event);
             storeComboBox.setDisable(false);
         }
+
+
+        if (chainReport1.isSelected()) {
+            reportStore1 = null;
+            storeComboBox1.setDisable(true);
+        }
+        else {
+            selectStore1(event);
+            storeComboBox1.setDisable(false);
+        }
     }
 
     @FXML
     void selectReportType(ActionEvent event) {
-        String report = reportTypeComboBox.getValue();
-        switch (report) {
-            case "Orders" -> reportType = ReportType.ORDERS;
-            case "Revenue" -> reportType = ReportType.REVENUE;
-            case "Complaints" -> reportType = ReportType.COMPLAINTS;
+        if (event.getSource() == reportTypeComboBox) {
+            String report = reportTypeComboBox.getValue();
+            switch (report) {
+                case "Orders" -> reportType = ReportType.ORDERS;
+                case "Revenue" -> reportType = ReportType.REVENUE;
+                case "Complaints" -> reportType = ReportType.COMPLAINTS;
+            }
+        }
+        else {
+            String report = reportTypeComboBox1.getValue();
+            switch (report) {
+                case "Orders" -> reportType1 = ReportType.ORDERS;
+                case "Revenue" -> reportType1 = ReportType.REVENUE;
+                case "Complaints" -> reportType1 = ReportType.COMPLAINTS;
+            }
         }
     }
 
     @FXML
     void setStartDate(ActionEvent event) {
-        reportStartDate = startDatePicker.getValue();
+        if (event.getSource() == startDatePicker) {
+            reportStartDate = startDatePicker.getValue();
+        }
+        else {
+            reportStartDate1 = startDatePicker1.getValue();
+        }
     }
 
     @FXML
     void setEndDate(ActionEvent event) {
-        reportEndDate = endDatePicker.getValue();
+        if (event.getSource() == endDatePicker) {
+            reportEndDate = endDatePicker.getValue();
+        }
+        else {
+            reportEndDate1 = endDatePicker1.getValue();
+        }
     }
 
     @FXML
     void generateReport(ActionEvent event) {
         if (reportType!=null && reportStartDate!=null && reportEndDate!=null) {
             report = new Report(reportType, reportStore, reportStartDate, reportEndDate);
-
             boolean success = false;
             if (chainReport.isSelected()) {
                 success = report.generateChainHistogram(storesList);
@@ -640,38 +729,80 @@ public class EmployeeProfileController {
                 success = report.generateHistogram();
             }
             if (success) {
-                viewReportButton.setDisable(false);
+                generateMessageText.setVisible(true);
                 generateMessageText.setTextFill(Color.GREEN);
                 generateMessageText.setText(Constants.GENERATE_REPORT_SUCCESS);
+                messageDisappearanceTask(4000, generateMessageText);
                 System.out.println("Report generated successfully.");
             }
             else {
+                generateMessageText.setVisible(true);
                 generateMessageText.setTextFill(Color.RED);
                 generateMessageText.setText(Constants.GENERATE_REPORT_FAILED);
+                messageDisappearanceTask(4000, generateMessageText);
                 System.out.println("Generating report failed.");
+                return;
             }
-
+            App.setCurrentReportDisplayed(report);
         }
         else {
+            generateMessageText.setVisible(true);
             generateMessageText.setTextFill(Color.RED);
             generateMessageText.setText(Constants.MISSING_REQUIREMENTS);
+            messageDisappearanceTask(4000, generateMessageText);
             System.out.println("Insert required data.");
+            return;
         }
 
+        if (two_reports) {
+            if (reportType1!=null && reportStartDate1!=null && reportEndDate1!=null) {
+                report1 = new Report(reportType1, reportStore1, reportStartDate1, reportEndDate1);
+
+                boolean success = false;
+                if (chainReport1.isSelected()) {
+                    success = report1.generateChainHistogram(storesList);
+                }
+                else {
+                    success = report1.generateHistogram();
+                }
+                if (success) {
+                    generateMessageText.setVisible(true);
+                    generateMessageText.setTextFill(Color.GREEN);
+                    generateMessageText.setText(Constants.GENERATE_REPORT_SUCCESS);
+                    messageDisappearanceTask(4000, generateMessageText);
+                    System.out.println("Report generated successfully.");
+                }
+                else {
+                    generateMessageText.setVisible(true);
+                    generateMessageText.setTextFill(Color.RED);
+                    generateMessageText.setText(Constants.GENERATE_REPORT_FAILED);
+                    messageDisappearanceTask(4000, generateMessageText);
+                    System.out.println("Generating report failed.");
+                    return;
+                }
+
+            }
+            else {
+                generateMessageText.setVisible(true);
+                generateMessageText.setTextFill(Color.RED);
+                generateMessageText.setText(Constants.MISSING_REQUIREMENTS);
+                messageDisappearanceTask(4000, generateMessageText);
+                System.out.println("Insert required data.");
+                return;
+            }
+            App.setCurrentReport1Displayed(report1);
+        }
+        viewReport(event);
     }
 
     @FXML
     void viewReport(ActionEvent event) {
-        App.setCurrentReportDisplayed(report);
-        App.popUpLaunch(viewReportButton, "ReportPopUp");
-    }
-
-
-    // View Existing Reports Handlers
-    @FXML
-    void viewExistingReports(ActionEvent event) {
-        // TODO: Get report images
-        App.popUpLaunch(viewExistingReportsButton, "TwoReportsPopUp");
+        if (two_reports) {
+            App.popUpLaunch(generateReportButton, "TwoReportsPopUp");
+        }
+        else {
+            App.popUpLaunch(generateReportButton, "ReportPopUp");
+        }
     }
 
 
@@ -747,19 +878,25 @@ public class EmployeeProfileController {
                 if (!response.isSuccessful()) {
                     // TODO: maybe log the specific exception somewhere
                     System.err.println("Updating Complaint failed");
+                    updated_complaint_text.setVisible(true);
                     updated_complaint_text.setText("Failed to close complaint");
                     updated_complaint_text.setTextFill(Color.RED);
+                    messageDisappearanceTask(4000, updated_complaint_text);
                     return;
                 }
+                updated_complaint_text.setVisible(true);
                 updated_complaint_text.setText("You have successfully closed the complaint");
                 updated_complaint_text.setTextFill(Color.GREEN);
+                messageDisappearanceTask(4000, updated_complaint_text);
             });
 
             updateComplaintTask.setOnFailed(e -> {
                 // TODO: maybe properly log it somewhere
                 updateComplaintTask.getException().printStackTrace();
+                updated_complaint_text.setVisible(true);
                 updated_complaint_text.setText("Failed to close complaint");
                 updated_complaint_text.setTextFill(Color.RED);
+                messageDisappearanceTask(4000, updated_complaint_text);
             });
             //new Thread(updateComplaintTask).start();
             try {
@@ -865,9 +1002,21 @@ public class EmployeeProfileController {
 
         System.out.println("inserted into editEmployee");
         String selectedStatus = employeeStatusComboBox.getValue();
+
         String employeeName = selectEmployeeComboBox.getValue();
         Store selectedStore= null;
         Store oldStore = null;
+        if(selectedStatus.equals("Chain Manager")) {
+            for (Store store : storesList) {
+                if ((store.getName().equals("Lilach Warehouse"))) {
+                    selectedStore = store;
+                    System.out.println("selected warehouse is: " + selectedStore.getName());
+                    break;
+                }
+                //selectedStore = chainManager.getWarehouseManaged();
+                //System.out.println("selected warehouse is: "+ selectedStore.getName());
+            }
+        }
         if(selectStoreComboBox.getValue()!=null){
             String storeName = selectStoreComboBox.getValue();
             if(storeName!=null) {
@@ -918,13 +1067,18 @@ public class EmployeeProfileController {
             createTaskEmployeeUpdate(selectedEmployee, selectedStore, null,selectedStatus, "Customer Service");
         }
 
-        else{//we're editing chain maneger
-            createTaskEmployeeUpdate(chainManager, selectedStore, null,selectedStatus, "Chain Manager");
+        else{//we're editing chain manager
+            if (chainManager.getFullName().equals(employeeName)) {
+                oldStore = chainManager.getWarehouseManaged();
+                System.out.println("old store in profiles is: " + oldStore.getName());
+            }
+            createTaskEmployeeUpdate(chainManager, selectedStore, oldStore,selectedStatus, "Chain Manager");
         }
         employeesTypeComboBox.valueProperty().setValue(null); //edit to clear all
         selectStoreComboBox.valueProperty().setValue(null);
         employeeStatusComboBox.valueProperty().setValue(null);
         selectEmployeeComboBox.valueProperty().setValue(null);
+        selectEmployeeComboBox.getItems().clear();
     }
 
 //    @FXML
@@ -942,7 +1096,7 @@ public class EmployeeProfileController {
 
     @FXML
     public void initialize() {
-
+        reportsVBox.getChildren().remove(report2Vbox);
         if (App.getCurrentUser() != null) {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         } else {
@@ -952,40 +1106,44 @@ public class EmployeeProfileController {
         addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                selectReport2CB.setVisible(true);
-                selectReport2CBText.setVisible(true);
+                reportsVBox.getChildren().add(1, report2Vbox);
                 removeReportViewButton.setVisible(true);
                 addReportViewButton.setVisible(false);
+                two_reports = true;
             }
         });
         removeReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                selectReport2CB.setVisible(false);
-                selectReport2CBText.setVisible(false);
+                reportsVBox.getChildren().remove(report2Vbox);
                 removeReportViewButton.setVisible(false);
                 addReportViewButton.setVisible(true);
+                two_reports = false;
             }
         });
 
         //TODO: edit to show only to authorized users
         if (App.getCurrentUser() != null) {
-            /*
-            if(App.getCurrentUser().getClass() == ChainEmployee.class){
-                paneStoreReport.setVisible(false);
-                paneChainReport.setVisible(false);
-                handleUsersPane.setVisible(false);
-                viewTwoReportsPane.setVisible(false);
-            }*/
+            if(App.getCurrentUser().getClass()==ChainEmployee.class) {
+                employeeControls.getPanes().removeAll(generateReportsPane, handleUsersPane, handleComplaintsPane);
+            }
             if (App.getCurrentUser().getClass() == StoreManager.class) {
                 chainReport.setVisible(false);
+                storeComboBox.setDisable(true);
+                StoreManager manager = (StoreManager)App.getCurrentUser();
+                reportStore = manager.getStoreManged();
+                report1Vbox.getChildren().remove(addReportViewButtonBox);
+                reportsVBox.getChildren().remove(report2Vbox);
                 employeeControls.getPanes().remove(handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
-                employeeControls.getPanes().removeAll(generateReportsPane, viewReportsPane, handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == ChainManager.class) {
+            }
+            if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class) {
+                employeeControls.getPanes().removeAll(generateReportsPane, handleUsersPane);
+            }
+            if (App.getCurrentUser().getClass() == ChainManager.class) {
                 employeeControls.getPanes().remove(handleUsersPane);
-            } else if (App.getCurrentUser().getClass() == SystemAdmin.class) {
-                employeeControls.getPanes().remove(handleComplaintsPane);
+            }
+            if (App.getCurrentUser().getClass() == SystemAdmin.class) {
+                employeeControls.getPanes().removeAll(generateReportsPane, handleComplaintsPane);
             }
         }
 

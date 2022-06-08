@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Order;
 import org.cshaifa.spring.entities.Store;
 import org.cshaifa.spring.entities.User;
 import org.cshaifa.spring.entities.responses.NotifyDeleteResponse;
@@ -96,6 +97,10 @@ public class App extends Application {
     private static boolean enteredSupplyDetails = false;
 
     private static Report report;
+
+    private static Report report1;
+
+    private static Order selectedOrder = null;
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
@@ -289,6 +294,8 @@ public class App extends Application {
         report = report1;
     }
 
+    static void setCurrentReport1Displayed(Report report2) { report1 = report2; }
+
     public static void updateCurrentItemDisplayed(CatalogItem updatedItem) {
         if (updatedItem.getDiscount() != 0) {
             double price = updatedItem.getPrice() * (1 - updatedItem.getDiscount() / 100);
@@ -307,6 +314,8 @@ public class App extends Application {
     static Report getCurrentReportDisplayed() {
         return report;
     }
+
+    static Report getCurrentReport1Displayed() { return report1; }
 
     static CatalogItem getItemByID(long itemID) {
         return itemByID;
@@ -439,6 +448,10 @@ public class App extends Application {
     public static void setCreatedItem(CatalogItem createdItem) {
         App.createdItem = createdItem;
     }
+
+    public static Order getSelectedOrder() { return selectedOrder; }
+
+    public static void setSelectedOrder(Order order) { selectedOrder = order; }
 
     public static String getGreeting() {
         return greeting;

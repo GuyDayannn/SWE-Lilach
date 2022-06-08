@@ -105,7 +105,7 @@
       </VBox>
       <HBox fx:id="mainHBox" prefHeight="600.0" prefWidth="1040.0">
          <children>
-            <VBox fx:id="catalogVBox" prefHeight="200.0" prefWidth="1040.0">
+            <VBox fx:id="catalogVBox" prefHeight="600.0" prefWidth="1040.0">
                <children>
                   <HBox alignment="CENTER" minHeight="40.0" minWidth="840.0" prefHeight="40.0" prefWidth="1040.0" spacing="10.0" styleClass="filterBar">
                      <children>
@@ -129,13 +129,18 @@
                   </ScrollPane>
                </children>
             </VBox>
-            <VBox fx:id="salesVBox" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" styleClass="onsale">
+            <VBox fx:id="salesVBox" maxWidth="200.0" prefHeight="600.0" prefWidth="200.0" styleClass="onsale">
                <children>
                   <Text fx:id="onSaleText" fill="#e80909" strokeType="OUTSIDE" strokeWidth="0.0" text="On Sale!" textAlignment="CENTER" wrappingWidth="198.0">
                      <font>
                         <Font name="System Bold Italic" size="18.0" />
                      </font>
                   </Text>
+                  <ScrollPane fx:id="salesScrollPane" hbarPolicy="NEVER" maxWidth="200.0" minWidth="200.0" prefWidth="200.0">
+                     <content>
+                        <TilePane fx:id="salesPane" maxWidth="200.0" minWidth="200.0" prefColumns="1" prefHeight="600.0" prefWidth="200.0" />
+                     </content>
+                  </ScrollPane>
                </children>
             </VBox>
          </children>
