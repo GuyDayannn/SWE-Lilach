@@ -238,7 +238,7 @@ public class LilachServer extends AbstractServer {
                         Store store = createOrderRequest.getStore();
                         if (store == null)
                             store = DatabaseHandler.getWarehouseStore();
-                        Order order = DatabaseHandler.createOrder(store, createOrderRequest.getCustomer(),
+                        Order order = DatabaseHandler.createOrder(store, createOrderRequest.getCustomer(), createOrderRequest.getCardNumber(),
                                 createOrderRequest.getItems(), createOrderRequest.getGreeting(),
                                 createOrderRequest.getOrderDate(), createOrderRequest.getSupplyDate(),
                                 createOrderRequest.getDelivery(), createOrderRequest.getDeliveryDetails());

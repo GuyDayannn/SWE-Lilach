@@ -26,6 +26,8 @@ public class Order implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     private Customer customer;
 
+    private String cardNumber;
+
     private String greeting;
 
     private Timestamp orderDate;
@@ -46,12 +48,13 @@ public class Order implements Serializable {
     @Transient
     private final double DELIVERY_PRICE = 30;
 
-    public Order(Map<CatalogItem, Integer> items, Store store, Customer customer, String greeting, Timestamp orderDate,
+    public Order(Map<CatalogItem, Integer> items, Store store, Customer customer, String cardNumber, String greeting, Timestamp orderDate,
             Timestamp supplyDate, boolean delivery, Delivery deliveryDetails) {
         super();
         this.items = items;
         this.store = store;
         this.customer = customer;
+        this.cardNumber = cardNumber;
         this.greeting = greeting;
         this.orderDate = orderDate;
         this.supplyDate = supplyDate;
@@ -81,6 +84,10 @@ public class Order implements Serializable {
     public Customer getCustomer() {
         return customer;
     }
+
+    public String getCardNumber() { return cardNumber; }
+
+    public void setCardNumber(String creditCard) { this.cardNumber = creditCard; }
 
     public void setCustomer(Customer customer) {
         this.customer = customer;

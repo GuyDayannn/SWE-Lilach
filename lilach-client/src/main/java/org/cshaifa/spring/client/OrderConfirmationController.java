@@ -203,6 +203,7 @@ public class OrderConfirmationController {
         App.setCardExpDate(null);
         App.setCardCvv(null);
         App.setGreeting(null);
+        App.setCardNumber(null);
     }
 
     @FXML
@@ -214,7 +215,7 @@ public class OrderConfirmationController {
         else
             greeting = "Mazal Tov";
         Task<CreateOrderResponse> createOrderTask = App.createTimedTask(() -> ClientHandler.createOrder(
-                App.isOrderDelivery() ? null : App.getPickupStore(), (Customer) App.getCurrentUser(), App.getCart(),
+                App.isOrderDelivery() ? null : App.getPickupStore(), (Customer) App.getCurrentUser(), App.getCardNumber(), App.getCart(),
                 greeting, new Timestamp(Calendar.getInstance().getTime().getTime()),
                 App.isOrderDelivery() ? App.getSupplyDate() : null, App.isOrderDelivery(),
                 App.isOrderDelivery()
