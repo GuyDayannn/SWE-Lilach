@@ -32,19 +32,21 @@ public class OrderDetailsPopUpController {
     @FXML
     private AnchorPane anchorPane;
     @FXML
-    private Label cardNumberLabel;
+    private Label orderDateLabel;
     @FXML
     private Label deliveryTimeLabel;
     @FXML
     private VBox deliveryVbox;
     @FXML
-    private Label expDateLabel;
+    private Label supplyDateLabel;
     @FXML
     private Label firstNameDeliveryLabel;
     @FXML
     private Label firstNamePaymentLabel;
     @FXML
     private VBox itemsVbox;
+    @FXML
+    private VBox paneVBox;
     @FXML
     private VBox orderDetailsVbox;
     @FXML
@@ -66,42 +68,29 @@ public class OrderDetailsPopUpController {
     @FXML
     private Button goBackButton;
 
+    private Order selectedOrder;
+
     @FXML
     HBox getItemHBox(CatalogItem item, int quantity) {
         HBox hBox = new HBox();
-        ImageView iv = null;
-        if (item.getImage() != null) {
-            try {
-                iv = new ImageView(App.getImageFromByteArray(item.getImage()));
-                iv.setFitWidth(50);
-                iv.setFitHeight(50);
-            } catch (IOException e1) {
-                // TODO: maybe log the exception somewhere
-                System.out.println("Failed to get item image.");
-                e1.printStackTrace();
-            }
-        }
 
-        Label itemName = new Label(item.getName() + "\t\t");
+        Label itemName = new Label(item.getName() + "\t");
         double price = item.getPrice();
         if (item.isOnSale()) {
             price = new BigDecimal((price * 0.01 * (100 - item.getDiscount()))).setScale(2, RoundingMode.HALF_UP)
                     .doubleValue();
         }
+
         double finalPrice = price * quantity;
         Label itemPrice = new Label(String.format("%.2f", price) + "\t");
         Label itemFinalPrice = new Label(String.format("%.2f", finalPrice) + "\t");
-        Label itemQuantity = new Label(Integer.toString(quantity));
+        Label itemQuantity = new Label(Integer.toString(quantity) + "\t");
         HBox.setMargin(itemName, new Insets(0, 0, 0, 0));
         HBox.setMargin(itemPrice, new Insets(0, 60, 0, 60));
         HBox.setMargin(itemQuantity, new Insets(0, 0, 0, 0));
         HBox.setMargin(itemFinalPrice, new Insets(0, 0, 0, 0));
-        if (iv!=null) {
-            hBox.getChildren().addAll(iv, itemName, itemPrice, itemQuantity, itemFinalPrice);
-        }
-        else {
-            hBox.getChildren().addAll(itemName, itemPrice, itemQuantity, itemFinalPrice);
-        }
+
+        hBox.getChildren().addAll(itemName, itemPrice, itemQuantity, itemFinalPrice);
         hBox.setSpacing(5);
         hBox.getStyleClass().add("item");
         hBox.setAlignment(Pos.CENTER_LEFT);
@@ -110,17 +99,28 @@ public class OrderDetailsPopUpController {
 
     @FXML
     void displayOrderDetails() {
+        firstNamePaymentLabel.setText(selectedOrder.getCustomer().getFullName());
+        orderDateLabel.setText(selectedOrder.getOrderDate().toString());
+        supplyDateLabel.setText(selectedOrder.getSupplyDate().toString());
         if (App.getSelectedOrder().isDelivery()) {
-            orderDetailsVbox.getChildren().remove(selfpickupVbox);
+            paneVBox.getChildren().remove(selfpickupVbox);
+            firstNameDeliveryLabel.setText(selectedOrder.getDeliveryDetails().getRecipientName());
+            lastNameDeliveryLabel.setText(selectedOrder.getDeliveryDetails().getRecipientName());
+            phoneNumberLabel.setText(selectedOrder.getDeliveryDetails().getPhoneNumber());
+            addressLabel.setText(selectedOrder.getDeliveryDetails().getAddress());
+            messageLabel.setText(selectedOrder.getDeliveryDetails().getMessage());
         }
         else {
-            orderDetailsVbox.getChildren().removeAll(deliveryVbox);
+            paneVBox.getChildren().removeAll(deliveryVbox);
+            storeAddressLabel.setText(selectedOrder.getStore().getAddress());
+            storeNameLabel.setText(selectedOrder.getStore().getName());
         }
     }
 
     @FXML
     void initialize() {
-        for (Map.Entry<CatalogItem, Integer> entry : App.getSelectedOrder().getItems().entrySet()) {
+        selectedOrder = App.getSelectedOrder();
+        for (Map.Entry<CatalogItem, Integer> entry : selectedOrder.getItems().entrySet()) {
             CatalogItem item = entry.getKey();
             Integer integer = entry.getValue();
             HBox itemHBox = getItemHBox(item, integer);

@@ -11,7 +11,7 @@
 
 <AnchorPane fx:id="anchorPane" maxHeight="600.0" maxWidth="400.0" prefHeight="600.0" prefWidth="400.0" stylesheets="@stylesheets/shoppingcart.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.OrderDetailsPopUpController">
    <children>
-      <VBox prefHeight="600.0" prefWidth="400.0">
+      <VBox fx:id="paneVBox" prefHeight="600.0" prefWidth="400.0">
          <children>
             <HBox fx:id="titleHbox" minHeight="50.0" minWidth="400.0" prefHeight="50.0" prefWidth="400.0" styleClass="titleHBox">
                <children>
@@ -33,42 +33,14 @@
             </VBox>
             <VBox fx:id="orderDetailsVbox" prefHeight="100.0" prefWidth="400.0">
                <children>
-                  <Label text="Payment Details">
+                  <Label text="Order Details">
                      <font>
                         <Font size="18.0" />
                      </font>
                   </Label>
                   <HBox prefHeight="50.0" prefWidth="429.0" spacing="10.0">
                      <children>
-                        <Label text="Card Number" textAlignment="CENTER">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="cardNumberLabel" alignment="TOP_LEFT" textAlignment="CENTER">
-                           <font>
-                              <Font size="15.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="50.0" prefWidth="429.0" spacing="10.0">
-                     <children>
-                        <Label text="Exp. Date" textAlignment="CENTER">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="expDateLabel" alignment="TOP_LEFT" textAlignment="CENTER">
-                           <font>
-                              <Font size="15.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="50.0" prefWidth="429.0" spacing="10.0">
-                     <children>
-                        <Label text="First Name" textAlignment="CENTER">
+                        <Label text="Customer Name" textAlignment="CENTER">
                            <font>
                               <Font name="System Bold" size="15.0" />
                            </font>
@@ -82,12 +54,26 @@
                   </HBox>
                   <HBox prefHeight="50.0" prefWidth="429.0" spacing="10.0">
                      <children>
-                        <Label text="Last Name" textAlignment="CENTER">
+                        <Label text="Order Date" textAlignment="CENTER">
                            <font>
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </Label>
-                        <Label fx:id="lastNamePaymentLabel" alignment="TOP_LEFT" textAlignment="CENTER">
+                        <Label fx:id="orderDateLabel" alignment="TOP_LEFT" textAlignment="CENTER">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="50.0" prefWidth="429.0" spacing="10.0">
+                     <children>
+                        <Label text="Supply Date" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="supplyDateLabel" alignment="TOP_LEFT" textAlignment="CENTER">
                            <font>
                               <Font size="15.0" />
                            </font>
@@ -161,20 +147,6 @@
                   </HBox>
                   <HBox prefHeight="50.0" prefWidth="429.0" spacing="10.0">
                      <children>
-                        <Label text="Delivery Time" textAlignment="CENTER">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="deliveryTimeLabel" alignment="TOP_LEFT" textAlignment="CENTER">
-                           <font>
-                              <Font size="15.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="50.0" prefWidth="429.0" spacing="10.0">
-                     <children>
                         <Label text="Message" textAlignment="CENTER">
                            <font>
                               <Font name="System Bold" size="15.0" />
@@ -226,7 +198,7 @@
                   </HBox>
                </children>
             </VBox>
-            <HBox prefHeight="50.0" prefWidth="400.0" alignment="CENTER_RIGHT">
+            <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="400.0">
                <children>
                         <Button fx:id="goBackButton" mnemonicParsing="false" text="Go Back">
                            <font>
