@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.TwoReportsPopUpController">
+<AnchorPane prefHeight="500.0" prefWidth="800.0" stylesheets="@stylesheets/reports.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cshaifa.spring.client.TwoReportsPopUpController">
    <children>
       <BorderPane prefHeight="500.0" prefWidth="800.0">
          <bottom>
@@ -31,18 +31,18 @@
          <top>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="400.0">
+                  <HBox alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="400.0" styleClass="report-title-box">
                      <children>
-                        <Text fx:id="reportText1" strokeType="OUTSIDE" strokeWidth="0.0" text="Report1">
+                        <Text fx:id="reportText1" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleText" text="Report1">
                            <font>
                               <Font size="24.0" />
                            </font>
                         </Text>
                      </children>
                   </HBox>
-                  <HBox alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="400.0">
+                  <HBox alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="400.0" styleClass="report-title-box">
                      <children>
-                        <Text fx:id="reportText2" strokeType="OUTSIDE" strokeWidth="0.0" text="Report2">
+                        <Text fx:id="reportText2" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleText" text="Report2">
                            <font>
                               <Font size="24.0" />
                            </font>
