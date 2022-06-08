@@ -412,7 +412,6 @@ public class DatabaseHandler {
         Session session = DatabaseConnector.getSessionFactory().openSession();
         session.beginTransaction();
 
-
         updateDB(session, chainManager);
 
         tryFlushSession(session);
@@ -439,10 +438,12 @@ public class DatabaseHandler {
             employees.get(2*i).setStore(store);
             employees.get((2*i)+1).setStore(store);
             managers.get(i).setStoreManged(store);
+            //store.setChainManager(chainManager);
             stores.add(store);
         }
-        Store store = (new Store(Constants.WAREHOUSE_NAME, "Everywhere", chainManager, new ArrayList<>()));
-        chainManager.setStoreManged(store);
+        Store store = (new Store(Constants.WAREHOUSE_NAME, "Everywhere", null, new ArrayList<>()));
+        store.setChainManager(chainManager);
+        chainManager.setWarehouseManaged(store);
         stores.add(store);
         return stores;
     }
@@ -758,7 +759,7 @@ public class DatabaseHandler {
                 } else if (strNewType.equals("Store Manager")) {
                     editToStoreManager(session, chainEmployee, storeManager, oldStore, store);
                 } else if (strNewType.equals("Chain Manager")) {
-                    editToStoreManager(session, chainEmployee, chainManager, oldStore, store);
+                    editToChainManager(session, chainEmployee, chainManager, oldStore, store);
                 }
             }
             case "Store Manager" -> {
@@ -773,7 +774,7 @@ public class DatabaseHandler {
                 } else if (strNewType.equals("Chain Employee")) {
                    editToChainEmployee(session, chainEmployee, employee, oldStore, store);
                 } else if (strNewType.equals("Chain Manager")) {
-                    editToStoreManager(session, chainEmployee, chainManager, oldStore,store);
+                    editToChainManager(session, chainEmployee, chainManager, oldStore,store);
                 }
             }
             case "Customer Service" -> {
@@ -784,13 +785,13 @@ public class DatabaseHandler {
                     System.out.println("case customer service store manager");
                     editToStoreManager(session, chainEmployee, storeManager, oldStore, store);
                 } else if (strNewType.equals("Chain Manager")) {
-                    editToStoreManager(session, chainEmployee, chainManager, oldStore, store);
+                    editToChainManager(session, chainEmployee, chainManager, oldStore, store);
                 }
             }
             case "Chain Manager"-> {
                 if(oldStore != null) {
-                    oldStore.getStoreManager().removeStoreManaged();
-                    oldStore.removeManager();
+                    oldStore.getChainManager().removeWarehouse();
+                    oldStore.removeChainManger();
                 }
                 if (strNewType.equals("Chain Employee")) { //turn into chain employee
                     editToChainEmployee(session, chainEmployee, employee, oldStore, store);
@@ -937,7 +938,7 @@ public class DatabaseHandler {
     public static void editToStoreManager(Session session, ChainEmployee chainEmployee, StoreManager storeManager,
                                           Store oldStore, Store newStore){
         System.out.println("in func edit to store manager");
-        ChainManager chainManager =null;
+        StoreManager oldStoreManager = null;
         if(newStore!=null && oldStore!=null && newStore.getName().equals(oldStore.getName())){
             newStore = null;
             if(oldStore.getStoreManager()!=null) {
@@ -946,14 +947,10 @@ public class DatabaseHandler {
                 System.out.println("removed old manager from same store");
             }
         }
-        if(storeManager.getClass().isAssignableFrom(ChainManager.class)){
-            if (newStore != null) {
-              chainManager=  (ChainManager) newStore.getStoreManager();
-            }
-        }
             if (newStore != null) {
                 if(newStore.getStoreManager()!=null){
-                    newStore.getStoreManager().removeStoreManaged();
+                    oldStoreManager = newStore.getStoreManager();
+                    oldStoreManager.removeStoreManaged();
                     newStore.removeManager();
                     System.out.println("removed old manager from new store");
                 }
@@ -961,7 +958,6 @@ public class DatabaseHandler {
                     System.out.println("new store didn't have a manager");
                 }
             }
-
             try {
                 if (oldStore != null) {
                     session.update(oldStore);
@@ -969,12 +965,13 @@ public class DatabaseHandler {
                 if (newStore != null) {
                     session.update(newStore);
                 }
-                if(chainManager!=null){
-                    session.delete(chainManager);
-                    System.out.println("deleted old chain manager");
-                }
                 session.update(chainEmployee);
                 session.delete(chainEmployee);
+                if(oldStoreManager!=null){
+                    session.update(oldStoreManager);
+                    session.delete(oldStoreManager);
+                }
+                System.out.println("deleted old employee");
             } catch (Exception e) {
                 e.printStackTrace();
                 if (newStore != null) {
@@ -983,10 +980,10 @@ public class DatabaseHandler {
                 if (oldStore != null) {
                     session.merge(oldStore);
                 }
-//                if(chainManager!=null){
-//                    session.merge(chainManager);
-//                }
-                session.merge(chainEmployee);
+                if(oldStoreManager!=null){
+                    session.update(oldStoreManager);
+                }
+                //session.merge(chainEmployee);
             }
             System.out.println("updated old store");
             tryFlushSession(session);
@@ -1009,6 +1006,70 @@ public class DatabaseHandler {
             System.out.println("saved store manager");
             tryFlushSession(session2);
     }
+
+
+    public static void editToChainManager(Session session, ChainEmployee chainEmployee, ChainManager chainManager,
+                                          Store oldStore, Store newStore){
+        System.out.println("in func edit to chain  manager");
+        ChainManager oldChainManager = null;
+        if (newStore != null) {
+            if(newStore.getChainManager()!=null){ //in case chain manager was deleted
+                oldChainManager=  newStore.getChainManager();
+                oldChainManager.getWarehouseManaged().removeChainManger();
+                oldChainManager.removeWarehouse();
+            }
+        }
+        try {
+            if (oldStore != null) {
+                session.update(oldStore);
+            }
+            if (newStore != null) {
+                session.update(newStore);
+            }
+            if(oldChainManager!=null){
+                session.update(oldChainManager);
+                session.delete(oldChainManager);
+            }
+
+            System.out.println("deleted old chain manager");
+
+            session.update(chainEmployee);
+            session.delete(chainEmployee);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (newStore != null) {
+                session.merge(newStore);
+            }
+            if (oldStore != null) {
+                session.merge(oldStore);
+            }
+            if(oldChainManager!=null){
+                session.merge(oldChainManager);
+            }
+            session.merge(chainEmployee);
+        }
+        System.out.println("updated old store");
+        tryFlushSession(session);
+
+        Session session2 = DatabaseConnector.getSessionFactory().openSession();
+        session2.beginTransaction();
+        chainManager.setWarehouseManaged(newStore);
+        session2.save(chainManager);
+        if (newStore != null) {
+            newStore.setChainManager(chainManager);
+        }
+        try {
+            if (newStore != null) {
+                session2.update(newStore);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            session2.merge(newStore);
+        }
+        System.out.println("saved chain manager");
+        tryFlushSession(session2);
+    }
+
 
     public static void editToChainEmployee(Session session, ChainEmployee chainEmployee, ChainEmployee newChainEmployee, Store oldStore, Store newStore){
         System.out.println("in func edit to chain employee");

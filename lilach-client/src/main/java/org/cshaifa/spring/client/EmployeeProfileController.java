@@ -311,16 +311,19 @@ public class EmployeeProfileController {
             chainEmployeeList.clear();
             storeManagersList.clear();
             customerServiceList.clear();
+            storesList.clear();
             for(User user: userList){
                 if(user.getClass().isAssignableFrom(ChainEmployee.class) ){
                     chainEmployeeList.add((ChainEmployee) user);
                     employeeList.add((Employee) user);
                     //System.out.println("added chain employee");
                 }
-                else if(user.getClass().isAssignableFrom(StoreManager.class)){
-                    storeManagersList.add((StoreManager) user);
-                    employeeList.add((Employee) user);
-                    //System.out.println("added store manager");
+                else if(user.getClass().isAssignableFrom(StoreManager.class)) {
+                    if (!user.getClass().isAssignableFrom(ChainManager.class)) {
+                        storeManagersList.add((StoreManager) user);
+                        employeeList.add((Employee) user);
+                        //System.out.println("added store manager");
+                    }
                 }
                 else if(user.getClass().isAssignableFrom(CustomerServiceEmployee.class)){
                     customerServiceList.add((CustomerServiceEmployee) user);
@@ -893,9 +896,21 @@ public class EmployeeProfileController {
 
         System.out.println("inserted into editEmployee");
         String selectedStatus = employeeStatusComboBox.getValue();
+
         String employeeName = selectEmployeeComboBox.getValue();
         Store selectedStore= null;
         Store oldStore = null;
+        if(selectedStatus.equals("Chain Manager")) {
+            for (Store store : storesList) {
+                if ((store.getName().equals("Lilach Warehouse"))) {
+                    selectedStore = store;
+                    System.out.println("selected warehouse is: " + selectedStore.getName());
+                    break;
+                }
+                //selectedStore = chainManager.getWarehouseManaged();
+                //System.out.println("selected warehouse is: "+ selectedStore.getName());
+            }
+        }
         if(selectStoreComboBox.getValue()!=null){
             String storeName = selectStoreComboBox.getValue();
             if(storeName!=null) {
@@ -948,7 +963,7 @@ public class EmployeeProfileController {
 
         else{//we're editing chain manager
             if (chainManager.getFullName().equals(employeeName)) {
-                oldStore = chainManager.getStoreManged();
+                oldStore = chainManager.getWarehouseManaged();
                 System.out.println("old store in profiles is: " + oldStore.getName());
             }
             createTaskEmployeeUpdate(chainManager, selectedStore, oldStore,selectedStatus, "Chain Manager");
