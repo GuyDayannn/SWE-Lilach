@@ -422,7 +422,7 @@ public class EmployeeProfileController {
             if (complaintList != null) {
                 for (int i = 0; i < complaintList.size(); i++) {
                     Long id = (complaintList.get(i).getId());
-                    if(id!=0.0) {
+                    if (id!=0.0) {
                         complaintListID.add(id);
                     }
                 }
@@ -809,6 +809,10 @@ public class EmployeeProfileController {
     // Handle Complaints Handlers
     @FXML
     void openComplaint(ActionEvent event) {
+        if (complaintComboBox.getValue() == null) {
+            System.out.println("Select a complaint");
+            return;
+        }
 
         long complaintID  = complaintComboBox.getValue(); //getting selected complaint ID
         Complaint selectedComplaint = null;
