@@ -214,6 +214,7 @@ public class OrderConfirmationController {
             greeting = App.getGreeting();
         else
             greeting = "Mazal Tov";
+
         Task<CreateOrderResponse> createOrderTask = App.createTimedTask(() -> ClientHandler.createOrder(
                 App.isOrderDelivery() ? null : App.getPickupStore(), (Customer) App.getCurrentUser(), App.getCardNumber(), App.getCart(),
                 greeting, new Timestamp(Calendar.getInstance().getTime().getTime()),
