@@ -419,8 +419,8 @@ public class EmployeeProfileController {
             List<Long> complaintListID = new ArrayList<Long>();
             ObservableList<Long> data = FXCollections.observableArrayList();
             //showing customer only his complaints
-            if (complaintList.size() >= 1) {
-                for (int i = 0; i < complaintList.size()-1; i++) {
+            if (complaintList != null) {
+                for (int i = 0; i < complaintList.size(); i++) {
                     Long id = (complaintList.get(i).getId());
                     if(id!=0.0) {
                         complaintListID.add(id);
@@ -1101,6 +1101,10 @@ public class EmployeeProfileController {
             welcomeText.setText("Welcome, " + App.getCurrentUser().getFullName());
         } else {
             welcomeText.setText("Welcome, unknown employee");
+        }
+
+        if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class || App.getCurrentUser().getClass() == SystemAdmin.class) {
+            catalogButton.setText("View Catalog");
         }
 
         addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {

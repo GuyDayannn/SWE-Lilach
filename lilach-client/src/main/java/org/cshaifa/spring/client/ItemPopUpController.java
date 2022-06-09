@@ -4,22 +4,27 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.cshaifa.spring.entities.CatalogItem;
+import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.CustomerServiceEmployee;
+import org.cshaifa.spring.entities.SystemAdmin;
+
+import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import org.cshaifa.spring.entities.CatalogItem;
-import org.cshaifa.spring.entities.Customer;
+import javafx.util.Duration;
 
 public class ItemPopUpController {
     @FXML AnchorPane popupPane;
@@ -32,6 +37,8 @@ public class ItemPopUpController {
     @FXML Button    btnPopUpUpdate;
     @FXML Button    btnPopUpCancel;
     @FXML ImageView itemImage;
+    @FXML
+    Label notificationLabel;
 
     public void initialize() {
         CatalogItem currentItemDisplayed = App.getCurrentItemDisplayed();
@@ -41,7 +48,7 @@ public class ItemPopUpController {
         itemDetailsBox.getChildren().add(itemDetails);
 
         //Change this to access permissions later
-        if (App.getCurrentUser()==null || Customer.class == App.getCurrentUser().getClass()) {
+        if (App.getCurrentUser()==null || Customer.class == App.getCurrentUser().getClass() || CustomerServiceEmployee.class == App.getCurrentUser().getClass() || App.getCurrentUser().getClass() == SystemAdmin.class) {
             buttonsHbox.getChildren().remove(btnPopUpUpdate);
         }
 
@@ -56,6 +63,14 @@ public class ItemPopUpController {
             addCartButton.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
+                    notificationLabel.setText("Added to cart!");
+                    FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1),
+                            notificationLabel);
+                    notificationLabel.setVisible(true);
+                    fadeTransition.setFromValue(0.0);
+                    fadeTransition.setToValue(1.0);
+                    fadeTransition.setOnFinished(e -> notificationLabel.setVisible(false));
+                    fadeTransition.play();
                     if (App.getCart().containsKey(currentItemDisplayed)) {
                         Integer quantity = App.getCart().get(currentItemDisplayed);
                         App.getCart().put(currentItemDisplayed, ++quantity);
@@ -76,8 +91,7 @@ public class ItemPopUpController {
             popupNewPriceText.setFill(Color.RED);
             popupNewPriceText.setFont(Font.font("Arial", FontWeight.BOLD, 36));
             popupNewPriceText.setVisible(true);
-        }
-        else {
+        } else {
             priceBox.getChildren().remove(popupNewPriceText);
             popupPriceText.setTextAlignment(TextAlignment.CENTER);
         }

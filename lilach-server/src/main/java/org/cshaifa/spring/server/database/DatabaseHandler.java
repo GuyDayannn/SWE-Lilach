@@ -463,7 +463,7 @@ public class DatabaseHandler {
                     int randomInt = random.nextInt(0, 2);
                     double randomPrice = random.nextInt(50, 500) + 0.99;
                     Map<Store, Integer> stock = stores.stream()
-                            .collect(Collectors.toMap(Function.identity(), __ -> random.nextInt(5000, 10000)));
+                            .collect(Collectors.toMap(Function.identity(), __ -> 10000));
                     randomItems.add(new CatalogItem("Random Item " + itemNum++, imagePath.toUri().toString(), randomPrice, stock,
                             false, 0.0, sizes[randomInt], itemTypes[typeInd], colors[randomInt], true));
                 }
