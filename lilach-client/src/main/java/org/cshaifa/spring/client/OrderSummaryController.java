@@ -65,8 +65,8 @@ public class OrderSummaryController {
         if (item.getImage() != null) {
             try {
                 iv = new ImageView(App.getImageFromByteArray(item.getImage()));
-                iv.setFitWidth(50);
-                iv.setFitHeight(50);
+                iv.setFitWidth(100);
+                iv.setFitHeight(100);
             } catch (IOException e1) {
                 // TODO: maybe log the exception somewhere
                 e1.printStackTrace();

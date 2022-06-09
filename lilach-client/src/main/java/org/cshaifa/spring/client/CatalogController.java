@@ -1,19 +1,15 @@
 package org.cshaifa.spring.client;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javafx.scene.control.*;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.Employee;
-import org.cshaifa.spring.entities.responses.CreateItemResponse;
 import org.cshaifa.spring.entities.responses.DeleteItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.NotifyCreateResponse;
@@ -21,7 +17,6 @@ import org.cshaifa.spring.entities.responses.NotifyDeleteResponse;
 import org.cshaifa.spring.entities.responses.NotifyResponse;
 import org.cshaifa.spring.entities.responses.NotifyUpdateResponse;
 import org.cshaifa.spring.utils.Constants;
-import org.cshaifa.spring.utils.ImageUtils;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -33,6 +28,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.Slider;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -45,8 +48,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -239,6 +240,14 @@ public class CatalogController {
         addCartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                updateNotification.setText("Added to cart!");
+                FadeTransition fadeTransition = new FadeTransition(Duration.seconds(1),
+                        updateNotification);
+                updateNotification.setVisible(true);
+                fadeTransition.setFromValue(0.0);
+                fadeTransition.setToValue(1.0);
+                fadeTransition.setOnFinished(e -> updateNotification.setVisible(false));
+                fadeTransition.play();
                 if (App.getCart().containsKey(item)) {
                     Integer quantity = App.getCart().get(item);
                     App.getCart().put(item, ++quantity);
