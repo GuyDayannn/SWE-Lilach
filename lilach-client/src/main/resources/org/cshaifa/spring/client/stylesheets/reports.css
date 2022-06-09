@@ -2,11 +2,6 @@
     -fx-background-color: linear-gradient(rgba(81, 147, 73, 0.55), rgba(144, 206, 127, 0.47));
 }
 
-
-.titleText {
-    -fx-font-style: Bold;
-}
-
 .image-view {
     -fx-border-color: black;
     -fx-border-width: 2;
