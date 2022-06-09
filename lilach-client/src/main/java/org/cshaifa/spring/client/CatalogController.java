@@ -9,7 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
+import org.cshaifa.spring.entities.CustomerServiceEmployee;
 import org.cshaifa.spring.entities.Employee;
+import org.cshaifa.spring.entities.SystemAdmin;
 import org.cshaifa.spring.entities.responses.DeleteItemResponse;
 import org.cshaifa.spring.entities.responses.GetCatalogResponse;
 import org.cshaifa.spring.entities.responses.NotifyCreateResponse;
@@ -304,6 +306,9 @@ public class CatalogController {
             buttonBox.getChildren().addAll(viewButton, addCartButton);
         } else {
             buttonBox.getChildren().addAll(viewButton, removeItemButton);
+            if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class || App.getCurrentUser().getClass() == SystemAdmin.class) {
+                buttonBox.getChildren().remove(removeItemButton);
+            }
         }
 
         vBox.getChildren().add(buttonBox);
@@ -515,6 +520,9 @@ public class CatalogController {
             toolbar.getItems().remove(shoppingCart);
             toolbar.getItems().remove(signInButton);
             toolbar.getItems().remove(registerButton);
+            if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class || App.getCurrentUser().getClass() == SystemAdmin.class) {
+                toolbar.getItems().remove(addItemButton);
+            }
         }
 
         Task<GetCatalogResponse> getCatalogTask = App.createTimedTask(() -> {
