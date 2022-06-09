@@ -453,7 +453,7 @@ public class CustomerProfileController {
                     if (! row.isEmpty() && event.getButton()== MouseButton.PRIMARY
                             && event.getClickCount() == 2) {
                         // TODO: Maybe add order details pop-up
-                        App.setSelectedOrder(customerOrderList.get(0));
+                        App.setSelectedOrder(customerOrderList.get(row.getIndex()));
                         App.popUpLaunch(null, "orderDetailsPopUp");
                     }
                 });

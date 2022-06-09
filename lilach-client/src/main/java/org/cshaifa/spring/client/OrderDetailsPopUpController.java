@@ -101,7 +101,8 @@ public class OrderDetailsPopUpController {
     void displayOrderDetails() {
         firstNamePaymentLabel.setText(selectedOrder.getCustomer().getFullName());
         orderDateLabel.setText(selectedOrder.getOrderDate().toString());
-        supplyDateLabel.setText(selectedOrder.getSupplyDate().toString());
+        if (selectedOrder.getSupplyDate() != null)
+            supplyDateLabel.setText(selectedOrder.getSupplyDate().toString());
         if (App.getSelectedOrder().isDelivery()) {
             paneVBox.getChildren().remove(selfpickupVbox);
             firstNameDeliveryLabel.setText(selectedOrder.getDeliveryDetails().getRecipientName());
