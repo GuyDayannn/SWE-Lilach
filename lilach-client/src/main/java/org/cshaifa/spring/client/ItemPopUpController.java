@@ -21,6 +21,7 @@ import javafx.scene.text.TextAlignment;
 import org.cshaifa.spring.entities.CatalogItem;
 import org.cshaifa.spring.entities.Customer;
 import org.cshaifa.spring.entities.CustomerServiceEmployee;
+import org.cshaifa.spring.entities.SystemAdmin;
 
 public class ItemPopUpController {
     @FXML AnchorPane popupPane;
@@ -42,7 +43,7 @@ public class ItemPopUpController {
         itemDetailsBox.getChildren().add(itemDetails);
 
         //Change this to access permissions later
-        if (App.getCurrentUser()==null || Customer.class == App.getCurrentUser().getClass() || CustomerServiceEmployee.class == App.getCurrentUser().getClass()) {
+        if (App.getCurrentUser()==null || Customer.class == App.getCurrentUser().getClass() || CustomerServiceEmployee.class == App.getCurrentUser().getClass() || App.getCurrentUser().getClass() == SystemAdmin.class) {
             buttonsHbox.getChildren().remove(btnPopUpUpdate);
         }
 

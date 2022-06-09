@@ -1103,6 +1103,10 @@ public class EmployeeProfileController {
             welcomeText.setText("Welcome, unknown employee");
         }
 
+        if (App.getCurrentUser().getClass() == CustomerServiceEmployee.class || App.getCurrentUser().getClass() == SystemAdmin.class) {
+            catalogButton.setText("View Catalog");
+        }
+
         addReportViewButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
