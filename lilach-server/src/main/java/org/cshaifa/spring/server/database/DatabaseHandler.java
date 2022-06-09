@@ -310,12 +310,12 @@ public class DatabaseHandler {
         if (!delivery) {
             // Check stock
             //supplyDate = orderDate;
-            if (!items.entrySet().stream().allMatch(entry -> {
-                return entry.getKey().getStock().containsKey(store)
-                        && entry.getValue() <= entry.getKey().getStock().get(store);
-            })) {
-                return null;
-            }
+            // if (!items.entrySet().stream().allMatch(entry -> {
+            //     return entry.getKey().getStock().containsKey(store)
+            //             && entry.getValue() <= entry.getKey().getStock().get(store);
+            // })) {
+            //     return null;
+            // }
         }
 
         Session session = DatabaseConnector.getSessionFactory().openSession();
@@ -335,10 +335,10 @@ public class DatabaseHandler {
 
         if (!delivery) {
             // Update stock
-            items.forEach((item, amount) -> {
-                item.reduceQuantity(store, amount);
-                updateDB(session, item);
-            });
+            // items.forEach((item, amount) -> {
+            //     item.reduceQuantity(store, amount);
+            //     updateDB(session, item);
+            // });
         }
 
         tryFlushSession(session);

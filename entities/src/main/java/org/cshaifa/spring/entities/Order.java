@@ -21,6 +21,7 @@ public class Order implements Serializable {
     @CollectionTable(name = "orders_items", joinColumns = @JoinColumn(name = "order_id"))
     @MapKeyJoinColumn(name = "item_id")
     @Column(name = "quantity")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private Map<CatalogItem, Integer> items;
 
     @ManyToOne
