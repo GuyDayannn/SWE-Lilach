@@ -419,8 +419,8 @@ public class EmployeeProfileController {
             List<Long> complaintListID = new ArrayList<Long>();
             ObservableList<Long> data = FXCollections.observableArrayList();
             //showing customer only his complaints
-            if (complaintList.size() >= 1) {
-                for (int i = 0; i < complaintList.size()-1; i++) {
+            if (complaintList != null) {
+                for (int i = 0; i < complaintList.size(); i++) {
                     Long id = (complaintList.get(i).getId());
                     if(id!=0.0) {
                         complaintListID.add(id);
