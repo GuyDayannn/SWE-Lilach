@@ -4,7 +4,7 @@ This is our final project for Software Engineering in the University of Haifa.
 The system is splitted into two parts:
 
 * **lilach-client:** Built with JavaFX
-* **lilach-server** Built with MySQL.
+* **lilach-server** Built with MySQL
 
 ## Requirements
 1. [JDK 17](https://openjdk.java.net/projects/jdk/17/)
